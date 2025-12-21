@@ -1,13 +1,18 @@
-#include "engine.hpp"
-#include "io/window.hpp"
-#include "io/window_event.hpp"
-#include "structs/rect2i.hpp"
+#include "ve/engine.hpp"
+#include "ve/engine_events.hpp"
+#include "ve/io/window.hpp"
+#include "ve/io/window_event.hpp"
+#include "ve/structs/rect2i.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 #include <algorithm>
 #include <array>
+#include <csignal>
+#include <cstdint>
 #include <glm/ext/vector_int2.hpp>
 #include <iostream>
 #include <memory>
@@ -18,6 +23,18 @@
 namespace VoidEngine {
 	std::shared_ptr<Engine> Engine::instance;
 
+	void sigHandler(int signal) {
+		std::cout << "GOT SIGNAL " << signal << std::endl;
+		switch (signal) {
+		case SIGINT:
+		case SIGTERM: {
+			Events::QuitEvent event;
+			std::shared_ptr<Engine> engine = Engine::getInstance();
+			engine->onQuit.postEvent(event);
+			}; break;
+		}
+	}
+
 	Engine::Engine() {
 #ifdef __linux__
 		setenv("SDL_VIDEODRIVER", "x11", 1);
@@ -26,6 +43,9 @@ namespace VoidEngine {
 		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 
 		SDL_Init(SDL_INIT_VIDEO);
+
+		signal(SIGINT, sigHandler);
+		signal(SIGTERM, sigHandler);
 
 		IO::Window::CreationOptions mainWindowOptions = {	};
 		mainWindow = IO::Window::create(mainWindowOptions);
@@ -36,8 +56,12 @@ namespace VoidEngine {
 	}
 
 	std::shared_ptr<Engine> Engine::getInstance() {
-		instance = std::shared_ptr<Engine>(new Engine());
+		if(!instance) instance = std::shared_ptr<Engine>(new Engine());
 		return instance;
+	}
+	
+	double Engine::getDelta() const {
+		return delta;
 	}
 
 	std::shared_ptr<IO::Window> Engine::getMainWindow() {
@@ -45,9 +69,20 @@ namespace VoidEngine {
 	}
 
 	void Engine::pollEvents() {
+		uint64_t time = SDL_GetTicks();
+		delta = (double) (time - lastTime) * 1000.0 / (double) SDL_GetPerformanceFrequency();
+		lastTime = time;
+
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
+				case SDL_EVENT_DISPLAY_ORIENTATION:
+				case SDL_EVENT_DISPLAY_REMOVED:
+				case SDL_EVENT_DISPLAY_MOVED:
+				case SDL_EVENT_DISPLAY_ADDED: {
+					Events::ScreenLayoutChangedEvent event;
+					onScreenLayoutChanged.postEvent(event);
+					}; break;
 				case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
 					IO::Window* window = IO::Window::windowMap[event.window.windowID];
 					IO::Events::WindowCloseRequested closeRequest;
@@ -58,6 +93,16 @@ namespace VoidEngine {
 					IO::Events::MouseMoved motion(window, { event.motion.x, event.motion.y }, { event.motion.xrel, event.motion.yrel });
 					window->onMouseMotion.postEvent(motion);
 					} break;
+				case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+					IO::Window* window = IO::Window::windowMap[event.button.windowID];
+					IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, true);
+					window->onMouseButtonPressed.postEvent(pressed);
+					}; break;
+				case SDL_EVENT_MOUSE_BUTTON_UP: {
+					IO::Window* window = IO::Window::windowMap[event.button.windowID];
+					IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, false);
+					window->onMouseButtonReleased.postEvent(pressed);
+					}; break;
 			}
 		}
 	}
@@ -138,7 +183,7 @@ namespace VoidEngine {
 		for(int idx = chunks.size() - 1; idx >= 0; idx--) {
 			bool hitsMonitor = false;
 			for(const auto& monArea : monitorAreas) {
-				if(monArea.collidesWith(chunks[idx])) {
+				if(monArea.containsPoint(chunks[idx].getCenter())) {
 					hitsMonitor = true;
 					break;
 				}

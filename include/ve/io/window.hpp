@@ -1,9 +1,9 @@
 #pragma once
 
-#include "io/gfx/render_target.hpp"
-#include "event/event_bus.hpp"
-#include "event/event_listener.hpp"
-#include "io/window_event.hpp"
+#include "ve/io/gfx/render_target.hpp"
+#include "ve/event/event_bus.hpp"
+#include "ve/event/event_listener.hpp"
+#include "ve/io/window_event.hpp"
 #include <glm/ext/vector_float4.hpp>
 #include <map>
 #include <SDL3/SDL_video.h>
@@ -22,11 +22,12 @@ namespace VoidEngine::IO {
 	public:
 		struct CreationOptions {
 			bool utility = false;
-			bool popup = false;
 			glm::ivec2 startingSize = { 800, 600 };
 			bool resizable = true;
 			bool borderless = false;
 			bool alwaysOnTop = false;
+			bool forceOrphan = false;
+			glm::vec4 startingClearColor = { 0.1, 0.1, 0.1, 1.0 };
 		};
 
 	private:
@@ -51,6 +52,8 @@ namespace VoidEngine::IO {
 
 		Event::EventBus<Events::WindowCloseRequested> onCloseRequested;
 		Event::EventBus<Events::MouseMoved> onMouseMotion;
+		Event::EventBus<Events::MouseButtonPressed> onMouseButtonPressed;
+		Event::EventBus<Events::MouseButtonPressed> onMouseButtonReleased;
 
 		void setWindowVisible(bool value);
 

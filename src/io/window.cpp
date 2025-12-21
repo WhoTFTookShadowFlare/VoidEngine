@@ -1,6 +1,6 @@
-#include "io/window.hpp"
-#include "engine.hpp"
-#include "io/window_event.hpp"
+#include "ve/io/window.hpp"
+#include "ve/engine.hpp"
+#include "ve/io/window_event.hpp"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_video.h>
 #include <glbinding/gl/functions.h>
@@ -12,9 +12,9 @@
 #include <memory>
 
 namespace VoidEngine::IO {
-	std::map<SDL_WindowID, Window*> Window::windowMap;
+	std::map<SDL_WindowID, Window*> Window::windowMap = std::map<SDL_WindowID, Window*>();
 
-	Window::Window(Window::CreationOptions& options) {
+	Window::Window(Window::CreationOptions& options) : clearColor(options.startingClearColor) {
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -30,7 +30,7 @@ namespace VoidEngine::IO {
 			return;
 		}
 
-		if(Engine::instance && Engine::instance->mainWindow) {
+		if(Engine::instance && Engine::instance->mainWindow && !options.forceOrphan) {
 			SDL_SetWindowParent(window, Engine::instance->mainWindow->window);
 		}
 
@@ -63,7 +63,7 @@ namespace VoidEngine::IO {
 
 	void Window::bindRenderTarget() {
 		SDL_GL_MakeCurrent(window, glContext);
-		gl::glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+		gl::glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 	}
 
 	void Window::setClearColor(glm::vec4 color) {

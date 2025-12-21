@@ -18,14 +18,28 @@ namespace VoidEngine::Structs {
 			stream << "( { x: " << position.x << " y: " << position.y << " }" <<
 				", { w: " << size.x << " h: " << size.y << " })";
 			return stream.str();
-
 		}
 
-		bool collidesWith(Rect2i& other) const {
-			return position.x < other.position.x + other.size.x &&
-				position.x + size.x > other.position.x &&
-				position.y < other.position.y + other.size.y &&
-				position.y + size.y > other.position.y;
+		bool operator==(const Rect2i& RHS) const {
+			return position == RHS.position && size == RHS.size;
+		}
+
+		bool collidesWith(const Rect2i& other) const {
+			return position.x <= other.position.x + other.size.x &&
+				position.x + size.x >= other.position.x &&
+				position.y <= other.position.y + other.size.y &&
+				position.y + size.y >= other.position.y;
+		}
+
+		bool containsPoint(const glm::ivec2& point) const {
+			return point.x >= position.x &&
+				point.x <= position.x + size.x &&
+				point.y >= position.y &&
+				point.y <= position.y + size.y;
+		}
+
+		glm::ivec2 getCenter() const {
+			return position + size / 2;
 		}
 
 		std::array<glm::ivec2, 4> getRectVertices() const {
@@ -37,7 +51,7 @@ namespace VoidEngine::Structs {
 			};
 		}
 
-		std::array<Rect2i, 2>	splitHorizontally(int point) const {
+		std::array<Rect2i, 2> splitHorizontally(int point) const {
 			if(point <= position.y || point >= position.y + size.y) {
 				return { { position, size } };
 			}
@@ -64,7 +78,7 @@ namespace VoidEngine::Structs {
 				{ point, size.y}
 			};
 			Rect2i right = {
-				{ position.x + point, position.y },
+				{ point, position.y },
 				{ size.x - (point - position.y), size.y }
 			};
 

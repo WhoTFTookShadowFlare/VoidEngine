@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_int2.hpp>
 
@@ -24,5 +25,18 @@ namespace VoidEngine::IO::Events {
 		glm::vec2 getMouseRelative() const {
 			return relative;
 		}
+	};
+
+	class MouseButtonPressed {
+		Window* window = nullptr;
+		uint8_t clicks = 0, button = 0;
+		bool pressed = false;
+	public:
+		MouseButtonPressed(Window* window, uint8_t clicks, uint8_t button, bool pressed) :
+			window(window), clicks(clicks), button(button) {	}
+
+		uint8_t getClicks() const { return clicks; }
+		uint8_t getButton() const { return button; }
+		bool wasPressed() const { return pressed; }
 	};
 }
