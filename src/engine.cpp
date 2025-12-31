@@ -2,34 +2,30 @@
 #include "ve/engine_events.hpp"
 #include "ve/io/window.hpp"
 #include "ve/io/window_event.hpp"
-#include "ve/structs/rect2i.hpp"
+#include "ve/math/rect2.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
-#include <algorithm>
-#include <array>
 #include <csignal>
 #include <cstdint>
 #include <glm/ext/vector_int2.hpp>
-#include <iostream>
 #include <memory>
 
 #include <SDL3/SDL.h>
 #include <vector>
 
 namespace VoidEngine {
-	std::shared_ptr<Engine> Engine::instance;
+	Engine* Engine::instance;
 
 	void sigHandler(int signal) {
-		std::cout << "GOT SIGNAL " << signal << std::endl;
 		switch (signal) {
 		case SIGINT:
 		case SIGTERM: {
 			Events::QuitEvent event;
-			std::shared_ptr<Engine> engine = Engine::getInstance();
+			Engine* engine = Engine::getInstance();
 			engine->onQuit.postEvent(event);
 			}; break;
 		}
@@ -48,15 +44,15 @@ namespace VoidEngine {
 		signal(SIGTERM, sigHandler);
 
 		IO::Window::CreationOptions mainWindowOptions = {	};
-		mainWindow = IO::Window::create(mainWindowOptions);
+		mainWindow = std::make_shared<IO::Window>(mainWindowOptions);
 	}
 
 	Engine::~Engine() {
 		SDL_Quit();
 	}
 
-	std::shared_ptr<Engine> Engine::getInstance() {
-		if(!instance) instance = std::shared_ptr<Engine>(new Engine());
+	Engine* Engine::getInstance() {
+		if(!instance) instance = new Engine();
 		return instance;
 	}
 	
@@ -85,21 +81,25 @@ namespace VoidEngine {
 					}; break;
 				case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
 					IO::Window* window = IO::Window::windowMap[event.window.windowID];
+					if(!window) continue;
 					IO::Events::WindowCloseRequested closeRequest;
 					window->onCloseRequested.postEvent(closeRequest);
 					} break;
 				case SDL_EVENT_MOUSE_MOTION: {
 					IO::Window* window = IO::Window::windowMap[event.motion.windowID];
+					if(!window) continue;
 					IO::Events::MouseMoved motion(window, { event.motion.x, event.motion.y }, { event.motion.xrel, event.motion.yrel });
 					window->onMouseMotion.postEvent(motion);
 					} break;
 				case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					IO::Window* window = IO::Window::windowMap[event.button.windowID];
+					if(!window) continue;
 					IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, true);
 					window->onMouseButtonPressed.postEvent(pressed);
 					}; break;
 				case SDL_EVENT_MOUSE_BUTTON_UP: {
 					IO::Window* window = IO::Window::windowMap[event.button.windowID];
+					if(!window) continue;
 					IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, false);
 					window->onMouseButtonReleased.postEvent(pressed);
 					}; break;
@@ -107,8 +107,8 @@ namespace VoidEngine {
 		}
 	}
 
-	std::vector<Structs::Rect2i> Engine::getMonitorAreas() {
-		std::vector<Structs::Rect2i> areas;
+	std::vector<Math::Rect2i> Engine::getMonitorAreas() {
+		std::vector<Math::Rect2i> areas;
 
 		int count = 0;
 		SDL_DisplayID* displays = SDL_GetDisplays(&count);
@@ -132,12 +132,12 @@ namespace VoidEngine {
 		return area;
 	}
 
-	std::vector<Structs::Rect2i> Engine::getWorkspaceChunked() {
+	std::vector<Math::Rect2i> Engine::getWorkspaceChunked() {
 		glm::ivec2 workspaceArea = getWorkspaceArea();
-		std::vector<Structs::Rect2i> areaRects = getMonitorAreas();
+		std::vector<Math::Rect2i> areaRects = getMonitorAreas();
 
 		std::vector<int> interiorVerticesX, interiorVerticesY;
-		for(const Structs::Rect2i& area : areaRects) {
+		for(const Math::Rect2i& area : areaRects) {
 			std::array<glm::ivec2, 4> vertices = area.getRectVertices();
 			for(const glm::ivec2 vertex : vertices) {
 				if((vertex.x == 0 || vertex.x == workspaceArea.x) || (vertex.y == 0 || vertex.y == workspaceArea.y)) continue;
@@ -146,10 +146,10 @@ namespace VoidEngine {
 			}
 		}
 
-		std::vector<Structs::Rect2i> workspaceRects = {{ { 0, 0 }, workspaceArea }};
+		std::vector<Math::Rect2i> workspaceRects = {{ { 0, 0 }, workspaceArea }};
 
 		for(const auto& yPoint : interiorVerticesY) {
-			std::vector<Structs::Rect2i> splits;
+			std::vector<Math::Rect2i> splits;
 			for(const auto& rect : workspaceRects) {
 				auto rectSplits = rect.splitHorizontally(yPoint);
 				for(const auto& rectSplit : rectSplits) {
@@ -161,7 +161,7 @@ namespace VoidEngine {
 		}
 
 		for(const auto& xPoint : interiorVerticesX) {
-			std::vector<Structs::Rect2i> splits;
+			std::vector<Math::Rect2i> splits;
 			for(const auto& rect : workspaceRects) {
 				auto rectSplits = rect.splitVertically(xPoint);
 				for(const auto& rectSplit : rectSplits) {
@@ -175,8 +175,8 @@ namespace VoidEngine {
 		return workspaceRects;
 	}
 
-	std::vector<Structs::Rect2i> Engine::getWorkspaceDeadzones() {
-		std::vector<Structs::Rect2i> 
+	std::vector<Math::Rect2i> Engine::getWorkspaceDeadzones() {
+		std::vector<Math::Rect2i> 
 			chunks = getWorkspaceChunked(),
 			monitorAreas = getMonitorAreas();
 
@@ -192,6 +192,38 @@ namespace VoidEngine {
 		}
 
 		return chunks;
+	}
+
+	std::vector<Math::Rect2i> Engine::getWorkspaceCaves() {
+		std::vector<Math::Rect2i> deadzones = getWorkspaceDeadzones(),
+			chunks = getWorkspaceChunked(),
+			caves = std::vector<Math::Rect2i>(deadzones.size());
+
+		for(const auto& chunk : chunks) {
+			for(const auto& zone : deadzones) {
+				if(chunk.containsPoint({ zone.getHorizontalCenter(), zone.position.y + zone.size.y + 1 })) {
+					caves.push_back(chunk);
+				}
+			}
+		}
+
+		return caves;
+	}
+
+	std::vector<Math::Rect2i> Engine::getWorkspacePlateaus() {
+		std::vector<Math::Rect2i> deadzones = getWorkspaceDeadzones(),
+			chunks = getWorkspaceChunked(),
+			plateaus = std::vector<Math::Rect2i>(deadzones.size());
+
+		for(const auto& chunk : chunks) {
+			for(const auto& zone : deadzones) {
+				if(chunk.containsPoint({ zone.getHorizontalCenter(), zone.position.y - 1 })) {
+					plateaus.push_back(chunk);
+				}
+			}
+		}
+
+		return plateaus;
 	}
 }
 

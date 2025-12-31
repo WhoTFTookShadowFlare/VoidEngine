@@ -4,7 +4,6 @@
 #include "ve/event/event_bus.hpp"
 #include "ve/event/event_listener.hpp"
 #include "ve/io/window_event.hpp"
-#include <glm/ext/vector_float4.hpp>
 #include <map>
 #include <SDL3/SDL_video.h>
 #include <memory>
@@ -40,14 +39,13 @@ namespace VoidEngine::IO {
 
 		bool closeRequested = false;
 
-		Window(CreationOptions& options);
 	public:
 		void bindRenderTarget();
 		void setClearColor(glm::vec4 color);
 
 		void onEvent(Events::WindowCloseRequested& event);
 
-		static std::shared_ptr<Window> create(CreationOptions& options);
+		Window(const CreationOptions& options);
 		~Window();
 
 		Event::EventBus<Events::WindowCloseRequested> onCloseRequested;

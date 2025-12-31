@@ -9,12 +9,11 @@
 #include <glm/ext/vector_float4.hpp>
 #include <glm/ext/vector_int2.hpp>
 #include <iostream>
-#include <memory>
 
 namespace VoidEngine::IO {
 	std::map<SDL_WindowID, Window*> Window::windowMap = std::map<SDL_WindowID, Window*>();
 
-	Window::Window(Window::CreationOptions& options) : clearColor(options.startingClearColor) {
+	Window::Window(const Window::CreationOptions& options) : clearColor(options.startingClearColor) {
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -52,15 +51,7 @@ namespace VoidEngine::IO {
 		SDL_GL_DestroyContext(glContext);
 		SDL_DestroyWindow(window);
 	}
-
-	std::shared_ptr<Window> Window::create(Window::CreationOptions& options) {
-		auto instance = std::shared_ptr<Window>(new Window(options));
 	
-		instance->onCloseRequested.addListener(instance);
-
-		return instance;
-	}
-
 	void Window::bindRenderTarget() {
 		SDL_GL_MakeCurrent(window, glContext);
 		gl::glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);

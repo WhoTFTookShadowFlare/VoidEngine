@@ -3,7 +3,8 @@
 #include "ve/engine_events.hpp"
 #include "ve/event/event_bus.hpp"
 #include "ve/io/window.hpp"
-#include "ve/structs/rect2i.hpp"
+#include "ve/math/rect2.hpp"
+#include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_int2.hpp>
 #include <memory>
 #include <vector>
@@ -18,7 +19,7 @@ namespace VoidEngine {
 		Engine();
 	
 		std::shared_ptr<IO::Window> mainWindow = std::shared_ptr<IO::Window>(nullptr);
-		static std::shared_ptr<Engine> instance;
+		static Engine* instance;
 
 		uint64_t lastTime;
 		double delta;
@@ -30,16 +31,18 @@ namespace VoidEngine {
 		Event::EventBus<Events::QuitEvent> onQuit;
 		Event::EventBus<Events::ScreenLayoutChangedEvent> onScreenLayoutChanged;
 
-		static std::shared_ptr<Engine> getInstance();
+		[[nodiscard]] static Engine* getInstance();
 
-		double getDelta() const;
+		[[nodiscard]] double getDelta() const;
 
-		std::shared_ptr<IO::Window> getMainWindow();
+		[[nodiscard]] std::shared_ptr<IO::Window> getMainWindow();
 		void pollEvents();
 
-		std::vector<Structs::Rect2i> getMonitorAreas();
-		glm::ivec2 getWorkspaceArea();
-		std::vector<Structs::Rect2i> getWorkspaceChunked();
-		std::vector<Structs::Rect2i> getWorkspaceDeadzones();
+		[[nodiscard]] std::vector<Math::Rect2i> getMonitorAreas();
+		[[nodiscard]] glm::ivec2 getWorkspaceArea();
+		[[nodiscard]] std::vector<Math::Rect2i> getWorkspaceChunked();
+		[[nodiscard]] std::vector<Math::Rect2i> getWorkspaceDeadzones();
+		[[nodiscard]] std::vector<Math::Rect2i> getWorkspaceCaves();
+		[[nodiscard]] std::vector<Math::Rect2i> getWorkspacePlateaus();
 	};
 }

@@ -5,9 +5,7 @@ project "VoidEngine"
 	targetdir(tostring(_MAIN_SCRIPT_DIR) .. "/bin/%{cfg.buildcfg}")
 
 	files { "src/**.hpp", "src/**.cpp" }
-	cppdialect "C++20"
-
-	defines { "GLM_FORCE_XYZW_ONLY" }
+	cppdialect "C++23"
 
 	usage "INTERFACE"
 		links { "SDL3",  "glbinding" }
