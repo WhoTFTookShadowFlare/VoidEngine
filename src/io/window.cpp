@@ -24,7 +24,7 @@ namespace VoidEngine::IO {
 		if(options.utility)			flags |= SDL_WINDOW_UTILITY;
 		if(options.resizable)		flags |= SDL_WINDOW_RESIZABLE;
 		window = SDL_CreateWindow("HEWO 4:38", options.startingSize.x, options.startingSize.y, flags);
-		if(window == nullptr) {
+		if(window == nullptr) [[unlikely]] {
 			std::cout << SDL_GetError() << std::endl;
 			return;
 		}
@@ -34,7 +34,7 @@ namespace VoidEngine::IO {
 		}
 
 		glContext = SDL_GL_CreateContext(window);
-		if(glContext == nullptr) {
+		if(glContext == nullptr) [[unlikely]] {
 			std::cout << SDL_GetError() << std::endl;
 			return;
 		}

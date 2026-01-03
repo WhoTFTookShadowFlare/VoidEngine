@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <glm/detail/qualifier.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_int2.hpp>
@@ -93,6 +94,30 @@ namespace VoidEngine::Math {
 			};
 
 			return { left, right };
+		}
+
+		template<typename R>
+		[[nodiscard]] Rect2<R> round() const {
+			return {
+				{ std::round(position.x), std::round(position.y) },
+				{ std::round(size.x), std::round(size.y) }
+			};
+		}
+
+		template<typename R>
+		[[nodiscard]] Rect2<R> floor() const {
+			return {
+				{ std::floor(position.x), std::floor(position.y) },
+				{ std::floor(size.x), std::floor(size.y) }
+			};
+		}
+
+		template<typename R>
+		[[nodiscard]] Rect2<R> ceil() const {
+			return {
+				{ std::ceil(position.x), std::ceil(position.y) },
+				{ std::ceil(size.x), std::ceil(size.y) }
+			};
 		}
 	};
 

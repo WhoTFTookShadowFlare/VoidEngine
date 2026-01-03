@@ -44,7 +44,7 @@ namespace VoidEngine::IO::GFX {
 		glShaderSource(frgShader, 1, &frgPtr, nullptr);
 		glCompileShader(frgShader);
 		glGetShaderiv(frgShader, GL_COMPILE_STATUS, &success);
-		if(!success) {file:///home/shadowflare/Pictures/Reddit/RDT_20250105_2136265067489471474656270.gif
+		if(!success) {
 			GLint logLen;
 			glGetShaderiv(frgShader, GL_INFO_LOG_LENGTH, &logLen);
 			char* log = new char[logLen];

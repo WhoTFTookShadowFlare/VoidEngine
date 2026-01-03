@@ -1,7 +1,11 @@
 #include "ve/py_api/py_module.hpp"
 #include <glm/ext/vector_float2.hpp>
-#include "ve/py_api/math/py_vec2.hpp"
+#include "ve/py_api/io/py_io.hpp"
+#include "ve/py_api/math/py_math.hpp"
+#include "ve/py_api/py_engine.hpp"
 #include <python3.13/Python.h>
+#include <python3.13/dictobject.h>
+#include <python3.13/listobject.h>
 #include <python3.13/structmember.h>
 #include <python3.13/exports.h>
 #include <python3.13/import.h>
@@ -12,35 +16,6 @@
 #include <python3.13/pytypedefs.h>
 
 namespace VoidEngine::PyAPI {
-	namespace Math {
-		static PyMethodDef Math_methods[] = {
-			{ nullptr }
-		};
-
-		static struct PyModuleDef Math_module = {
-			.m_base = PyModuleDef_HEAD_INIT,
-			.m_name = "VoidEngine.Math",
-			.m_doc = "Im sure you can figure this out",
-			.m_size = 0,
-			.m_methods = Math_methods
-		};
-		
-		PyMODINIT_FUNC PyInit_VoidEngine_Math(void) {
-			PyObject* module = PyModule_Create(&Math_module);
-
-			if(PyType_Ready(&Vec2TypeObject) < 0)
-				return nullptr;
-
-			if(PyModule_AddType(module, &Vec2TypeObject) < 0) {
-				Py_DECREF(&Vec2TypeObject);
-				Py_DECREF(module);
-				return nullptr;
-			}
-
-			return module;
-		}
-	}
-
 	static PyMethodDef VoidEngine_methods[] = {
 		{ nullptr }
 	};
@@ -55,8 +30,21 @@ namespace VoidEngine::PyAPI {
 
 	PyMODINIT_FUNC PyInit_VoidEngine(void) {
 		PyObject* module = PyModule_Create(&VoidEngine_module);
+		PyModule_AddObjectRef(module, "__path__", PyList_New(0));
+		PyModule_AddStringConstant(module, "__package__", "VoidEngine");
 
-		PyModule_AddObject(module, "Math", Math::PyInit_VoidEngine_Math());
+		// TODO: Move this into a dedicated function
+		PyObject* engine_module = PyInit_VoidEngine_Engine();
+		PyModule_Add(module, "Engine", engine_module);
+		PyDict_SetItemString(PyImport_GetModuleDict(), "VoidEngine.Engine", engine_module);
+		
+		PyObject* math_module = Math::PyInit_VoidEngine_Math();
+		PyModule_Add(module, "Math", math_module);
+		PyDict_SetItemString(PyImport_GetModuleDict(), "VoidEngine.Math", math_module);
+
+		PyObject* io_module = IO::PyInit_VoidEngine_IO();
+		PyModule_Add(module, "IO", io_module);
+		PyDict_SetItemString(PyImport_GetModuleDict(), "VoidEngine.IO", io_module);
 
 		return module;
 	}
@@ -65,3 +53,4 @@ namespace VoidEngine::PyAPI {
 		PyImport_AppendInittab("VoidEngine", &VoidEngine::PyAPI::PyInit_VoidEngine);
 	}
 }
+

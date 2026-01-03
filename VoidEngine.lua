@@ -1,3 +1,14 @@
+newoption {
+	trigger = "pyversion",
+	value = "version",
+	description = "The python version to build against",
+	allowed = {
+		{ "3.13" },
+		{ "3.14" }
+	},
+	default = "3.13"
+}
+
 project "VoidEngine"
 	kind "StaticLib"
 	language "C++"
@@ -10,9 +21,32 @@ project "VoidEngine"
 	usage "INTERFACE"
 		links { "SDL3",  "glbinding" }
 
+		filter "platforms:win*"
+			if _OPTIONS["pyversion"] == "3.13" then
+				links { "python313" }
+			elseif _OPTIONS["pyversion"] == "3.14" then
+				links { "python314" }
+			end
+
+		filter "platforms:linux*"
+			links { "python3.13" }
+
+		filter "platforms:macosx"
+			if _OPTIONS["pyversion"] == "3.13" then
+				links { "python3.13" }
+			elseif _OPTIONS["pyversion"] == "3.14" then
+				links { "python3.14" }
+			end
+
 	usage "PUBLIC"
 		includedirs { "include" }
 		links { "glm" }
+		
+		if _OPTIONS["pyversion"] == "3.13" then
+			defines { "python3_13" }
+		elseif _OPTIONS["pyversion"] == "3.14" then
+			defines { "python3_14" }
+		end
 
 	filter "configurations:debug"
 		defines { "DEBUG" }

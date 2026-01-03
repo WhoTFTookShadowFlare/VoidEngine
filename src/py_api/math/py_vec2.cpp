@@ -1,4 +1,5 @@
 #include "ve/py_api/math/py_vec2.hpp"
+#include <format>
 #include <glm/ext/vector_float2.hpp>
 #include <python3.13/Python.h>
 #include <python3.13/structmember.h>
@@ -9,6 +10,8 @@
 #include <python3.13/pyport.h>
 #include <python3.13/pytypedefs.h>
 #include <python3.13/tupleobject.h>
+#include <python3.13/unicodeobject.h>
+#include <string>
 
 namespace VoidEngine::PyAPI::Math {
 	static PyMethodDef vec2Methods[] = {
@@ -26,6 +29,7 @@ namespace VoidEngine::PyAPI::Math {
 		.tp_name = "VoidEngine.Math.Vec2",
 		.tp_basicsize = sizeof(PyVec2),
 		.tp_itemsize = 0,
+		.tp_str = PyVec2_repr,
 		.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
 		.tp_doc = "A 2 dimensional vector",
 		.tp_methods = vec2Methods,
@@ -50,7 +54,7 @@ namespace VoidEngine::PyAPI::Math {
 	PyObject* PyVec2_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
 		PyVec2* self = (PyVec2*) subtype->tp_alloc(subtype, 0);
 
-		if(self != nullptr) {
+		if(self != nullptr) [[unlikely]] {
 			self->value = { 0, 0 };
 		}
 
@@ -65,10 +69,16 @@ namespace VoidEngine::PyAPI::Math {
 			PyArg_ParseTuple(args, "ff", &vec2->value.x, &vec2->value.y);
 		else if(argc == 0)
 			vec2->value = { 0, 0 };
-		else
+		else [[unlikely]]
 			PyErr_BadArgument();
 
 		return 0;
+	}
+
+	PyObject* PyVec2_repr(PyObject* self) {
+		PyVec2* vec2 = (PyVec2*) self;
+		std::string str = std::format("{{ {}, {} }}", vec2->value.x, vec2->value.y);
+		return PyUnicode_FromString(str.c_str());
 	}
 }
 
