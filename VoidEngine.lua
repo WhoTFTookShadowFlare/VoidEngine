@@ -40,7 +40,6 @@ project "VoidEngine"
 
 	usage "PUBLIC"
 		includedirs { "include" }
-		links { "glm" }
 		
 		if _OPTIONS["pyversion"] == "3.13" then
 			defines { "python3_13" }
