@@ -1,84 +1,120 @@
 #include "ve/py_api/math/py_vec3.hpp"
-#include <cstddef>
+
 #include <format>
+#include <string>
+#include "pocketpy.h"
 #include <glm/ext/vector_float3.hpp>
-#include <python3.13/Python.h>
-#include <python3.13/structmember.h>
-#include <python3.13/modsupport.h>
-#include <python3.13/object.h>
-#include <python3.13/pyerrors.h>
-#include <python3.13/pyport.h>
-#include <python3.13/pytypedefs.h>
-#include <python3.13/tupleobject.h>
-#include <python3.13/unicodeobject.h>
 
 namespace VoidEngine::PyAPI::Math {
-	static PyMethodDef vec3Methods[] = {
+	bool PyVec3__new__(int argc, py_Ref argv);
+	bool PyVec3__init__(int argc, py_Ref argv);
+	bool PyVec3__repr__(int argc, py_Ref argv);
 
-		{ nullptr, nullptr, 0, nullptr }
-	};
+	bool PyVec3_get_x(int argc, py_Ref argv);
+	bool PyVec3_get_y(int argc, py_Ref argv);
+	bool PyVec3_get_z(int argc, py_Ref argv);
 
-	static PyMemberDef vec3Members[] = {
-		{ "x", T_FLOAT, offsetof(PyVec3, value.x), 0, "The x component" },
-		{ "y", T_FLOAT, offsetof(PyVec3, value.y), 0, "The x component" },
-		{ "z", T_FLOAT, offsetof(PyVec3, value.z), 0, "The x component" },
-		{ nullptr, 0, 0, 0, nullptr }
-	};
+	bool PyVec3_set_x(int argc, py_Ref argv);
+	bool PyVec3_set_y(int argc, py_Ref argv);
+	bool PyVec3_set_z(int argc, py_Ref argv);
 
-	PyTypeObject Vec3TypeObject = {
-		.ob_base = { _PyObject_EXTRA_INIT 1, (0) },
-		.tp_name = "VoidEngine.Math.Vec3",
-		.tp_basicsize = sizeof(PyVec3),
-		.tp_itemsize = 0,
-		.tp_str = PyVec3_repr,
-		.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-		.tp_doc = "",
-		.tp_methods = vec3Methods,
-		.tp_members = vec3Members,
-		.tp_init = PyVec3_init,
-		.tp_new = PyVec3_new,
-	};
+	py_Type vec3Type = 0;
+	void initVec3PyType(py_GlobalRef module) {
+		vec3Type = py_newtype("Vec3", tp_object, module, nullptr);
+		py_bindmethod(vec3Type, "__new__", PyVec3__new__);
+		py_bindmethod(vec3Type, "__init__", PyVec3__init__);
+		py_bindmethod(vec3Type, "__repr__", PyVec3__repr__);
 
-	PyVec3* PyVec3_create(glm::vec3 value) {
-		PyTypeObject* type = &Vec3TypeObject;
-		PyVec3* instance = (PyVec3*) type->tp_alloc(type, 0);
-
-		PyObject* args = PyTuple_New(0);
-		type->tp_init((PyObject*) instance, args, nullptr);
-		Py_DecRef(args);
-
-		instance->value = value;
-		return instance;
+		py_bindproperty(vec3Type, "x", PyVec3_get_x, PyVec3_set_x);
+		py_bindproperty(vec3Type, "y", PyVec3_get_y, PyVec3_set_y);
+		py_bindproperty(vec3Type, "z", PyVec3_get_z, PyVec3_set_z);
+	}
+	
+	bool PyVec3__new__(int argc, py_Ref argv) {
+		py_Type cls = py_totype(argv);
+		py_newobject(py_retval(), cls, 0, sizeof(glm::vec3));
+		return true;
 	}
 
-	PyObject* PyVec3_new(PyTypeObject* subtype, PyObject* args, PyObject* kwds) {
-		PyVec3* self = (PyVec3*) subtype->tp_alloc(subtype, 0);
-
-		if(self != nullptr) [[unlikely]] {
-			self->value = { 0, 0, 0 };
+	bool PyVec3__init__(int argc, py_Ref argv) {
+		if(argc == 1) {
+			glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+			self->x = 0.0;
+			self->y = 0.0;
+			self->z = 0.0;
+			return true;
+		}
+		if(argc != 4) {
+			return false;
 		}
 
-		return (PyObject*) self;
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+
+		if(py_castfloat32(py_arg(1), &self->x) || py_castfloat32(py_arg(2), &self->y) || py_castfloat32(py_arg(3), &self->z)) {
+			return TypeError("A value passed to a Vec3 was not a float");
+		}
+
+		py_newnone(py_retval());
+		return true;
 	}
 
-	int PyVec3_init(PyObject* self, PyObject* args, PyObject* kwds) {
-		PyVec3* vec3 = (PyVec3*) self;
-		
-		Py_ssize_t argc = PyTuple_Size(args);
-		if(argc == 3)
-			PyArg_ParseTuple(args, "fff", &vec3->value.x, &vec3->value.y, &vec3->value.z);
-		else if(argc == 0)
-			vec3->value = { 0, 0, 0 };
-		else [[unlikely]]
-			PyErr_BadArgument();
-
-		return 0;
+	bool PyVec3__repr__(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+		std::string str = std::format("{{ {}, {}, {} }}", self->x, self->y, self->z);
+		py_newstr(py_retval(), str.c_str());
+		return true;
 	}
 
-	PyObject* PyVec3_repr(PyObject* self) {
-		PyVec3* vec3 = (PyVec3*) self;
-		std::string str = std::format("{{ {}, {}, {} }}", vec3->value.x, vec3->value.y, vec3->value.z);
-		return PyUnicode_FromString(str.c_str());
+	bool PyVec3_get_x(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+		py_newfloat(py_retval(), self->x);
+		return true;
+	}
+
+	bool PyVec3_get_y(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+		py_newfloat(py_retval(), self->y);
+		return true;
+	}
+
+	bool PyVec3_get_z(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+		py_newfloat(py_retval(), self->z);
+		return true;
+	}
+
+	bool PyVec3_set_x(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(2);
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+		if(!py_castfloat32(py_arg(1), &self->x)) {
+			return TypeError(std::format("Expected float, got {}", py_tpname(py_typeof(py_arg(1)))).c_str());
+		}
+		py_newnone(py_retval());
+		return true;
+	}
+
+	bool PyVec3_set_y(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(2);
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+		if(!py_castfloat32(py_arg(1), &self->y)) {
+			return TypeError(std::format("Expected float, got {}", py_tpname(py_typeof(py_arg(1)))).c_str());
+		}
+		py_newnone(py_retval());
+		return true;
+	}
+
+	bool PyVec3_set_z(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(2);
+		glm::vec3 *self = (glm::vec3*) py_touserdata(py_arg(0));
+		if(!py_castfloat32(py_arg(1), &self->z)) {
+			return TypeError(std::format("Expected float, got {}", py_tpname(py_typeof(py_arg(1)))).c_str());
+		}
+		py_newnone(py_retval());
+		return true;
 	}
 }
 

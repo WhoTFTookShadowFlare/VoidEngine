@@ -1,52 +1,35 @@
-newoption {
-	trigger = "pyversion",
-	value = "version",
-	description = "The python version to build against",
-	allowed = {
-		{ "3.13" },
-		{ "3.14" }
-	},
-	default = "3.13"
-}
+project "pocketpy"
+	kind "SharedLib"
+	language "C"
+	cdialect "C11"
+	targetdir(tostring(_MAIN_SCRIPT_DIR) .. "/bin/%{cfg.buildcfg}")
+
+	files { "pocketpy/*.c" }
+
+	usage "PUBLIC"
+		includedirs { "pocketpy/include" }
+
+	filter "platforms:win*"
+		links { "ws2_32" }
 
 project "VoidEngine"
 	kind "StaticLib"
 	language "C++"
-	toolset "gcc"
+	cppdialect "C++23"
 	targetdir(tostring(_MAIN_SCRIPT_DIR) .. "/bin/%{cfg.buildcfg}")
 
 	files { "src/**.hpp", "src/**.cpp" }
-	cppdialect "C++23"
+
+	usage "PUBLIC"
+		uses { "pocketpy" }
+		links { "pocketpy" }
 
 	usage "INTERFACE"
 		links { "SDL3",  "glbinding" }
 
-		filter "platforms:win*"
-			if _OPTIONS["pyversion"] == "3.13" then
-				links { "python313" }
-			elseif _OPTIONS["pyversion"] == "3.14" then
-				links { "python314" }
-			end
-
-		filter "platforms:linux*"
-			links { "python3.13" }
-
-		filter "platforms:macosx"
-			if _OPTIONS["pyversion"] == "3.13" then
-				links { "python3.13" }
-			elseif _OPTIONS["pyversion"] == "3.14" then
-				links { "python3.14" }
-			end
-
 	usage "PUBLIC"
+		defines { "PK_IS_PUBLIC_INCLUDE" }
 		includedirs { "include" }
-		links { "glm" }
-		
-		if _OPTIONS["pyversion"] == "3.13" then
-			defines { "python3_13" }
-		elseif _OPTIONS["pyversion"] == "3.14" then
-			defines { "python3_14" }
-		end
 
 	filter "configurations:debug"
 		defines { "DEBUG" }
@@ -60,11 +43,12 @@ project "VoidEngine"
 		system "macosx"
 		architecture "UNIVERSAL"
 
-	filter "platforms:win64"
+	filter "platforms:win*"
 		system "windows"
-		architecture "x86_64"
 
-	filter "platforms:nix64"
+	filter "platforms:linux*"
 		system "linux"
+
+	filter "platforms:*64"
 		architecture "x86_64"
 

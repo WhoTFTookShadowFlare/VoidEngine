@@ -1,77 +1,107 @@
 #include "ve/py_api/io/gfx/py_vertex.hpp"
+#include "pocketpy.h"
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/py_api/math/py_vec3.hpp"
 #include "ve/py_api/math/py_vec4.hpp"
-#include <cstddef>
-#include <python3.13/object.h>
-#include <python3.13/pytypedefs.h>
-#include <python3.13/structmember.h>
+#include <format>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
 
 namespace VoidEngine::PyAPI::IO::GFX {
-	static PyMethodDef vertexMethods[] = {
-		{ nullptr, nullptr, 0, nullptr }
-	};
+	using namespace VoidEngine::IO::GFX;
 
-	static PyMemberDef vertexMembers[] = {
-		{ "position", T_OBJECT, offsetof(PyVertex, position), 0, "The vertex position" },
-		{ "color", T_OBJECT, offsetof(PyVertex, color), 0, "The vertex color" },
-		{ nullptr, 0, 0, 0, nullptr }
-	};
+	bool PyVertex__new__(int argc, py_Ref argv);
+	bool PyVertex__init__(int argc, py_Ref argv);
+	bool PyVertex__repr__(int argc, py_Ref argv);
 
-	PyTypeObject VertexTypeObject = {
-		.ob_base = { _PyObject_EXTRA_INIT 1, (0) },
-		.tp_name = "VoidEngine.IO.GFX.Vertex",
-		.tp_basicsize = sizeof(PyVertex),
-		.tp_itemsize = 0,
-		// .tp_str = PyVertex_repr,
-		.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-		.tp_doc = "A vertex for a Mesh",
-		.tp_methods = vertexMethods,
-		.tp_members = vertexMembers,
-		.tp_init = PyVertex_init,
-		.tp_new = PyVertex_new,
-	};
+	bool PyVertex_get_position(int argc, py_Ref argv);
+	bool PyVertex_get_color(int argc, py_Ref argv);
 
-	PyVertex* PyVertex_create(VoidEngine::IO::GFX::Vertex value) {
-		PyTypeObject* type = &VertexTypeObject;
-		PyVertex* instance = (PyVertex*) type->tp_alloc(type, 0);
+	bool PyVertex_set_position(int argc, py_Ref argv);
+	bool PyVertex_set_color(int argc, py_Ref argv);
 
-		PyObject* args = PyTuple_New(0);
-		type->tp_init((PyObject*) instance, args, nullptr);
-		Py_DecRef(args);
+	py_Type vertexType = 0;
+	void initVertexPyType(py_GlobalRef module) {
+		vertexType = py_newtype("Vertex", tp_object, module, nullptr);
+		py_bindmethod(vertexType, "__new__", PyVertex__new__);
+		py_bindmethod(vertexType, "__init__", PyVertex__init__);
+		py_bindmethod(vertexType, "__repr__", PyVertex__repr__);
 
-		instance->position->value = value.position;
-		instance->color->value = value.color;
-
-		return instance;
-	}
-	
-	VoidEngine::IO::GFX::Vertex PyVertex_toCXX(PyObject* self) {
-		PyVertex* vertex = (PyVertex*) self;
-		return {
-			vertex->position->value,
-			vertex->color->value
-		};
+		py_bindproperty(vertexType, "position", PyVertex_get_position, PyVertex_get_position);
+		py_bindproperty(vertexType, "color", PyVertex_get_color, PyVertex_set_color);
 	}
 
-	PyObject* PyVertex_new(PyTypeObject* subtype, PyObject* args, PyObject* kwds) {
-		PyVertex* self = (PyVertex*) subtype->tp_alloc(subtype, 0);
+	bool PyVertex__new__(int argc, py_Ref argv) {
+		py_Type cls = py_totype(argv);
+		py_newobject(py_retval(), cls, 0, sizeof(Vertex));
+		return true;
+	}
 
-		if(self != nullptr) [[unlikely]] {
-			self->position = Math::PyVec3_create({ 0, 0, 0 });
-			self->color = Math::PyVec4_create({ 0, 0, 0, 1 });
+	bool PyVertex__init__(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		Vertex *self = (Vertex*) py_touserdata(py_arg(0));
+
+		self->position = { 0, 0, 0 };
+		self->color = { 0, 0, 0, 1 };
+
+		return true;
+	}
+
+	bool PyVertex__repr__(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		Vertex *self = (Vertex*) py_touserdata(py_arg(0));
+		std::string str = std::format("{{ position: {{ {}, {}, {} }}, color: {{ {}, {}, {}, {} }} }}",
+				self->position.x, self->position.y, self->position.z,
+				self->color.x, self->color.y, self->color.z, self->color.w
+		);
+		py_newstr(py_retval(), str.c_str());
+		return true;
+	}
+
+	bool PyVertex_get_position(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		Vertex *self = (Vertex*) py_touserdata(py_arg(0));
+		glm::vec3 *position = (glm::vec3*) py_newobject(py_retval(), Math::vec3Type, 0, sizeof(glm::vec3));
+		*position = self->position;
+		return true;
+	}
+
+	bool PyVertex_get_color(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(1);
+		Vertex *self = (Vertex*) py_touserdata(py_arg(0));
+		glm::vec4 *color = (glm::vec4*) py_newobject(py_retval(), Math::vec4Type, 0, sizeof(glm::vec4));
+		*color = self->color;
+		return true;
+	}
+
+	bool PyVertex_set_position(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(2);
+		Vertex *self = (Vertex*) py_touserdata(py_arg(0));
+
+		if(!py_isinstance(py_arg(1), Math::vec3Type)) {
+			return TypeError("Vertex.position must be of type Vec3");
 		}
 
-		return (PyObject*) self;
+		glm::vec3 *position = (glm::vec3*) py_touserdata(py_arg(1));
+		self->position = *position;
+
+		py_newnone(py_retval());
+		return true;
 	}
 
-	int PyVertex_init(PyObject* self, PyObject* args, PyObject* kwds) {
-		PyVertex* vtx = (PyVertex*) self;
+	bool PyVertex_set_color(int argc, py_Ref argv) {
+		PY_CHECK_ARGC(2);
+		Vertex *self = (Vertex*) py_touserdata(py_arg(0));
 
-		vtx->position = Math::PyVec3_create({ 0, 0, 0 });
-		vtx->color = Math::PyVec4_create({ 0, 0, 0, 1 });
+		if(!py_isinstance(py_arg(1), Math::vec4Type)) {
+			return TypeError("Vertex.color must be of type Vec4");
+		}
 
-		return 0;
+		glm::vec4 *color = (glm::vec4*) py_touserdata(py_arg(1));
+		self->color = *color;
+
+		py_newnone(py_retval());
+		return true;
 	}
 }
 
