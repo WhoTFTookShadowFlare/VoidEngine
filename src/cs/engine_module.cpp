@@ -44,11 +44,11 @@ namespace VoidEngine::CS {
 	}
 
 	MonoString *Engine_GetExecutablePath() {
-		return mono_string_new_wrapper(engine->getExecutablePath().c_str());
+		return mono_string_new_wrapper(engine->getExecutablePath().string().c_str());
 	}
 
 	MonoString *Engine_GetDataDirectory() {
-		return mono_string_new_wrapper(engine->getDataDirectory().c_str());
+		return mono_string_new_wrapper(engine->getDataDirectory().string().c_str());
 	}
 
 	MonoArray *Engine_GetMonitorAreas() {

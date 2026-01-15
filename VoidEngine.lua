@@ -13,6 +13,7 @@ project "VoidEngine"
 		filter "platforms:not win*"
 			links { "mono-2.0" }
 		filter "platforms:win*"
+			libdirs { "C:/Program Files/Mono/lib" }
 			links { "mono-2.0-sgen" }
 
 	usage "PUBLIC"

@@ -69,6 +69,11 @@ namespace VoidEngine::CS {
 			return nullptr;
 		}
 
+		if (!std::filesystem::is_regular_file(assemblyPath)) {
+			std::cerr << std::format("[ERR] {} is not a file", assemblyPath.string()) << std::endl;
+			return nullptr;
+		}
+
 		std::string assemblyPathStr = assemblyPath.string();
 		std::replace(assemblyPathStr.begin(), assemblyPathStr.end(), '\\', '/');
 		MonoAssembly *assembly = mono_domain_assembly_open(domain, assemblyPathStr.c_str());

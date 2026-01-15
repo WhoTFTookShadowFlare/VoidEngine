@@ -1,4 +1,5 @@
 obj/*
+bin/*
 
 Makefile
 *.make
@@ -6,3 +7,8 @@ Makefile
 bin/*
 compile_commands.json
 
+*.sln
+*.vcxproj*
+*.csproj*
+
+.vs/
