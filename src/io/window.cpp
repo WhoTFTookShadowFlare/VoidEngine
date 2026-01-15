@@ -29,10 +29,6 @@ namespace VoidEngine::IO {
 			return;
 		}
 
-		if(Engine::instance && Engine::instance->mainWindow && !options.forceOrphan) {
-			SDL_SetWindowParent(window, Engine::instance->mainWindow->window);
-		}
-
 		glContext = SDL_GL_CreateContext(window);
 		if(glContext == nullptr) [[unlikely]] {
 			std::cout << SDL_GetError() << std::endl;

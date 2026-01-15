@@ -1,34 +1,21 @@
-project "pocketpy"
-	kind "SharedLib"
-	language "C"
-	cdialect "C11"
-	targetdir(tostring(_MAIN_SCRIPT_DIR) .. "/bin/%{cfg.buildcfg}")
-
-	files { "pocketpy/*.c" }
-
-	usage "PUBLIC"
-		includedirs { "pocketpy/include" }
-
-	filter "platforms:win*"
-		links { "ws2_32" }
+require("VoidEngineCSAPI")
 
 project "VoidEngine"
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++23"
+	cppdialect "C++20"
 	targetdir(tostring(_MAIN_SCRIPT_DIR) .. "/bin/%{cfg.buildcfg}")
 
 	files { "src/**.hpp", "src/**.cpp" }
 
-	usage "PUBLIC"
-		uses { "pocketpy" }
-		links { "pocketpy" }
-
 	usage "INTERFACE"
 		links { "SDL3",  "glbinding" }
+		filter "platforms:not win*"
+			links { "mono-2.0" }
+		filter "platforms:win*"
+			links { "mono-2.0-sgen" }
 
 	usage "PUBLIC"
-		defines { "PK_IS_PUBLIC_INCLUDE" }
 		includedirs { "include" }
 
 	filter "configurations:debug"

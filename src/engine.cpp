@@ -9,23 +9,36 @@
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
+#include <cassert>
 #include <csignal>
 #include <cstdint>
+#include <filesystem>
+#include <format>
 #include <glm/ext/vector_int2.hpp>
+#include <iostream>
 #include <memory>
 
 #include <SDL3/SDL.h>
 #include <vector>
 
+#ifdef __unix
+#include <unistd.h>
+#include <pwd.h>
+#endif // __unix
+
+#ifdef _WIN64
+#include <Windows.h>
+#endif // _WIN64
+
 namespace VoidEngine {
-	Engine* Engine::instance;
+	std::shared_ptr<Engine> Engine::instance = nullptr;
 
 	void sigHandler(int signal) {
 		switch (signal) {
 		case SIGINT:
 		case SIGTERM: {
 			Events::QuitEvent event;
-			Engine* engine = Engine::getInstance();
+			std::shared_ptr<Engine> engine = Engine::getInstance();
 			engine->onQuit.postEvent(event);
 			}; break;
 		}
@@ -42,26 +55,48 @@ namespace VoidEngine {
 
 		signal(SIGINT, sigHandler);
 		signal(SIGTERM, sigHandler);
-
-		IO::Window::CreationOptions mainWindowOptions = {	};
-		mainWindow = std::make_shared<IO::Window>(mainWindowOptions);
 	}
 
 	Engine::~Engine() {
 		SDL_Quit();
 	}
 
-	Engine* Engine::getInstance() {
-		if(!instance) instance = new Engine();
+	std::shared_ptr<Engine> Engine::getInstance() {
+		if(!instance) instance = std::shared_ptr<Engine>(new Engine());
 		return instance;
 	}
 	
 	double Engine::getDelta() const {
 		return delta;
 	}
+	
+	std::filesystem::path Engine::getExecutablePath() {
+#ifdef _WIN64
+		char exePath[MAX_PATH];
+		GetModuleFileNameA(nullptr, exePath, MAX_PATH);
+		return std::filesystem::path(exePath);
+#endif // _WIN64
+#ifdef __unix
+		return std::filesystem::canonical("/proc/self/exe");
+#endif // __unix
+	}
 
-	std::shared_ptr<IO::Window> Engine::getMainWindow() {
-		return mainWindow;
+	void Engine::setDataDirectorySubdir(std::filesystem::path dataSubdir) {
+		this->dataSubdir = dataSubdir;
+	}
+
+	std::filesystem::path Engine::getDataDirectory() {
+#ifdef _WIN64
+		return std::filesystem::path(getenv("USERPROFILE")) / "Appdata/Roaming" / dataSubdir;
+#endif // _WIN64
+#ifdef __linux
+		std::filesystem::path homeDir = getpwuid(getuid())->pw_dir;
+		return homeDir / ".local/share" / dataSubdir;
+#endif // __linux
+#if defined (__unix) and not defined (__linux)
+		std::filesystem::path homeDir = getpwuid(getuid())->pw_dir;
+		return homeDir / "Library/Application Support" / dataSubdir;
+#endif //  defined (__unix) and not defined (__linux)
 	}
 
 	void Engine::pollEvents() {
@@ -197,7 +232,7 @@ namespace VoidEngine {
 	std::vector<Math::Rect2i> Engine::getWorkspaceCaves() {
 		std::vector<Math::Rect2i> deadzones = getWorkspaceDeadzones(),
 			chunks = getWorkspaceChunked(),
-			caves = std::vector<Math::Rect2i>(deadzones.size());
+			caves;
 
 		for(const auto& chunk : chunks) {
 			for(const auto& zone : deadzones) {
@@ -207,13 +242,15 @@ namespace VoidEngine {
 			}
 		}
 
+		assert(caves.size() <= deadzones.size());
+
 		return caves;
 	}
 
 	std::vector<Math::Rect2i> Engine::getWorkspacePlateaus() {
 		std::vector<Math::Rect2i> deadzones = getWorkspaceDeadzones(),
 			chunks = getWorkspaceChunked(),
-			plateaus = std::vector<Math::Rect2i>(deadzones.size());
+			plateaus;
 
 		for(const auto& chunk : chunks) {
 			for(const auto& zone : deadzones) {
@@ -222,6 +259,8 @@ namespace VoidEngine {
 				}
 			}
 		}
+
+		assert(plateaus.size() <= deadzones.size());
 
 		return plateaus;
 	}

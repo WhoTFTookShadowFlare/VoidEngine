@@ -4,6 +4,7 @@
 #include "ve/event/event_bus.hpp"
 #include "ve/io/window.hpp"
 #include "ve/math/rect2.hpp"
+#include <filesystem>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_int2.hpp>
 #include <memory>
@@ -18,9 +19,9 @@ namespace VoidEngine {
 		friend class IO::Window;
 		Engine();
 	
-		std::shared_ptr<IO::Window> mainWindow = std::shared_ptr<IO::Window>(nullptr);
-		static Engine* instance;
+		static std::shared_ptr<Engine> instance;
 
+		std::filesystem::path dataSubdir;
 		uint64_t lastTime;
 		double delta;
 	public:
@@ -31,12 +32,16 @@ namespace VoidEngine {
 		Event::EventBus<Events::QuitEvent> onQuit;
 		Event::EventBus<Events::ScreenLayoutChangedEvent> onScreenLayoutChanged;
 
-		[[nodiscard]] static Engine* getInstance();
+		[[nodiscard]] static std::shared_ptr<Engine> getInstance();
 
 		[[nodiscard]] double getDelta() const;
 
-		[[nodiscard]] std::shared_ptr<IO::Window> getMainWindow();
 		void pollEvents();
+
+		[[nodiscard]] std::filesystem::path getExecutablePath();
+
+		void setDataDirectorySubdir(std::filesystem::path subdir);
+		[[nodiscard]] std::filesystem::path getDataDirectory();
 
 		[[nodiscard]] std::vector<Math::Rect2i> getMonitorAreas();
 		[[nodiscard]] glm::ivec2 getWorkspaceArea();
@@ -46,3 +51,4 @@ namespace VoidEngine {
 		[[nodiscard]] std::vector<Math::Rect2i> getWorkspacePlateaus();
 	};
 }
+

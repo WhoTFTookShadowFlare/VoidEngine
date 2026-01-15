@@ -25,7 +25,6 @@ namespace VoidEngine::IO {
 			bool resizable = true;
 			bool borderless = false;
 			bool alwaysOnTop = false;
-			bool forceOrphan = false;
 			glm::vec4 startingClearColor = { 0.1, 0.1, 0.1, 1.0 };
 		};
 

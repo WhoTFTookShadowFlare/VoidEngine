@@ -42,15 +42,15 @@ namespace VoidEngine::Math {
 		}
 
 		[[nodiscard]] glm::vec2 getCenter() const {
-			return position + size / (T) 2;
+			return position + (size / (T) 2);
 		}
 
 		[[nodiscard]] T getVerticalCenter() const {
-			return position.y + size.y / (T) 2;
+			return position.y + (size.y / (T) 2);
 		}
 
 		[[nodiscard]] T getHorizontalCenter() const {
-			return position.x + size.x / (T) 2;
+			return position.x + (size.x / (T) 2);
 		}
 
 		[[nodiscard]] std::array<glm::vec<2, T>, 4> getRectVertices() const {
@@ -69,7 +69,7 @@ namespace VoidEngine::Math {
 
 			Rect2<T> top = {
 				position,
-				{ size.x, point }
+				{ size.x, point - position.y }
 			};
 			Rect2<T> bottom = {
 				{ position.x, position.y + point },
@@ -86,11 +86,11 @@ namespace VoidEngine::Math {
 
 			Rect2<T> left = {
 				position,
-				{ point, size.y}
+				{ point - position.x, size.y }
 			};
 			Rect2<T> right = {
 				{ point, position.y },
-				{ size.x - (point - position.y), size.y }
+				{ size.x - (point - position.x), size.y }
 			};
 
 			return { left, right };
