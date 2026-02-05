@@ -46,5 +46,16 @@ namespace VoidEngine::IO::GFX {
 		if(backend == nullptr) return nullptr;
 		return backend->createMesh();
 	}
+
+	Shader *Renderer::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
+		if(backend == nullptr) return nullptr;
+		return backend->createShader(type, sourceCode);
+	}
+
+	GraphicsProgram *Renderer::createGraphicsProgram(Shader *vertex, Shader *fragment) {
+		if(backend == nullptr) return nullptr;
+		return backend->createGraphicsProgram(vertex, fragment);
+	}
 }
+
 

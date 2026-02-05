@@ -5,9 +5,13 @@
 #include <vector>
 
 namespace VoidEngine::IO::GFX {
+	class GraphicsProgram;
 	class Mesh {
+		friend class GraphicsProgram;
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
+		
+		virtual void draw() = 0;
 	public:
 		virtual ~Mesh() {}
 
@@ -18,7 +22,6 @@ namespace VoidEngine::IO::GFX {
 		std::vector<uint32_t>& getIndexData();
 
 		virtual void buildMesh() = 0;
-		virtual void draw() = 0;
 	};
 }
 

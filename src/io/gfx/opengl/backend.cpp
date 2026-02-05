@@ -1,6 +1,8 @@
 #include "ve/io/gfx/opengl/backend.hpp"
 #include "ve/io/gfx/mesh.hpp"
+#include "ve/io/gfx/opengl/graphics_program.hpp"
 #include "ve/io/gfx/opengl/mesh.hpp"
+#include "ve/io/gfx/opengl/shader.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/window.hpp"
 #include <glbinding/glbinding.h>
@@ -38,6 +40,14 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 	Mesh *RendererOpenGL::createMesh() {
 		return new GLMesh;
+	}
+
+	Shader *RendererOpenGL::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
+		return new GLShader(type, sourceCode);
+	}
+
+	GraphicsProgram *RendererOpenGL::createGraphicsProgram(Shader *vertex, Shader *fragment) {
+		return new GLGraphicsProgram(vertex, fragment);
 	}
 }
 

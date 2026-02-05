@@ -15,6 +15,9 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		void swapBuffers(Window*);
 
 		Mesh *createMesh();
+
+		Shader *createShader(ShaderType, AShaderSourceProvider&);
+		GraphicsProgram *createGraphicsProgram(Shader *vertex, Shader *fragment);
 	};
 }
 
