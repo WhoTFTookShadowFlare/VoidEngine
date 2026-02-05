@@ -1,78 +1,40 @@
 #include "ve/io/window.hpp"
-#include "ve/engine.hpp"
-#include "ve/io/window_event.hpp"
-#include <SDL3/SDL_error.h>
+#include "ve/io/gfx/renderer.hpp"
 #include <SDL3/SDL_video.h>
-#include <glbinding/gl/functions.h>
-#include <glbinding/glbinding.h>
-#include <glbinding/gl46core/gl.h>
-#include <glm/ext/vector_float4.hpp>
 #include <glm/ext/vector_int2.hpp>
-#include <iostream>
+#include <memory>
 
 namespace VoidEngine::IO {
-	std::map<SDL_WindowID, Window*> Window::windowMap = std::map<SDL_WindowID, Window*>();
+	Window::Window(CreationOptions& options) {
+		// TODO: Extract SDL_WINDOW_OPENGL
+		SDL_WindowFlags flags = SDL_WINDOW_OPENGL;
 
-	Window::Window(const Window::CreationOptions& options) : clearColor(options.startingClearColor) {
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		if(options.resizable) flags |= SDL_WINDOW_RESIZABLE;
+		if(options.borderless) flags |= SDL_WINDOW_BORDERLESS;
+		if(options.alwaysOnTop) flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+		if(options.utility) flags |= SDL_WINDOW_UTILITY;
 
-		SDL_WindowFlags flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_TRANSPARENT;
-		if(options.alwaysOnTop)	flags |= SDL_WINDOW_ALWAYS_ON_TOP;
-		if(options.borderless)	flags |= SDL_WINDOW_BORDERLESS;
-		if(options.utility)			flags |= SDL_WINDOW_UTILITY;
-		if(options.resizable)		flags |= SDL_WINDOW_RESIZABLE;
-		window = SDL_CreateWindow("HEWO 4:38", options.startingSize.x, options.startingSize.y, flags);
-		if(window == nullptr) [[unlikely]] {
-			std::cout << SDL_GetError() << std::endl;
-			return;
-		}
-
-		glContext = SDL_GL_CreateContext(window);
-		if(glContext == nullptr) [[unlikely]] {
-			std::cout << SDL_GetError() << std::endl;
-			return;
-		}
-
-		SDL_GL_MakeCurrent(window, glContext);
-		glbinding::initialize(SDL_GL_GetProcAddress);
-		windowMap[SDL_GetWindowID(window)] = this;
-
-		SDL_ShowWindow(window);
+		window = SDL_CreateWindow(options.title.c_str(), options.size.x, options.size.y, flags);
+		auto renderer = GFX::Renderer::getInstance();
+		renderer->setupWindow(this);
 	}
 
 	Window::~Window() {
-		windowMap.erase(SDL_GetWindowID(window));
-		SDL_GL_DestroyContext(glContext);
+		auto renderer = GFX::Renderer::getInstance();
+		renderer->destroyWindow(this);
 		SDL_DestroyWindow(window);
 	}
-	
-	void Window::bindRenderTarget() {
-		SDL_GL_MakeCurrent(window, glContext);
-		gl::glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+
+	std::shared_ptr<Window> Window::create(CreationOptions& options) {
+		return std::shared_ptr<Window>(new Window(options));
 	}
 
-	void Window::setClearColor(glm::vec4 color) {
-		clearColor = color;
-	}
-
-	void Window::onEvent(Events::WindowCloseRequested& event) {
-		closeRequested = true;
-	}
-
-	void Window::setWindowVisible(bool value) {
-		(value ? SDL_ShowWindow : SDL_HideWindow)(window);
-	}
-
-	glm::ivec2 Window::getPosition() {
-		glm::ivec2 position = { 0, 0 };
-		SDL_GetWindowPosition(window, &position.x, &position.y);
-		return position;
+	void Window::setSize(glm::ivec2 size) {
+		SDL_SetWindowSize(window, size.x, size.y);
 	}
 
 	glm::ivec2 Window::getSize() {
-		glm::ivec2 size = { 0, 0 };
+		glm::ivec2 size;
 		SDL_GetWindowSize(window, &size.x, &size.y);
 		return size;
 	}
@@ -81,15 +43,10 @@ namespace VoidEngine::IO {
 		SDL_SetWindowPosition(window, position.x, position.y);
 	}
 
-	void Window::setSize(glm::ivec2 size) {
-		SDL_SetWindowSize(window, size.x, size.y);
-	}
-
-	bool Window::shouldClose() {
-		return closeRequested;
-	}
-
-	void Window::swapBuffers() {
-		SDL_GL_SwapWindow(window);
+	glm::ivec2 Window::getPosition() {
+		glm::ivec2 position;
+		SDL_GetWindowPosition(window, &position.x, &position.y);
+		return position;
 	}
 }
+

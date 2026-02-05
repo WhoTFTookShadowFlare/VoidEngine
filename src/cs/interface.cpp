@@ -34,7 +34,7 @@ namespace VoidEngine::CS {
 
 		std::filesystem::path veAPIPath = Engine::getInstance()->getExecutablePath().parent_path() / "VoidEngine.dll";
 		if(!std::filesystem::exists(veAPIPath)) {
-			std::cerr << std::format("[ERR] Failed to find VoidEngine.dll, make sure it is at {}", veAPIPath.string());
+			std::cerr << std::format("[ERR] Failed to find VoidEngine.dll, make sure it is at {}", veAPIPath.string()) << std::endl;
 			std::exit(1);
 		}
 

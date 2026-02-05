@@ -2,7 +2,8 @@ project "VoidEngineCSAPI"
 	kind "SharedLib"
 	language "C#"
 	clr "Off"
-	csversion "5"
+	csversion "8"
+	targetdir(tostring(_MAIN_SCRIPT_DIR) .. "/bin/%{cfg.buildcfg}")
 
 	targetname "VoidEngine"
 

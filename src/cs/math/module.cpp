@@ -12,10 +12,10 @@
 
 namespace VoidEngine::CS::Math {
 	CSharpInterface *interface = nullptr;
-	MonoClass *Vec2fClass = nullptr;
-	MonoClass *Vec2iClass = nullptr;
-	MonoClass *Rect2fClass = nullptr;
-	MonoClass *Rect2iClass = nullptr;
+
+	MonoClass *Vec2fClass = nullptr, *Vec3fClass = nullptr, *Vec4fClass = nullptr,
+			  *Vec2iClass = nullptr, *Vec3iClass = nullptr, *Vec4iClass = nullptr,
+			  *Rect2fClass = nullptr, *Rect2iClass = nullptr;
 
 	MonoObject *Rect2f_GetEndPosition(MonoObject *self);
 	bool Rect2f_CollidesWith(MonoObject *self, MonoObject *other);
@@ -67,9 +67,45 @@ namespace VoidEngine::CS::Math {
 
 		interface = CSharpInterface::getInstance();
 		Vec2fClass = interface->getClass("VoidEngine.Math", "Vec2f");
+		Vec3fClass = interface->getClass("VoidEngine.Math", "Vec3f");
+		Vec4fClass = interface->getClass("VoidEngine.Math", "Vec4f");
 		Vec2iClass = interface->getClass("VoidEngine.Math", "Vec2i");
+		Vec3iClass = interface->getClass("VoidEngine.Math", "Vec3i");
+		Vec4iClass = interface->getClass("VoidEngine.Math", "Vec4i");
 		Rect2fClass = interface->getClass("VoidEngine.Math", "Rect2f");
 		Rect2iClass = interface->getClass("VoidEngine.Math", "Rect2i");
+	}
+
+	MonoClass *getRect2fClass(void) {
+		return Rect2fClass;
+	}
+
+	MonoClass *getRect2iClass(void) {
+		return Rect2iClass;
+	}
+
+	MonoClass *getVec2fClass(void) {
+		return Vec2fClass;
+	}
+
+	MonoClass *getVec3fClass(void) {
+		return Vec3fClass;
+	}
+
+	MonoClass *getVec4fClass(void) {
+		return Vec4fClass;
+	}
+
+	MonoClass *getVec2iClass(void) {
+		return Vec2iClass;
+	}
+
+	MonoClass *getVec3iClass(void) {
+		return Vec3iClass;
+	}
+
+	MonoClass *getVec4iClass(void) {
+		return Vec4iClass;
 	}
 
 	MonoObject *vec2fToMonoObject(glm::vec2 from) {
@@ -273,22 +309,6 @@ namespace VoidEngine::CS::Math {
 			vec2iFromMonoObject(posObj),
 			vec2iFromMonoObject(sizeObj)
 		};
-	}
-
-	MonoClass *getVec2fClass() {
-		return Vec2fClass;
-	}
-
-	MonoClass *getRect2fClass() {
-		return Rect2fClass;
-	}
-
-	MonoClass *getVec2iClass() {
-		return Vec2iClass;
-	}
-
-	MonoClass *getRect2iClass() {
-		return Rect2iClass;
 	}
 
 	MonoObject *Rect2f_GetEndPosition(MonoObject *self) {

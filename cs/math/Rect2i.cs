@@ -2,31 +2,14 @@ using System.Runtime.CompilerServices;
 
 namespace VoidEngine.Math
 {
-    public class Rect2i
+    public struct Rect2i
 	{
-		private Vec2i position = new Vec2i(0, 0), size = new Vec2i(1, 1);
-
-		public Vec2i Position {
-			get { return position; }
-			set {
-				if(value == null) return;
-				position = value;
-			}
-		}
-
-		public Vec2i Size {
-			get { return size; }
-			set {
-				if(value == null) return;
-				size = value;
-			}
-		}
-
-		public Rect2i() {}
+		public Vec2i Position { get; set; }
+		public Vec2i Size { get; set; }
 
 		public Rect2i(Vec2i position, Vec2i size) {
-			if(position != null) this.position = position;
-			if(size != null) this.size = size;
+			this.Position = position;
+			this.Size = size;
 		}
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -47,6 +30,8 @@ namespace VoidEngine.Math
 		public extern Rect2i[] SplitHorizontally(int point);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		public extern Rect2i[] SplitVertically(int point);
+
+		public override string ToString() => $"( Position: {Position}, Size: {Size} )";
 	}
 }
 

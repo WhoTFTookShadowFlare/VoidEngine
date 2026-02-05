@@ -1,7 +1,6 @@
 #include "ve/engine.hpp"
 #include "ve/engine_events.hpp"
 #include "ve/io/window.hpp"
-#include "ve/io/window_event.hpp"
 #include "ve/math/rect2.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_hints.h>
@@ -17,7 +16,7 @@
 #include <glm/ext/vector_int2.hpp>
 #include <iostream>
 #include <memory>
-
+#include <glbinding/gl46core/gl.h>
 #include <SDL3/SDL.h>
 #include <vector>
 
@@ -31,6 +30,8 @@
 #endif // _WIN64
 
 namespace VoidEngine {
+	using namespace gl;
+
 	std::shared_ptr<Engine> Engine::instance = nullptr;
 
 	void sigHandler(int signal) {
@@ -44,28 +45,33 @@ namespace VoidEngine {
 		}
 	}
 
-	Engine::Engine() {
-#ifdef __linux__
-		setenv("SDL_VIDEODRIVER", "x11", 1);
-#endif // __linux__
-
-		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
-
-		SDL_Init(SDL_INIT_VIDEO);
-
-		signal(SIGINT, sigHandler);
-		signal(SIGTERM, sigHandler);
-	}
-
 	Engine::~Engine() {
 		SDL_Quit();
 	}
 
 	std::shared_ptr<Engine> Engine::getInstance() {
-		if(!instance) instance = std::shared_ptr<Engine>(new Engine());
+		if(!instance) {
+			instance = std::shared_ptr<Engine>(new Engine());
+#ifdef __linux__
+			setenv("SDL_VIDEODRIVER", "x11", 1);
+#endif // __linux__
+
+			SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
+
+			SDL_Init(SDL_INIT_VIDEO);
+
+			signal(SIGINT, sigHandler);
+			signal(SIGTERM, sigHandler);
+			IO::Window::CreationOptions options {};
+			instance->mainWindow = IO::Window::create(options);
+		}
 		return instance;
 	}
 	
+	std::shared_ptr<IO::Window> Engine::getMainWindow() const {
+		return mainWindow;
+	}
+
 	double Engine::getDelta() const {
 		return delta;
 	}
@@ -114,30 +120,30 @@ namespace VoidEngine {
 					Events::ScreenLayoutChangedEvent event;
 					onScreenLayoutChanged.postEvent(event);
 					}; break;
-				case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
-					IO::Window* window = IO::Window::windowMap[event.window.windowID];
-					if(!window) continue;
-					IO::Events::WindowCloseRequested closeRequest;
-					window->onCloseRequested.postEvent(closeRequest);
-					} break;
-				case SDL_EVENT_MOUSE_MOTION: {
-					IO::Window* window = IO::Window::windowMap[event.motion.windowID];
-					if(!window) continue;
-					IO::Events::MouseMoved motion(window, { event.motion.x, event.motion.y }, { event.motion.xrel, event.motion.yrel });
-					window->onMouseMotion.postEvent(motion);
-					} break;
-				case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-					IO::Window* window = IO::Window::windowMap[event.button.windowID];
-					if(!window) continue;
-					IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, true);
-					window->onMouseButtonPressed.postEvent(pressed);
-					}; break;
-				case SDL_EVENT_MOUSE_BUTTON_UP: {
-					IO::Window* window = IO::Window::windowMap[event.button.windowID];
-					if(!window) continue;
-					IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, false);
-					window->onMouseButtonReleased.postEvent(pressed);
-					}; break;
+				// case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
+				// 	IO::Window* window = IO::Window::windowMap[event.window.windowID];
+				// 	if(!window) continue;
+				// 	IO::Events::WindowCloseRequested closeRequest;
+				// 	window->onCloseRequested.postEvent(closeRequest);
+				// 	} break;
+				// case SDL_EVENT_MOUSE_MOTION: {
+				// 	IO::Window* window = IO::Window::windowMap[event.motion.windowID];
+				// 	if(!window) continue;
+				// 	IO::Events::MouseMoved motion(window, { event.motion.x, event.motion.y }, { event.motion.xrel, event.motion.yrel });
+				// 	window->onMouseMotion.postEvent(motion);
+				// 	} break;
+				// case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+				// 	IO::Window* window = IO::Window::windowMap[event.button.windowID];
+				// 	if(!window) continue;
+				// 	IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, true);
+				// 	window->onMouseButtonPressed.postEvent(pressed);
+				// 	}; break;
+				// case SDL_EVENT_MOUSE_BUTTON_UP: {
+				// 	IO::Window* window = IO::Window::windowMap[event.button.windowID];
+				// 	if(!window) continue;
+				// 	IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, false);
+				// 	window->onMouseButtonReleased.postEvent(pressed);
+				// 	}; break;
 			}
 		}
 	}

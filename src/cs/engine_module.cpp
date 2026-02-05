@@ -17,7 +17,7 @@ namespace VoidEngine::CS {
 	MonoString *Engine_GetExecutablePath();
 	MonoString *Engine_GetDataDirectory();
 	MonoArray *Engine_GetMonitorAreas();
-	MonoObject *Engine_GetWorkspaceArea();
+	glm::ivec2 Engine_GetWorkspaceArea();
 	MonoArray *Engine_GetWorkspaceChunked();
 	MonoArray *Engine_GetWorkspaceDeadzones();
 	MonoArray *Engine_GetWorkspaceCaves();
@@ -56,13 +56,13 @@ namespace VoidEngine::CS {
 		MonoArray *array = interface->allocArray(Math::getRect2iClass(), areas.size());
 
 		for(uint8_t idx = 0; idx < areas.size(); idx++)
-			mono_array_setref(array, idx, Math::rect2iToMonoObject(areas[idx]));
+			mono_array_set(array, VoidEngine::Math::Rect2i, idx, areas[idx]);
 
 		return array;
 	}
 
-	MonoObject *Engine_GetWorkspaceArea() {
-		return CS::Math::vec2iToMonoObject(Engine::getInstance()->getWorkspaceArea());
+	glm::ivec2 Engine_GetWorkspaceArea() {
+		return Engine::getInstance()->getWorkspaceArea();
 	}
 
 	MonoArray *Engine_GetWorkspaceChunked() {
@@ -70,7 +70,7 @@ namespace VoidEngine::CS {
 		MonoArray *array = interface->allocArray(Math::getRect2iClass(), areas.size());
 
 		for(uint8_t idx = 0; idx < areas.size(); idx++)
-			mono_array_setref(array, idx, Math::rect2iToMonoObject(areas[idx]));
+			mono_array_set(array, VoidEngine::Math::Rect2i, idx, areas[idx]);
 
 		return array;
 	}
@@ -80,7 +80,7 @@ namespace VoidEngine::CS {
 		MonoArray *array = interface->allocArray(Math::getRect2iClass(), areas.size());
 
 		for(uint8_t idx = 0; idx < areas.size(); idx++)
-			mono_array_setref(array, idx, Math::rect2iToMonoObject(areas[idx]));
+			mono_array_set(array, VoidEngine::Math::Rect2i, idx, areas[idx]);
 
 		return array;
 	}
@@ -90,7 +90,7 @@ namespace VoidEngine::CS {
 		MonoArray *array = interface->allocArray(Math::getRect2iClass(), areas.size());
 
 		for(uint8_t idx = 0; idx < areas.size(); idx++)
-			mono_array_setref(array, idx, Math::rect2iToMonoObject(areas[idx]));
+			mono_array_set(array, VoidEngine::Math::Rect2i, idx, areas[idx]);
 
 		return array;
 	}
@@ -100,7 +100,7 @@ namespace VoidEngine::CS {
 		MonoArray *array = interface->allocArray(Math::getRect2iClass(), areas.size());
 
 		for(uint8_t idx = 0; idx < areas.size(); idx++)
-			mono_array_setref(array, idx, Math::rect2iToMonoObject(areas[idx]));
+			mono_array_set(array, VoidEngine::Math::Rect2i, idx, areas[idx]);
 
 		return array;
 	}

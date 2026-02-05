@@ -4,29 +4,12 @@ namespace VoidEngine.Math
 {
     public class Rect2f
 	{
-		private Vec2f position = new Vec2f(0.0f, 0.0f), size = new Vec2f(1.0f, 1.0f);
-
-		public Vec2f Position {
-			get { return position; }
-			set {
-				if(value == null) return;
-				position = value;
-			}
-		}
-
-		public Vec2f Size {
-			get { return size; }
-			set {
-				if(value == null) return;
-				size = value;
-			}
-		}
-
-		public Rect2f() {}
-
+		public Vec2f Position { get; set; }
+		public Vec2f Size { get; set; }
+		
 		public Rect2f(Vec2f position, Vec2f size) {
-			if(position != null) this.position = position;
-			if(size != null) this.size = size;
+			this.Position = position;
+			this.Size = size;
 		}
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -54,6 +37,8 @@ namespace VoidEngine.Math
 		public extern Rect2f Floor();
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		public extern Rect2f Ceil();
+
+		public override string ToString() => $"( Position: {Position}, Size: {Size} )";
 	}
 }
 

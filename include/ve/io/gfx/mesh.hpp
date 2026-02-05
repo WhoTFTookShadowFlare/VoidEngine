@@ -1,36 +1,24 @@
 #pragma once
 
+#include "ve/io/gfx/vertex.hpp"
 #include <cstdint>
-#include <glm/ext/vector_float3.hpp>
-#include <glbinding/gl/types.h>
-#include <glbinding/gl46core/gl.h>
-#include <glm/ext/vector_float4.hpp>
 #include <vector>
 
 namespace VoidEngine::IO::GFX {
-	using namespace gl;
-	struct Vertex {
-		glm::vec3 position;
-		glm::vec4 color;
-	};
-
 	class Mesh {
-		GLuint VAO, VBO, EBO;
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
-
-		void setupVAO();
-
 	public:
-		Mesh();
-		~Mesh();
+		virtual ~Mesh() {}
 
-		void bind();
+		void setVertexData(std::vector<Vertex> data);
+		void setIndexData(std::vector<uint32_t> data);
 
-		void setVertexData(std::vector<Vertex> vertices);
-		void setIndexData(std::vector<uint32_t> indices);
+		std::vector<Vertex>& getVertexData();
+		std::vector<uint32_t>& getIndexData();
 
-		void draw();
+		virtual void buildMesh() = 0;
+		virtual void draw() = 0;
 	};
 }
 

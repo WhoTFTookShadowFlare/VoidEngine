@@ -2,7 +2,6 @@
 
 #include "ve/engine_events.hpp"
 #include "ve/event/event_bus.hpp"
-#include "ve/io/window.hpp"
 #include "ve/math/rect2.hpp"
 #include <filesystem>
 #include <glm/ext/vector_float2.hpp>
@@ -17,13 +16,15 @@ namespace VoidEngine {
 
 	class Engine {
 		friend class IO::Window;
-		Engine();
+		Engine() {}
 	
 		static std::shared_ptr<Engine> instance;
 
 		std::filesystem::path dataSubdir;
 		uint64_t lastTime;
 		double delta;
+
+		std::shared_ptr<IO::Window> mainWindow = nullptr;
 	public:
 		Engine(const Engine&) = delete;
 		Engine& operator=(const Engine&) = delete;
@@ -33,6 +34,7 @@ namespace VoidEngine {
 		Event::EventBus<Events::ScreenLayoutChangedEvent> onScreenLayoutChanged;
 
 		[[nodiscard]] static std::shared_ptr<Engine> getInstance();
+		[[nodiscard]] std::shared_ptr<IO::Window> getMainWindow() const;
 
 		[[nodiscard]] double getDelta() const;
 

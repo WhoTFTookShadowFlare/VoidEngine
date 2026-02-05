@@ -1,66 +1,37 @@
 #pragma once
 
 #include "ve/io/gfx/render_target.hpp"
-#include "ve/event/event_bus.hpp"
-#include "ve/event/event_listener.hpp"
-#include "ve/io/window_event.hpp"
-#include <map>
 #include <SDL3/SDL_video.h>
-#include <memory>
 #include <glm/ext/vector_int2.hpp>
+#include <memory>
 
-namespace VoidEngine {
-	class Engine;
-}
+#include "ve/io/gfx/opengl/backend.hpp"
 
 namespace VoidEngine::IO {
-	class Window : 
-		public GFX::IRenderTarget,
-		public Event::IEventListener<Events::WindowCloseRequested>
-	{
+	class Window : public GFX::ARenderTarget {
+		friend class GFX::OpenGL::RendererOpenGL;
 	public:
 		struct CreationOptions {
-			bool utility = false;
-			glm::ivec2 startingSize = { 800, 600 };
+			glm::ivec2 size = { 800, 600 };
+			std::string title = "VoidEngine";
 			bool resizable = true;
 			bool borderless = false;
 			bool alwaysOnTop = false;
-			glm::vec4 startingClearColor = { 0.1, 0.1, 0.1, 1.0 };
+			bool utility = false;
 		};
-
 	private:
-		friend class ::VoidEngine::Engine;
-		static std::map<SDL_WindowID, Window*> windowMap;
-		SDL_Window* window = nullptr;
-		SDL_GLContext glContext;
-
-		glm::vec4 clearColor = { 0.1, 0.1, 0.1, 1.0 };
-
-		bool closeRequested = false;
-
+		SDL_Window *window = nullptr;
+	
+		Window(CreationOptions&);
 	public:
-		void bindRenderTarget();
-		void setClearColor(glm::vec4 color);
-
-		void onEvent(Events::WindowCloseRequested& event);
-
-		Window(const CreationOptions& options);
 		~Window();
+		static std::shared_ptr<Window> create(CreationOptions&);
 
-		Event::EventBus<Events::WindowCloseRequested> onCloseRequested;
-		Event::EventBus<Events::MouseMoved> onMouseMotion;
-		Event::EventBus<Events::MouseButtonPressed> onMouseButtonPressed;
-		Event::EventBus<Events::MouseButtonPressed> onMouseButtonReleased;
-
-		void setWindowVisible(bool value);
-
-		glm::ivec2 getPosition();
+		void setSize(glm::ivec2);
 		glm::ivec2 getSize();
 
-		void setPosition(glm::ivec2 position);
-		void setSize(glm::ivec2 size);
-
-		bool shouldClose();
-		void swapBuffers();
+		void setPosition(glm::ivec2);
+		glm::ivec2 getPosition();
 	};
 }
+
