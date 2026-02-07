@@ -5,6 +5,7 @@ namespace VoidEngine::IO::GFX {
 		VERTEX,
 		FRAGMENT,
 	};
+
 	class Shader {
 		ShaderType type;
 	public:

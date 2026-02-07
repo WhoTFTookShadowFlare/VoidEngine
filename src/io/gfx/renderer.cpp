@@ -1,6 +1,7 @@
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/opengl/backend.hpp"
 #include "ve/io/gfx/render_target.hpp"
+#include <cstdint>
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
@@ -55,6 +56,11 @@ namespace VoidEngine::IO::GFX {
 	GraphicsProgram *Renderer::createGraphicsProgram(Shader *vertex, Shader *fragment) {
 		if(backend == nullptr) return nullptr;
 		return backend->createGraphicsProgram(vertex, fragment);
+	}
+
+	Texture *Renderer::createTexture(uint8_t slot) {
+		if(backend == nullptr) return nullptr;
+		return backend->createTexture(slot);
 	}
 }
 

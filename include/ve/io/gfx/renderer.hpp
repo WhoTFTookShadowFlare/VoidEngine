@@ -5,6 +5,8 @@
 #include "ve/io/gfx/renderer_backend.hpp"
 #include "ve/io/gfx/shader.hpp"
 #include "ve/io/gfx/shader_source_provider.hpp"
+#include "ve/io/gfx/texture.hpp"
+#include <cstdint>
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
@@ -30,6 +32,8 @@ namespace VoidEngine::IO::GFX {
 
 		Shader *createShader(ShaderType, AShaderSourceProvider&);
 		GraphicsProgram *createGraphicsProgram(Shader *vertex, Shader *fragment);
+		
+		Texture *createTexture(uint8_t slot);
 	};
 }
 

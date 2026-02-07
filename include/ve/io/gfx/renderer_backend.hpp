@@ -4,6 +4,8 @@
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/shader.hpp"
 #include "ve/io/gfx/shader_source_provider.hpp"
+#include "ve/io/gfx/texture.hpp"
+#include <cstdint>
 
 namespace VoidEngine::IO {
 	class Window;
@@ -20,6 +22,8 @@ namespace VoidEngine::IO {
 			
 			virtual Shader *createShader(ShaderType, AShaderSourceProvider&) = 0;
 			virtual GraphicsProgram *createGraphicsProgram(Shader *vertex, Shader *fragment) = 0;
+
+			virtual Texture *createTexture(uint8_t slot) = 0;
 		};
 	}
 }

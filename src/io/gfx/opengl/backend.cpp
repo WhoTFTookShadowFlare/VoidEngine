@@ -4,7 +4,9 @@
 #include "ve/io/gfx/opengl/mesh.hpp"
 #include "ve/io/gfx/opengl/shader.hpp"
 #include "ve/io/gfx/render_target.hpp"
+#include "ve/io/gfx/opengl/texture.hpp"
 #include "ve/io/window.hpp"
+#include <cstdint>
 #include <glbinding/glbinding.h>
 #include <SDL3/SDL_video.h>
 
@@ -48,6 +50,10 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 	GraphicsProgram *RendererOpenGL::createGraphicsProgram(Shader *vertex, Shader *fragment) {
 		return new GLGraphicsProgram(vertex, fragment);
+	}
+
+	Texture *RendererOpenGL::createTexture(uint8_t slot) {
+		return new GLTexture(slot);
 	}
 }
 
