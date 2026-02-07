@@ -5,7 +5,8 @@
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
-	std::shared_ptr<Renderer> Renderer::instance = nullptr;
+	using std::shared_ptr;
+	shared_ptr<Renderer> Renderer::instance = nullptr;
 
 	Renderer::Renderer() {
 		backend = new OpenGL::RendererOpenGL;
@@ -16,7 +17,7 @@ namespace VoidEngine::IO::GFX {
 		delete backend;
 	}
 
-	std::shared_ptr<Renderer> Renderer::getInstance() {
+	shared_ptr<Renderer> Renderer::getInstance() {
 		if(instance == nullptr) {
 			instance = std::shared_ptr<Renderer>(new Renderer);
 		}
@@ -38,27 +39,32 @@ namespace VoidEngine::IO::GFX {
 		backend->setRenderTarget(target);
 	}
 
+	void Renderer::clear(glm::vec4 color) {
+		if(backend == nullptr) return;
+		backend->clear(color);
+	}
+
 	void Renderer::swapBuffers(Window *window) {
 		if(backend == nullptr) return;
 		backend->swapBuffers(window);
 	}
 
-	Mesh *Renderer::createMesh() {
+	shared_ptr<Mesh> Renderer::createMesh() {
 		if(backend == nullptr) return nullptr;
 		return backend->createMesh();
 	}
 
-	Shader *Renderer::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
+	shared_ptr<Shader> Renderer::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
 		if(backend == nullptr) return nullptr;
 		return backend->createShader(type, sourceCode);
 	}
 
-	GraphicsProgram *Renderer::createGraphicsProgram(Shader *vertex, Shader *fragment) {
+	shared_ptr<GraphicsProgram> Renderer::createGraphicsProgram(shared_ptr<Shader> vertex, shared_ptr<Shader> fragment) {
 		if(backend == nullptr) return nullptr;
 		return backend->createGraphicsProgram(vertex, fragment);
 	}
 
-	Texture *Renderer::createTexture(uint8_t slot) {
+	shared_ptr<Texture> Renderer::createTexture(uint8_t slot) {
 		if(backend == nullptr) return nullptr;
 		return backend->createTexture(slot);
 	}

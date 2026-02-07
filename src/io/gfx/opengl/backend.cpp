@@ -9,8 +9,10 @@
 #include <cstdint>
 #include <glbinding/glbinding.h>
 #include <SDL3/SDL_video.h>
+#include <glbinding/gl46core/gl.h>
 
 namespace VoidEngine::IO::GFX::OpenGL {
+	using namespace gl;
 	void RendererOpenGL::setupWindow(Window *window) {
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -36,24 +38,29 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		SDL_GL_MakeCurrent(window->window, contextMap[window]);
 	}
 
+	void RendererOpenGL::clear(glm::vec4 color) {
+		glClearColor(color.x, color.y, color.z, color.w);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
 	void RendererOpenGL::swapBuffers(Window *window) {
 		SDL_GL_SwapWindow(window->window);
 	}
 
-	Mesh *RendererOpenGL::createMesh() {
-		return new GLMesh;
+	shared_ptr<Mesh> RendererOpenGL::createMesh() {
+		return shared_ptr<Mesh>(new GLMesh);
 	}
 
-	Shader *RendererOpenGL::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
-		return new GLShader(type, sourceCode);
+	shared_ptr<Shader> RendererOpenGL::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
+		return shared_ptr<Shader>(new GLShader(type, sourceCode));
 	}
 
-	GraphicsProgram *RendererOpenGL::createGraphicsProgram(Shader *vertex, Shader *fragment) {
-		return new GLGraphicsProgram(vertex, fragment);
+	shared_ptr<GraphicsProgram> RendererOpenGL::createGraphicsProgram(shared_ptr<Shader> vertex, shared_ptr<Shader> fragment) {
+		return shared_ptr<GraphicsProgram>(new GLGraphicsProgram(vertex, fragment));
 	}
 
-	Texture *RendererOpenGL::createTexture(uint8_t slot) {
-		return new GLTexture(slot);
+	shared_ptr<Texture> RendererOpenGL::createTexture(uint8_t slot) {
+		return shared_ptr<Texture>(new GLTexture(slot));
 	}
 }
 

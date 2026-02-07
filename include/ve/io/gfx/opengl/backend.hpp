@@ -5,22 +5,25 @@
 #include <SDL3/SDL_video.h>
 #include <cstdint>
 #include <map>
+#include <memory>
 
 namespace VoidEngine::IO::GFX::OpenGL {
+	using std::shared_ptr;
 	class RendererOpenGL : public ARendererBackend {
 		std::map<Window*, SDL_GLContext> contextMap;
 	public:
 		void setupWindow(Window*);
 		void destroyWindow(Window*);
 		void setRenderTarget(ARenderTarget*);
+		void clear(glm::vec4 color);
 		void swapBuffers(Window*);
 
-		Mesh *createMesh();
+		shared_ptr<Mesh> createMesh();
 
-		Shader *createShader(ShaderType, AShaderSourceProvider&);
-		GraphicsProgram *createGraphicsProgram(Shader *vertex, Shader *fragment);
+		shared_ptr<Shader> createShader(ShaderType, AShaderSourceProvider&);
+		shared_ptr<GraphicsProgram> createGraphicsProgram(shared_ptr<Shader> vertex, shared_ptr<Shader> fragment);
 
-		Texture *createTexture(uint8_t);
+		shared_ptr<Texture> createTexture(uint8_t);
 	};
 }
 
