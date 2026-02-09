@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ve/io/gfx/mesh.hpp"
-#include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/renderer_backend.hpp"
 #include "ve/io/gfx/shader.hpp"
 #include "ve/io/gfx/shader_source_provider.hpp"
@@ -26,7 +25,7 @@ namespace VoidEngine::IO::GFX {
 		~Renderer();
 		static std::shared_ptr<Renderer> getInstance();
 
-		void setRenderTarget(ARenderTarget*);
+		void bindRenderTarget(Window*);
 		void clear(glm::vec4 color = { 0.1, 0.1, 0.1, 1.0 });
 		void swapBuffers(Window*);
 

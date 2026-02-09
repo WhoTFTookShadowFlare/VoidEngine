@@ -12,9 +12,11 @@ namespace VoidEngine::IO::GFX {
 
 		uint8_t getTextureSlot() { return slot; }
 
+		virtual void setFiltered(bool) = 0;
+		virtual bool isFiltered() = 0;
+
 		virtual void bindTexture() = 0;
 		virtual void setTextureProvider(ATextureProvider&) = 0;
-		virtual void setFiltered(bool) = 0;
 	};
 }
 

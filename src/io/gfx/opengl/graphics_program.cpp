@@ -78,7 +78,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		glUseProgram(0);
 	}
 
-	std::vector<Uniform> GLGraphicsProgram::getUniforms() {
+	constexpr std::vector<Uniform>& GLGraphicsProgram::getUniforms() {
 		return uniforms;
 	}
 
@@ -140,7 +140,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	void GLGraphicsProgram::setUniform(Uniform& uniform, vector<shared_ptr<Texture>>& data) {
 		std::vector<int32_t> texSlots(data.size());
 		for(size_t idx = 0; idx < data.size(); idx++) {
-			texSlots[idx] = data[idx]->getTextureSlot();
+			if(data[idx]) texSlots[idx] = data[idx]->getTextureSlot();
+			else data[idx] = 0;
 		}
 		setUniform(uniform, texSlots);
 	}

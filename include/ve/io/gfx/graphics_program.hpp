@@ -24,7 +24,7 @@ namespace VoidEngine::IO::GFX {
 
 		virtual void draw(std::shared_ptr<Mesh>) = 0;
 
-		virtual std::vector<Uniform> getUniforms() = 0;
+		virtual constexpr std::vector<Uniform>& getUniforms() = 0;
 
 		virtual void setUniform(Uniform&, vector<float>&) = 0;
 		virtual void setUniform(Uniform&, vector<int32_t>&) = 0;

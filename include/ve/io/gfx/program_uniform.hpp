@@ -32,13 +32,13 @@ namespace VoidEngine::IO::GFX {
 			name(name),
 			location(location),
 			type(type) {}
-
+		
 		std::string name;
 		int32_t location;
 		UniformType type;
 
 	public:
-		constexpr std::string getName() { return name; }
+		constexpr std::string& getName() { return name; }
 		constexpr int32_t getLocation() { return location; }
 		constexpr UniformType getType() { return type; }
 	};

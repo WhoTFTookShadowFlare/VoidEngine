@@ -1,9 +1,13 @@
 #include "ve/io/gfx/mesh.hpp"
+#include "ve/io/gfx/mesh_provider.hpp"
 
 namespace VoidEngine::IO::GFX {
-	void Mesh::setVertexData(std::vector<Vertex> data) { vertices = data; }
-	void Mesh::setIndexData(std::vector<uint32_t> data) { indices = data; }
-
 	std::vector<Vertex>& Mesh::getVertexData() { return vertices; }
 	std::vector<uint32_t>& Mesh::getIndexData() { return indices; }
+
+	void Mesh::setMeshFromProvider(AMeshProvider& provider) {
+		vertices = provider.getVertices();
+		indices = provider.getIndices();
+		buildMesh();
+	}
 }

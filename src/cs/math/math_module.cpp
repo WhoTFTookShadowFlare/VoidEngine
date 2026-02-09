@@ -26,7 +26,6 @@ namespace VoidEngine::CS::Math {
 	MonoArray *Rect2f_GetRectVertices(MonoObject *self);
 	MonoArray *Rect2f_SplitHorizontally(MonoObject *self, float point);
 	MonoArray *Rect2f_SplitVertically(MonoObject *self, float point);
-
 	MonoObject *Rect2f_Round(MonoObject *self);
 	MonoObject *Rect2f_Floor(MonoObject *self);
 	MonoObject *Rect2f_Ceil(MonoObject *self);

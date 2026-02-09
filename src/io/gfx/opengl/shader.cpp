@@ -13,7 +13,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		std::string sourceStr = sourceCode.getShaderSource();
 		const char *sourceCStr = sourceStr.c_str();
 
-		GLenum glShaderType;
+		GLenum glShaderType = GL_INVALID_VALUE;
 		switch(type) {
 		case VERTEX:
 			glShaderType = GL_VERTEX_SHADER;
@@ -22,6 +22,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 			glShaderType = GL_FRAGMENT_SHADER;
 			break;
 		}
+
+		if(glShaderType == GL_INVALID_VALUE) throw std::runtime_error(std::format("ShaderType ({}) was invalid!", (uint8_t) type));
 
 		shader = glCreateShader(glShaderType);
 		glShaderSource(shader, 1, &sourceCStr, nullptr);

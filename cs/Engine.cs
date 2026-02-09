@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using VoidEngine.Math;
+using VoidEngine.IO;
 
 namespace VoidEngine
 {
@@ -15,6 +16,9 @@ namespace VoidEngine
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		public static extern string GetDataDirectory();
+
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		public static extern Window GetMainWindow();
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		public static extern Rect2i[] GetMonitorAreas();

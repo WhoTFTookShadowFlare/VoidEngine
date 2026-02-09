@@ -17,7 +17,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 		void draw(shared_ptr<Mesh>);
 
-		std::vector<Uniform> getUniforms();
+		constexpr std::vector<Uniform>& getUniforms();
 
 		void setUniform(Uniform&, vector<float>&);
 		void setUniform(Uniform&, vector<int32_t>&);

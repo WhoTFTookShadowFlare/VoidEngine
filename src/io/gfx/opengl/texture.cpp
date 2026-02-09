@@ -25,9 +25,9 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 	void GLTexture::setTextureProvider(ATextureProvider& textureData) {
 		glm::ivec2 size = textureData.getSize();
-		void *data = textureData.getData();
+		std::vector<uint8_t> data = textureData.getData();
 		bindTexture();
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
 		glGenerateTextureMipmap(texture);
 	}
 
@@ -36,6 +36,11 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		GLenum filterMode = (value ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
+		filtered = value;
+	}
+
+	bool GLTexture::isFiltered() {
+		return filtered;
 	}
 }
 

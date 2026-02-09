@@ -3,29 +3,19 @@ using System.Runtime.CompilerServices;
 
 namespace VoidEngine.IO.GFX
 {
-    public sealed class Mesh
+    public sealed class FileShaderSourceProvider : AShaderSourceProvider
 	{
 #pragma warning disable CS0649
 		internal IntPtr cxxObject;
 #pragma warning restore CS0649
 
-		public extern Vertex[] Vertices {
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			get;
-		}
-
-		public extern uint[] Indices {
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			get;
-		}
-		
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		public extern Mesh();
+		public extern FileShaderSourceProvider(string filePath);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		extern ~Mesh();
+		extern ~FileShaderSourceProvider();
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		public extern void SetMeshFromProvider(AMeshProvider provider);
+		public override extern string GetShaderSource();
 	}
 }
 

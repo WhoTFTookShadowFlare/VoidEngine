@@ -1,7 +1,9 @@
 #include "ve/cs/engine_module.hpp"
 #include "ve/cs/interface.hpp"
+#include "ve/cs/io/module.hpp"
 #include "ve/cs/math/module.hpp"
 #include "ve/engine.hpp"
+#include "ve/io/window.hpp"
 #include "ve/math/rect2.hpp"
 #include <cstdint>
 #include <memory>
@@ -16,6 +18,7 @@ namespace VoidEngine::CS {
 	double Engine_GetDelta();
 	MonoString *Engine_GetExecutablePath();
 	MonoString *Engine_GetDataDirectory();
+	MonoObject *Engine_GetMainWindow();
 	MonoArray *Engine_GetMonitorAreas();
 	glm::ivec2 Engine_GetWorkspaceArea();
 	MonoArray *Engine_GetWorkspaceChunked();
@@ -27,6 +30,7 @@ namespace VoidEngine::CS {
 		mono_add_internal_call("VoidEngine.Engine::GetDelta", (void*) Engine_GetDelta);
 		mono_add_internal_call("VoidEngine.Engine::GetExecutablePath", (void*) Engine_GetExecutablePath);
 		mono_add_internal_call("VoidEngine.Engine::GetDataDirectory", (void*) Engine_GetDataDirectory);
+		mono_add_internal_call("VoidEngine.Engine::GetMainWindow", (void*) Engine_GetMainWindow);
 		mono_add_internal_call("VoidEngine.Engine::GetMonitorAreas", (void*) Engine_GetMonitorAreas);
 		mono_add_internal_call("VoidEngine.Engine::GetWorkspaceArea", (void*) Engine_GetWorkspaceArea);
 		mono_add_internal_call("VoidEngine.Engine::GetWorkspaceChunked", (void*) Engine_GetWorkspaceChunked);
@@ -49,6 +53,17 @@ namespace VoidEngine::CS {
 
 	MonoString *Engine_GetDataDirectory() {
 		return mono_string_new_wrapper(engine->getDataDirectory().string().c_str());
+	}
+
+	MonoObject *Engine_GetMainWindow() {
+		MonoObject *window = interface->allocClass(VoidEngine::CS::IO::getWindowClass());
+
+		MonoClassField *cxxObject = mono_class_get_field_from_name(VoidEngine::CS::IO::getWindowClass(), "cxxObject");
+
+		std::shared_ptr<VoidEngine::IO::Window> *winPtr = new std::shared_ptr<VoidEngine::IO::Window>(engine->getMainWindow());
+		mono_field_set_value(window, cxxObject, &winPtr);
+
+		return window;
 	}
 
 	MonoArray *Engine_GetMonitorAreas() {

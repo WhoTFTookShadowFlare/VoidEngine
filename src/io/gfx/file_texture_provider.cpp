@@ -7,6 +7,7 @@
 #include <format>
 #include <string>
 #include <sys/types.h>
+#include <vector>
 
 namespace VoidEngine::IO::GFX {
 	FileTextureProvider::FileTextureProvider(std::filesystem::path& filePath) {
@@ -34,8 +35,10 @@ namespace VoidEngine::IO::GFX {
 		return size;
 	}
 
-	void *FileTextureProvider::getData() {
-		return data;
+	std::vector<uint8_t> FileTextureProvider::getData() {
+		const size_t channels = 4;
+		std::vector<uint8_t> retVal(static_cast<uint8_t*>(data), static_cast<uint8_t*>(data) + (channels * size.x * size.y));
+		return retVal;
 	}
 }
 

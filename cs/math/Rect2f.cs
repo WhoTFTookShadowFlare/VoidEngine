@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace VoidEngine.Math
 {
-    public class Rect2f
+    public struct Rect2f
 	{
 		public Vec2f Position { get; set; }
 		public Vec2f Size { get; set; }

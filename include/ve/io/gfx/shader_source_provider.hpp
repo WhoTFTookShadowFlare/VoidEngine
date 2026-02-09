@@ -28,5 +28,13 @@ namespace VoidEngine::IO::GFX {
 
 		std::string getShaderSource() { return shaderSourceCode; }
 	};
+
+	class BasicShaderSourceProvider : public AShaderSourceProvider {
+		std::string shaderSourceCode = "";
+	public:
+		BasicShaderSourceProvider(std::string shaderSourceCode) : shaderSourceCode(shaderSourceCode) {}
+
+		std::string getShaderSource() { return shaderSourceCode; }
+	};
 }
 

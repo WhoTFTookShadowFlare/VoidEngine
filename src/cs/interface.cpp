@@ -2,6 +2,8 @@
 
 #include "ve/cs/engine_module.hpp"
 #include "ve/cs/math/module.hpp"
+#include "ve/cs/io/module.hpp"
+#include "ve/cs/io/gfx/module.hpp"
 #include "ve/engine.hpp"
 #include <algorithm>
 #include <cstdint>
@@ -58,6 +60,8 @@ namespace VoidEngine::CS {
 			instance = new CSharpInterface();
 			initModule_Engine();
 			Math::initModule_Engine_Math();
+			IO::initModule_Engine_IO();
+			IO::GFX::initModule_Engine_IO_GFX();
 		}
 		return instance;
 	}
@@ -108,6 +112,10 @@ namespace VoidEngine::CS {
 		return nullptr;
 	}
 
+	MonoObject *CSharpInterface::allocClass(MonoClass *cls) {
+		return mono_object_new(domain, cls);
+	}
+
 	MonoObject *CSharpInterface::instanceClass(MonoClass *cls) {
 		MonoObject *obj = mono_object_new(domain, cls);
 		if(obj == nullptr) {
@@ -124,7 +132,7 @@ namespace VoidEngine::CS {
 			std::cerr << "cls is nullptr" << std::endl;
 			return nullptr;
 		}
-		return mono_array_new(this->domain, mono_class_from_mono_type(mono_class_get_type(cls)), len);
+		return mono_array_new(this->domain, cls, len);
 	}
 }
 

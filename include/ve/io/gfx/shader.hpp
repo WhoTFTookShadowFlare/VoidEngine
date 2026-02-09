@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
 namespace VoidEngine::IO::GFX {
-	enum ShaderType {
-		VERTEX,
+	enum ShaderType : uint8_t {
+		VERTEX = 0,
 		FRAGMENT,
 	};
 

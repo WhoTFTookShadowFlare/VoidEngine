@@ -7,7 +7,7 @@
 namespace VoidEngine::IO {
 	Window::Window(CreationOptions& options) {
 		// TODO: Extract SDL_WINDOW_OPENGL
-		SDL_WindowFlags flags = SDL_WINDOW_OPENGL;
+		SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_TRANSPARENT;
 
 		if(options.resizable) flags |= SDL_WINDOW_RESIZABLE;
 		if(options.borderless) flags |= SDL_WINDOW_BORDERLESS;
@@ -47,6 +47,14 @@ namespace VoidEngine::IO {
 		glm::ivec2 position;
 		SDL_GetWindowPosition(window, &position.x, &position.y);
 		return position;
+	}
+
+	void Window::setTitle(std::string value) {
+		SDL_SetWindowTitle(window, value.c_str());
+	}
+
+	std::string Window::getTitle() {
+		return SDL_GetWindowTitle(window);
 	}
 }
 

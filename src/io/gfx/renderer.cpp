@@ -1,6 +1,5 @@
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/opengl/backend.hpp"
-#include "ve/io/gfx/render_target.hpp"
 #include <cstdint>
 #include <memory>
 
@@ -34,9 +33,9 @@ namespace VoidEngine::IO::GFX {
 		backend->destroyWindow(window);
 	}
 
-	void Renderer::setRenderTarget(ARenderTarget *target) {
+	void Renderer::bindRenderTarget(Window *target) {
 		if(backend == nullptr) return;
-		backend->setRenderTarget(target);
+		backend->bindRenderTarget(target);
 	}
 
 	void Renderer::clear(glm::vec4 color) {

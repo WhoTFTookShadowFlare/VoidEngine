@@ -3,7 +3,6 @@
 #include "ve/io/gfx/opengl/graphics_program.hpp"
 #include "ve/io/gfx/opengl/mesh.hpp"
 #include "ve/io/gfx/opengl/shader.hpp"
-#include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/opengl/texture.hpp"
 #include "ve/io/window.hpp"
 #include <cstdint>
@@ -33,8 +32,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		contextMap.erase(window);
 	}
 
-	void RendererOpenGL::setRenderTarget(ARenderTarget *target) {
-		Window *window = static_cast<Window*>(target);
+	void RendererOpenGL::bindRenderTarget(Window *window) {
 		SDL_GL_MakeCurrent(window->window, contextMap[window]);
 	}
 
