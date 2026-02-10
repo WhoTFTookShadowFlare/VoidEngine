@@ -86,7 +86,6 @@ namespace VoidEngine::CS::IO {
 		MonoClassField *cxxObject = mono_class_get_field_from_name(windowCreationOptionsClass, "cxxObject");
 		Window::CreationOptions *opts = new Window::CreationOptions;
 		mono_field_set_value(self, cxxObject, &opts);
-		std::cout << opts << std::endl;
 	}
 
 	void WindowCreationOptions_finalize(MonoObject *self) {
@@ -110,7 +109,6 @@ namespace VoidEngine::CS::IO {
 		MonoClassField *cxxObject = mono_class_get_field_from_name(windowCreationOptionsClass, "cxxObject");
 		Window::CreationOptions *opts = nullptr;
 		mono_field_get_value(self, cxxObject, &opts);
-		std::cout << opts << std::endl;
 		opts->size = value;
 	}
 

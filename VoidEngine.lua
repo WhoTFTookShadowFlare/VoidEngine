@@ -34,24 +34,3 @@ project "VoidEngine"
 	usage "PUBLIC"
 		includedirs { "include" }
 
-	filter "configurations:debug"
-		defines { "DEBUG" }
-		symbols "On"
-
-	filter "configurations:release"
-		defines { "NDEBUG" }
-		optimize "On"
-
-	filter "platforms:mac"
-		system "macosx"
-		architecture "UNIVERSAL"
-
-	filter "platforms:win*"
-		system "windows"
-
-	filter "platforms:linux*"
-		system "linux"
-
-	filter "platforms:*64"
-		architecture "x86_64"
-

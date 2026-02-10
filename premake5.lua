@@ -31,8 +31,10 @@ filter "platforms:*ARM64"
 
 filter "configurations:debug"
 	symbols "On"
+	defines { "DEBUG" }
 filter "configurations:release"
 	optimize "On"
+	defines { "NDEBUG" }
 
 require("VoidEngine")
 

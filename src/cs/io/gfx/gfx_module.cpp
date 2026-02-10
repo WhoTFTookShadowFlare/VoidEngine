@@ -806,7 +806,6 @@ namespace VoidEngine::CS::IO::GFX {
 		glm::ivec2 size;
 		MonoObject *sizeObj = mono_runtime_invoke(providerGetSize, provider, nullptr, nullptr);
 		size = *(glm::ivec2*) mono_object_unbox(sizeObj);
-		std::cout << std::format("{{ {}, {} }}", size.x, size.y) << std::endl;
 
 		MonoArray *dataArr = (MonoArray*) mono_runtime_invoke(providerGetData, provider, nullptr, nullptr);
 		auto data = interface->monoArrayToVector<uint8_t>(dataArr);
