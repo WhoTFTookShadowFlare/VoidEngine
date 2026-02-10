@@ -29,7 +29,7 @@ project "VoidEngine"
 			links { "mono-2.0" }
 		filter "platforms:win*"
 			libdirs { "C:/Program Files/Mono/lib" }
-			links { "mono-2.0-sgen" }
+			links { "mono-2.0" }
 
 	usage "PUBLIC"
 		includedirs { "include" }
