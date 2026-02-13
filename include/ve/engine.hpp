@@ -14,7 +14,7 @@ namespace VoidEngine {
 		class Window;
 	}
 
-	class Engine {
+	class Engine final {
 		friend class IO::Window;
 		Engine() {}
 	

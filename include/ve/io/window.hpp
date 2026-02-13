@@ -7,7 +7,7 @@
 #include "ve/io/gfx/opengl/backend.hpp"
 
 namespace VoidEngine::IO {
-	class Window {
+	class Window final {
 		friend class GFX::OpenGL::RendererOpenGL;
 	public:
 		struct CreationOptions {

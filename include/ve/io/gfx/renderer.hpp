@@ -11,7 +11,7 @@
 
 namespace VoidEngine::IO::GFX {
 	using std::shared_ptr;
-	class Renderer {
+	class Renderer final {
 		friend class ::VoidEngine::IO::Window;
 		static shared_ptr<Renderer> instance;
 		ARendererBackend *backend = nullptr;
