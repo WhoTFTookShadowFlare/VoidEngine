@@ -2,12 +2,14 @@
 #include "ve/cs/io/gfx/module.hpp"
 #include "ve/cs/scene/module.hpp"
 #include "ve/io/gfx/mesh.hpp"
+#include "ve/scene/component_updater.hpp"
 #include "ve/scene/components/mesh.hpp"
 #include "ve/scene/components/mono.hpp"
 #include "ve/scene/components/transform.hpp"
 #include "ve/scene/game_object.hpp"
 #include "ve/scene/object_component.hpp"
 #include "ve/scene/scene.hpp"
+#include <cstdint>
 #include <format>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
@@ -21,6 +23,7 @@
 namespace VoidEngine::CS::Scene {
 	using namespace std;
 	using namespace VoidEngine::Scene::Components;
+	using VoidEngine::Scene::ComponentUpdater;
 
 	void Scene_ctor(MonoObject*);
 	void Scene_finalize(MonoObject*);
@@ -33,6 +36,15 @@ namespace VoidEngine::CS::Scene {
 	void GameObject_AddComponent(MonoObject*, MonoObject*);
 	MonoArray *GameObject_GetComponents(MonoObject*);
 	void GameObject_RemoveComponent(MonoObject*, MonoObject*);
+
+	void ComponentUpdater_finalize(MonoObject*);
+	MonoObject *ComponentUpdater_GetInstance(uint32_t);
+	uint32_t ComponentUpdater_GetInstanceCount();
+	bool ComponentUpdater_IsComponentUpdating(MonoObject*);
+	void ComponentUpdater_AddComponent(MonoObject*, MonoObject*);
+	void ComponentUpdater_RemoveComponent(MonoObject*, MonoObject*);
+	bool ComponentUpdater_HandlesComponent(MonoObject*, MonoObject*);
+	void ComponentUpdater_UpdateComponents(MonoObject*, double);
 
 	void AObjectComponent_ctor(MonoObject*);
 	void AObjectComponent_finalize(MonoObject*);
@@ -58,6 +70,7 @@ namespace VoidEngine::CS::Scene {
 	void MeshComponent_Draw(MonoObject*, double);
 
 	MonoClass *sceneClass = nullptr, *gameObjectClass = nullptr, *objectComponentClass = nullptr;
+	MonoClass *componentUpdaterClass = nullptr;
 	MonoClass *transformComponentClass = nullptr, *meshComponentClass = nullptr;
 
 	CSharpInterface *interface = nullptr;
@@ -73,6 +86,15 @@ namespace VoidEngine::CS::Scene {
 		mono_add_internal_call("VoidEngine.Scene.GameObject::Finalize", (void*) GameObject_finalize);
 		mono_add_internal_call("VoidEngine.Scene.GameObject::AddComponent", (void*) GameObject_AddComponent);
 		mono_add_internal_call("VoidEngine.Scene.GameObject::GetComponents", (void*) GameObject_GetComponents);
+
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::Finalize", (void*) ComponentUpdater_finalize);
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::GetInstance", (void*) ComponentUpdater_GetInstance);
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::GetInstanceCount", (void*) ComponentUpdater_GetInstanceCount);
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::IsComponentUpdating", (void*) ComponentUpdater_IsComponentUpdating);
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::AddComponent", (void*) ComponentUpdater_AddComponent);
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::RemoveComponent", (void*) ComponentUpdater_RemoveComponent);
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::HandlesComponent", (void*) ComponentUpdater_HandlesComponent);
+		mono_add_internal_call("VoidEngine.Scene.ComponentUpdater::UpdateComponents", (void*) ComponentUpdater_UpdateComponents);
 
 		mono_add_internal_call("VoidEngine.Scene.AObjectComponent::.ctor", (void*) AObjectComponent_ctor);
 		mono_add_internal_call("VoidEngine.Scene.AObjectComponent::Finalize", (void*) AObjectComponent_finalize);
@@ -101,14 +123,15 @@ namespace VoidEngine::CS::Scene {
 
 		sceneClass = interface->getClass("VoidEngine.Scene", "Scene");
 		gameObjectClass = interface->getClass("VoidEngine.Scene", "GameObject");
+		componentUpdaterClass = interface->getClass("VoidEngine.Scene", "ComponentUpdater");
 		objectComponentClass = interface->getClass("VoidEngine.Scene", "AObjectComponent");
-
 		transformComponentClass = interface->getClass("VoidEngine.Scene.Components", "TransformComponent");
 		meshComponentClass = interface->getClass("VoidEngine.Scene.Components", "MeshComponent");
 	}
 
 	MonoClass *getSceneClass(void) { return sceneClass; }
 	MonoClass *getGameObjectClass(void) { return gameObjectClass; }
+	MonoClass *getComponentUpdaterClass(void) { return componentUpdaterClass; }
 	MonoClass *getAObjectComponentClass(void) { return objectComponentClass; }
 	MonoClass *getTransformComponentClass(void) { return transformComponentClass; }
 	MonoClass *getMeshComponentClass(void) { return meshComponentClass; }
@@ -291,6 +314,109 @@ namespace VoidEngine::CS::Scene {
 		mono_field_get_value(compToRemove, compCxxObject, &comp);
 
 		(*obj)->removeComponent(*comp);
+	}
+
+	void ComponentUpdater_finalize(MonoObject *self) {
+		if(self == nullptr) {
+			mono_raise_exception(mono_get_exception_null_reference());
+			return;
+		}
+
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getComponentUpdaterClass(), "cxxObject");
+		shared_ptr<ComponentUpdater> *updater = nullptr;
+		mono_field_get_value(self, cxxObject, updater);
+		if(updater == nullptr) delete updater;
+	}
+
+	MonoObject *ComponentUpdater_GetInstance(uint32_t idx) {
+		shared_ptr<ComponentUpdater> *updater = new shared_ptr<ComponentUpdater>(ComponentUpdater::getInstance(idx));
+
+		MonoObject *obj = interface->allocClass(getComponentUpdaterClass());
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getComponentUpdaterClass(), "cxxObject");
+		mono_field_set_value(obj, cxxObject, &updater);
+
+		return obj;
+	}
+
+	uint32_t ComponentUpdater_GetInstanceCount() {
+		return ComponentUpdater::getInstanceCount();
+	}
+
+	bool ComponentUpdater_IsComponentUpdating(MonoObject *component) {
+		if(component == nullptr) {
+			mono_raise_exception(mono_get_exception_null_reference());
+			return false;
+		}
+
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getAObjectComponentClass(), "cxxObject");
+		shared_ptr<VoidEngine::Scene::AObjectComponent> *comp = nullptr;
+		mono_field_get_value(component, cxxObject, &comp);
+		
+		return ComponentUpdater::isComponentUpdating(*comp);
+	}
+
+	void ComponentUpdater_AddComponent(MonoObject *self, MonoObject *component) {
+		if(self == nullptr || component == nullptr) {
+			mono_raise_exception(mono_get_exception_null_reference());
+			return;
+		}
+
+		shared_ptr<ComponentUpdater> *updater = nullptr;
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getComponentUpdaterClass(), "cxxObject");
+		mono_field_get_value(self, cxxObject, &updater);
+
+		shared_ptr<VoidEngine::Scene::AObjectComponent> *comp = nullptr;
+		MonoClassField *compCxxObject = mono_class_get_field_from_name(getAObjectComponentClass(), "cxxObject");
+		mono_field_get_value(component, compCxxObject, &comp);
+
+		(*updater)->addComponent(*comp);
+	}
+
+	void ComponentUpdater_RemoveComponent(MonoObject *self, MonoObject *component) {
+		if(self == nullptr || component == nullptr) {
+			mono_raise_exception(mono_get_exception_null_reference());
+			return;
+		}
+
+		shared_ptr<ComponentUpdater> *updater = nullptr;
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getComponentUpdaterClass(), "cxxObject");
+		mono_field_get_value(self, cxxObject, &updater);
+
+		shared_ptr<VoidEngine::Scene::AObjectComponent> *comp = nullptr;
+		MonoClassField *compCxxObject = mono_class_get_field_from_name(getAObjectComponentClass(), "cxxObject");
+		mono_field_get_value(component, compCxxObject, &comp);
+
+		(*updater)->removeComponent(*comp);
+	}
+
+	bool ComponentUpdater_HandlesComponent(MonoObject *self, MonoObject *component) {
+		if(self == nullptr || component == nullptr) {
+			mono_raise_exception(mono_get_exception_null_reference());
+			return false;
+		}
+
+		shared_ptr<ComponentUpdater> *updater = nullptr;
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getComponentUpdaterClass(), "cxxObject");
+		mono_field_get_value(self, cxxObject, &updater);
+
+		shared_ptr<VoidEngine::Scene::AObjectComponent> *comp = nullptr;
+		MonoClassField *compCxxObject = mono_class_get_field_from_name(getAObjectComponentClass(), "cxxObject");
+		mono_field_get_value(component, compCxxObject, &comp);
+
+		return (*updater)->handlesComponent(*comp);
+	}
+
+	void ComponentUpdater_UpdateComponents(MonoObject *self, double delta) {
+		if(self == nullptr) {
+			mono_raise_exception(mono_get_exception_null_reference());
+			return;
+		}
+
+		shared_ptr<ComponentUpdater> *updater = nullptr;
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getComponentUpdaterClass(), "cxxObject");
+		mono_field_get_value(self, cxxObject, &updater);
+
+		(*updater)->updateComponents(delta);
 	}
 
 	void AObjectComponent_ctor(MonoObject *self) {

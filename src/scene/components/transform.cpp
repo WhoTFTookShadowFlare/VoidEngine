@@ -17,12 +17,11 @@ namespace VoidEngine::Scene::Components {
 			matrix = parent->getMatrix();
 		}
 
+		matrix = glm::translate(matrix, position);
 		matrix = glm::rotate(matrix, glm::radians(rotation.x), { 1.0f, 0.0f, 0.0f });
 		matrix = glm::rotate(matrix, glm::radians(rotation.y), { 0.0f, 1.0f, 0.0f });
 		matrix = glm::rotate(matrix, glm::radians(rotation.z), { 0.0f, 0.0f, 1.0f });
-
 		matrix = glm::scale(matrix, scale);
-		matrix = glm::translate(matrix, position);
 		
 		return matrix;
 	}

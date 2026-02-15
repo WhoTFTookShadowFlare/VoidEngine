@@ -2,6 +2,7 @@
 #include "ve/engine_events.hpp"
 #include "ve/io/window.hpp"
 #include "ve/math/rect2.hpp"
+#include "ve/scene/component_updater.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_rect.h>
@@ -64,6 +65,8 @@ namespace VoidEngine {
 			signal(SIGTERM, sigHandler);
 			IO::Window::CreationOptions options {};
 			instance->mainWindow = IO::Window::create(options);
+
+			Scene::ComponentUpdater::ensureSetup();
 		}
 		return instance;
 	}
