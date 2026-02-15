@@ -9,5 +9,6 @@ namespace VoidEngine::CS::Scene {
 	MonoClass *getGameObjectClass(void);
 	MonoClass *getAObjectComponentClass(void);
 	MonoClass *getTransformComponentClass(void);
+	MonoClass *getMeshComponentClass(void);
 }
 

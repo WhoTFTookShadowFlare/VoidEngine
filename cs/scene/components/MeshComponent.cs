@@ -1,45 +1,43 @@
 using System;
 using System.Runtime.CompilerServices;
-using VoidEngine.Math;
+using VoidEngine.IO.GFX;
 
 namespace VoidEngine.Scene.Components
 {
-    public class TransformComponent : AObjectComponent
+    public class MeshComponent : AObjectComponent
 	{
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		public extern TransformComponent();
+		public extern MeshComponent();
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		extern ~TransformComponent();
-
-		public extern Vec3f Position
-		{
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			set;
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			get;
-		}
-
-		public extern Vec3f Rotation
-		{
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			set;
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			get;
-		}
-
-		public extern Vec3f Scale
-		{
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			set;
-			[MethodImplAttribute(MethodImplOptions.InternalCall)]
-			get;
-		}
+		extern ~MeshComponent();
 
 		public override void Update(double delta) {}
-		public override void Draw(double delta) {}
-
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		public extern Mat4x4f GetMatrix();
+		public override extern void Draw(double delta);
+
+		public extern TransformComponent Transform
+		{
+			[MethodImplAttribute(MethodImplOptions.InternalCall)]
+			set;
+			[MethodImplAttribute(MethodImplOptions.InternalCall)]
+			get;
+		}
+
+		public extern Mesh ToDraw
+		{
+			[MethodImplAttribute(MethodImplOptions.InternalCall)]
+			set;
+			[MethodImplAttribute(MethodImplOptions.InternalCall)]
+			get;
+		}
+
+		public extern GraphicsProgram Program
+		{
+			[MethodImplAttribute(MethodImplOptions.InternalCall)]
+			set;
+			[MethodImplAttribute(MethodImplOptions.InternalCall)]
+			get;
+		}
 	}
 }
 

@@ -14,12 +14,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
-#include <format>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <glm/ext/vector_int2.hpp>
-#include <iostream>
 #include <memory>
 #include <mono-2.0/mono/metadata/appdomain.h>
 #include <mono-2.0/mono/metadata/class.h>

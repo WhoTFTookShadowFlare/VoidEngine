@@ -23,7 +23,7 @@ namespace VoidEngine.Scene
 		extern ~Scene();
 
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
-		public extern void draw(double delta);
+		public extern void Draw(double delta);
 	}
 }
 
