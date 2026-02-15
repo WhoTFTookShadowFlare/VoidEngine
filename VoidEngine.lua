@@ -14,6 +14,8 @@ project "VoidEngine"
 	cppdialect "C++23"
 	targetdir(tostring(_MAIN_SCRIPT_DIR) .. "/bin/%{cfg.buildcfg}")
 
+	rtti "On"
+
 	files { "src/**.hpp", "src/**.cpp" }
 
 	usage "PUBLIC"

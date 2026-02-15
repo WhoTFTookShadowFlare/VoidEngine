@@ -1,0 +1,13 @@
+#pragma once
+
+#include <mono-2.0/mono/metadata/object-forward.h>
+
+namespace VoidEngine::CS::Scene {
+	void initModule_Engine_Scene(void);
+
+	MonoClass *getSceneClass(void);
+	MonoClass *getGameObjectClass(void);
+	MonoClass *getAObjectComponentClass(void);
+	MonoClass *getTransformComponentClass(void);
+}
+

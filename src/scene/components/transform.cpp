@@ -1,10 +1,15 @@
 #include "ve/scene/components/transform.hpp"
+#include "ve/cs/scene/module.hpp"
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
+#include <mono-2.0/mono/metadata/object-forward.h>
 
 namespace VoidEngine::Scene::Components {
+	MonoClass *TransformComponent::getCSClass() {
+		return VoidEngine::CS::Scene::getTransformComponentClass();
+	}
 	glm::mat4 TransformComponent::getMatrix() {
 		glm::mat4 matrix(1.0f);
 		

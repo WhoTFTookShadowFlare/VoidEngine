@@ -1,4 +1,5 @@
 #include "ve/scene/components/mono.hpp"
+#include "ve/cs/scene/module.hpp"
 #include <iostream>
 #include <mono-2.0/mono/metadata/class.h>
 #include <mono-2.0/mono/metadata/object-forward.h>
@@ -9,12 +10,20 @@ namespace VoidEngine::Scene::Components	{
 	using namespace std;
 
 	MonoComponent::MonoComponent(MonoObject *self) :
-		inst(self),
-		instClass(mono_object_get_class(inst)),
-		updateFunc(mono_class_get_method_from_name(instClass, "update", 1)),
-		drawFunc(mono_class_get_method_from_name(instClass, "draw", 1)) {	}
+		gcHandle(mono_gchandle_new_weakref(self, false)),
+		instClass(mono_object_get_class(mono_gchandle_get_target(gcHandle))),
+		updateFunc(mono_class_get_method_from_name(instClass, "Update", 1)),
+		drawFunc(mono_class_get_method_from_name(instClass, "Draw", 1)) {	}
+
+	MonoComponent::~MonoComponent() {
+		mono_gchandle_free(gcHandle);
+		std::cout << "~MonoComponent" << std::endl;
+	}
 
 	void MonoComponent::draw(double delta) {
+		MonoObject *inst = mono_gchandle_get_target(gcHandle);
+		if(inst == nullptr) return;
+
 		if(drawFunc == nullptr || inst == nullptr)
 			throw runtime_error("[ERROR] A MonoComponent is missing either the MonoObject or the Draw(double) function");
 
@@ -29,6 +38,9 @@ namespace VoidEngine::Scene::Components	{
 	}
 
 	void MonoComponent::update(double delta) {
+		MonoObject *inst = mono_gchandle_get_target(gcHandle);
+		if(inst == nullptr) return;
+
 		if(updateFunc == nullptr || inst == nullptr)
 			throw runtime_error("[ERROR] A MonoComponent is missing either the MonoObject or the Update(double) function");
 
@@ -40,6 +52,14 @@ namespace VoidEngine::Scene::Components	{
 		if(exception != nullptr) {
 			cerr << "[ERROR] A MonoComponent threw an exception in Update(double)" << endl;
 		}
+	}
+
+	MonoClass *MonoComponent::getCSClass() {
+		return instClass;
+	}
+
+	MonoObject *MonoComponent::getObject() {
+		return mono_gchandle_get_target(gcHandle);
 	}
 }
 

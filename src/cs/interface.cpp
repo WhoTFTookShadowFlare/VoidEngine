@@ -4,6 +4,7 @@
 #include "ve/cs/math/module.hpp"
 #include "ve/cs/io/module.hpp"
 #include "ve/cs/io/gfx/module.hpp"
+#include "ve/cs/scene/module.hpp"
 #include "ve/engine.hpp"
 #include <algorithm>
 #include <cstdint>
@@ -62,6 +63,7 @@ namespace VoidEngine::CS {
 			Math::initModule_Engine_Math();
 			IO::initModule_Engine_IO();
 			IO::GFX::initModule_Engine_IO_GFX();
+			Scene::initModule_Engine_Scene();
 		}
 		return instance;
 	}

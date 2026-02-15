@@ -11,6 +11,9 @@ namespace VoidEngine::Scene {
 	public:
 		
 		void addComponent(shared_ptr<AObjectComponent> component);
+		vector<shared_ptr<AObjectComponent>> getComponents();
+		void removeComponent(shared_ptr<AObjectComponent> component);
+
 		void draw(double delta);
 	};
 }
