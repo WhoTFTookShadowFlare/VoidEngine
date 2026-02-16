@@ -2,6 +2,8 @@
 #include "ve/scene/object_component.hpp"
 #include <algorithm>
 #include <cstdint>
+#include <format>
+#include <iostream>
 #include <memory>
 #include <thread>
 #include <vector>

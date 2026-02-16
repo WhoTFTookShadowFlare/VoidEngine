@@ -27,6 +27,8 @@ namespace VoidEngine::CS {
 		MonoObject *instanceClass(MonoClass *cls);
 		MonoArray *allocArray(MonoClass *cls, uint32_t len);
 
+		MonoClass *getClassFromRuntimeType(MonoObject *runtimeType);
+
 		template<typename CxxType>
 		constexpr std::vector<CxxType> monoArrayToVector(MonoArray *array) {
 			std::vector<CxxType> converted(mono_array_length(array));

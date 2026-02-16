@@ -9,6 +9,12 @@ namespace VoidEngine.Scene
 		internal IntPtr cxxObject;
 #pragma warning restore CS0649
 
+		public extern GameObject[] TiedTo
+		{
+			[MethodImplAttribute(MethodImplOptions.InternalCall)]
+			get;
+		}
+
 		public abstract void Update(double delta);
 		public abstract void Draw(double delta);
 

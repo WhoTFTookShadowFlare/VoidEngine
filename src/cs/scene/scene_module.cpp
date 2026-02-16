@@ -48,6 +48,7 @@ namespace VoidEngine::CS::Scene {
 
 	void AObjectComponent_ctor(MonoObject*);
 	void AObjectComponent_finalize(MonoObject*);
+	MonoArray *AObjectComponent_get_TiedTo(MonoObject*);
 
 	void TransformComponent_ctor(MonoObject*);
 	void TransformComponent_finalize(MonoObject*);
@@ -98,6 +99,7 @@ namespace VoidEngine::CS::Scene {
 
 		mono_add_internal_call("VoidEngine.Scene.AObjectComponent::.ctor", (void*) AObjectComponent_ctor);
 		mono_add_internal_call("VoidEngine.Scene.AObjectComponent::Finalize", (void*) AObjectComponent_finalize);
+		mono_add_internal_call("VoidEngine.Scene.AObjectComponent::get_TiedTo", (void*) AObjectComponent_get_TiedTo);
 
 		mono_add_internal_call("VoidEngine.Scene.Components.TransformComponent::.ctor", (void*) TransformComponent_ctor);
 		mono_add_internal_call("VoidEngine.Scene.Components.TransformComponent::Finalize", (void*) TransformComponent_finalize);
@@ -324,7 +326,7 @@ namespace VoidEngine::CS::Scene {
 
 		MonoClassField *cxxObject = mono_class_get_field_from_name(getComponentUpdaterClass(), "cxxObject");
 		shared_ptr<ComponentUpdater> *updater = nullptr;
-		mono_field_get_value(self, cxxObject, updater);
+		mono_field_get_value(self, cxxObject, &updater);
 		if(updater == nullptr) delete updater;
 	}
 
@@ -440,6 +442,31 @@ namespace VoidEngine::CS::Scene {
 		shared_ptr<VoidEngine::Scene::Components::MonoComponent> *comp = nullptr;
 		mono_field_get_value(self, cxxObject, &comp);
 		if(comp != nullptr) delete comp;
+	}
+
+	MonoArray *AObjectComponent_get_TiedTo(MonoObject *self) {
+		if(self == nullptr) {
+			mono_raise_exception(mono_get_exception_null_reference());
+			return nullptr;
+		}
+
+		MonoClassField *cxxObject = mono_class_get_field_from_name(getAObjectComponentClass(), "cxxObject");
+		shared_ptr<VoidEngine::Scene::AObjectComponent> *comp = nullptr;
+		mono_field_get_value(self, cxxObject, &comp);
+
+		auto objList = (*comp)->getObjectsUsing();
+
+		MonoArray *array = interface->allocArray(getGameObjectClass(), objList.size());
+
+		MonoClassField *objCxxObject = mono_class_get_field_from_name(getGameObjectClass(), "cxxObject");
+		for(size_t idx = 0; idx < objList.size(); idx++) {
+			MonoObject *obj = interface->allocClass(getGameObjectClass());
+			shared_ptr<VoidEngine::Scene::GameObject> *objPtr = new shared_ptr<VoidEngine::Scene::GameObject>(objList[idx]);
+			mono_field_set_value(obj, objCxxObject, &objPtr);
+			mono_array_set(array, MonoObject*, idx, obj);
+		}
+
+		return array;
 	}
 
 	void TransformComponent_ctor(MonoObject *self) {

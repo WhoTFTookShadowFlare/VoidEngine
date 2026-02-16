@@ -6,7 +6,7 @@
 
 namespace VoidEngine::Scene {
 	using namespace std;
-	class GameObject final {
+	class GameObject final : public enable_shared_from_this<GameObject> {
 		vector<shared_ptr<AObjectComponent>> components = {};
 	public:
 		

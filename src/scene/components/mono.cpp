@@ -1,5 +1,4 @@
 #include "ve/scene/components/mono.hpp"
-#include "ve/cs/scene/module.hpp"
 #include <iostream>
 #include <mono-2.0/mono/metadata/class.h>
 #include <mono-2.0/mono/metadata/object-forward.h>
@@ -10,14 +9,16 @@ namespace VoidEngine::Scene::Components	{
 	using namespace std;
 
 	MonoComponent::MonoComponent(MonoObject *self) :
-		gcHandle(mono_gchandle_new_weakref(self, false)),
-		instClass(mono_object_get_class(mono_gchandle_get_target(gcHandle))),
+		// TODO: Fix small memory leak here
+		//	Cuased by cyclic reference
+		//	Better to keep than delete prematurly
+		gcHandle(mono_gchandle_new(self, false)),
+		instClass(mono_object_get_class(self)),
 		updateFunc(mono_class_get_method_from_name(instClass, "Update", 1)),
 		drawFunc(mono_class_get_method_from_name(instClass, "Draw", 1)) {	}
 
 	MonoComponent::~MonoComponent() {
 		mono_gchandle_free(gcHandle);
-		std::cout << "~MonoComponent" << std::endl;
 	}
 
 	void MonoComponent::draw(double delta) {
