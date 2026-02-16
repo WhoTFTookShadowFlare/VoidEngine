@@ -136,5 +136,26 @@ namespace VoidEngine::CS {
 		}
 		return mono_array_new(this->domain, cls, len);
 	}
+
+	MonoClass *CSharpInterface::getClassFromRuntimeType(MonoObject *runtimeType) {
+		if(runtimeType == nullptr) {
+			std::cerr << "runtimeType is nullptr" << std::endl;
+			return nullptr;
+		}
+
+		MonoClass *rttClass = mono_object_get_class(runtimeType);
+		MonoProperty *propName = mono_class_get_property_from_name(rttClass, "Name");
+		MonoProperty *propNS = mono_class_get_property_from_name(rttClass, "Namespace");
+
+		if(propName == nullptr || propNS == nullptr) {
+			std::cerr << "runtimeType is missing either a \"Name\" or \"Namespace\" property" << std::endl;
+			return nullptr;
+		}
+
+		MonoString *propNameVal = (MonoString*) mono_property_get_value(propName, runtimeType, nullptr, nullptr);
+		MonoString *propNSVal = (MonoString*) mono_property_get_value(propNS, runtimeType, nullptr, nullptr);
+		
+		return getClass(mono_string_to_utf8(propNSVal), mono_string_to_utf8(propNameVal));
+	}
 }
 
