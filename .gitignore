@@ -12,3 +12,6 @@ compile_commands.json
 *.csproj*
 
 .vs/
+
+build/
+
