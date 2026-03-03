@@ -1,4 +1,5 @@
 require("VoidEngineCSAPI")
+require("VELibs")
 
 newoption {
 	trigger = "disableOpenGL",
@@ -19,14 +20,15 @@ project "VoidEngine"
 	files { "src/**.hpp", "src/**.cpp" }
 
 	usage "PUBLIC"
+		uses { "SDL3" }
 		filter "options:not disableOpenGL"
+			uses { "glbinding" }
 			defines { "GFX_BACKEND_GL" }
 
 	usage "PRIVATE"
 		includedirs { "stb" }
 
 	usage "INTERFACE"
-		links { "SDL3",  "glbinding" }
 		filter "platforms:not win*"
 			links { "mono-2.0" }
 		filter "platforms:win*"

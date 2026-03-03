@@ -17,7 +17,7 @@
 #include <glm/ext/vector_int2.hpp>
 #include <iostream>
 #include <memory>
-#include <glbinding/gl46core/gl.h>
+// #include <glbinding/gl46core/gl.h>
 #include <SDL3/SDL.h>
 #include <vector>
 
@@ -31,7 +31,7 @@
 #endif // _WIN64
 
 namespace VoidEngine {
-	using namespace gl;
+	// using namespace gl;
 
 	std::shared_ptr<Engine> Engine::instance = nullptr;
 

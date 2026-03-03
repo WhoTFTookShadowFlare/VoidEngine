@@ -6,13 +6,26 @@ workspace "VoidEngine"
 		"mac"
 	}
 
+	local defaulttarget = "debug_"
 	if _TARGET_OS == "windows" then
-		defaultplatform "win64"
+		defaulttarget = defaulttarget .. "win_"
 	elseif _TARGET_OS == "linux" then
-		defaultplatform "linux64"
+		defaulttarget = defaulttarget .. "linux_"
 	elseif _TARGET_OS == "macosx" then
-		defaultplatform "mac"
+		defaulttarget = defaulttarget .. "mac"
 	end
+
+	if _TARGET_OS ~= "macosx" then
+		if os.hostarch() == "x86_64" then
+			defaulttarget = defaulttarget .. "x64"
+		elseif os.hostarch() == "x86" then
+			defaulttarget = defaulttarget .. "x86"
+		elseif os.hostarch() == "AARCH64" then
+			defaulttarget = defaulttarget .. "ARM64"
+		end
+	end
+
+	defaultplatform(defaulttarget)
 
 filter "platforms:win*"
 	system "windows"

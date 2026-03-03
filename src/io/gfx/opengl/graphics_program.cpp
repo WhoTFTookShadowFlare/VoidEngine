@@ -82,7 +82,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		return uniforms;
 	}
 
-	void GLGraphicsProgram::setUniform(Uniform& uniform, std::vector<float>& data) {
+	void GLGraphicsProgram::setUniform(Uniform& uniform, vector<float>& data) {
 		glUseProgram(program);
 		glUniform1fv(uniform.getLocation(), data.size(), data.data());
 		glUseProgram(0);
@@ -131,7 +131,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		glUseProgram(0);
 	}
 
-	void GLGraphicsProgram::setUniform(Uniform& uniform, std::vector<glm::mat4>& data) {
+	void GLGraphicsProgram::setUniform(Uniform& uniform, vector<glm::mat4>& data) {
 		glUseProgram(program);
 		glUniformMatrix4fv(uniform.getLocation(), data.size(), false, reinterpret_cast<float*>(data.data()));
 		glUseProgram(0);
