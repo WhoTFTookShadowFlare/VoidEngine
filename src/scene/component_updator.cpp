@@ -9,49 +9,32 @@
 #include <vector>
 
 namespace VoidEngine::Scene {
-	vector<shared_ptr<ComponentUpdater>> ComponentUpdater::instances = {};
+	shared_ptr<ComponentUpdater> ComponentUpdater::instance = nullptr;
 
 	ComponentUpdater::ComponentUpdater() {}
 
 	void ComponentUpdater::ensureSetup() {
-		if(instances.size() == 0)
-			instances.resize(max(thread::hardware_concurrency(), (uint32_t) 1));
+		if(instance == nullptr) instance = shared_ptr<ComponentUpdater>(new ComponentUpdater);
 	}
 
-	shared_ptr<ComponentUpdater> ComponentUpdater::getInstance(uint32_t idx) {
-		if(instances.size() == 0) {
-			uint32_t maxUpdaters = std::max(thread::hardware_concurrency(), (uint32_t) 1);
-			instances.resize(maxUpdaters);
-		}
-		if(instances[idx % instances.size()] == nullptr) instances[idx % instances.size()] = shared_ptr<ComponentUpdater>(new ComponentUpdater);
-		return instances[idx % instances.size()];
-	}
-
-	uint32_t ComponentUpdater::getInstanceCount() {
-		return instances.size();
+	shared_ptr<ComponentUpdater> ComponentUpdater::getInstance() {
+		if(instance == nullptr) instance = shared_ptr<ComponentUpdater>(new ComponentUpdater);
+		return instance;
 	}
 
 	bool ComponentUpdater::isComponentUpdating(shared_ptr<AObjectComponent> component) {
-		for(const auto& updater : instances) {
-			if(updater == nullptr) continue;
-			if(updater->handlesComponent(component)) return true;
-		}
-		return false;
+		return find_if(components.cbegin(), components.cend(), [&component](const auto& updated) {
+			return component == updated.lock();
+			}) != components.end();
 	}
 
 	void ComponentUpdater::cleanComponents() {
-		for(auto comp = components.end(); comp != components.begin(); comp--) {
-			if(comp->expired()) {
-				iter_swap(comp, components.end());
-				components.pop_back();
-			}
-		}
-	}
-
-	bool ComponentUpdater::handlesComponent(shared_ptr<AObjectComponent> comp) {
-		return find_if(components.begin(), components.end(), [&comp](const auto& updated) {
-			return comp == updated.lock();
-		}) != components.end();
+		components.resize(distance(
+			components.begin(),
+			remove_if(components.begin(), components.end(), [](auto& comp) {
+				return comp.expired();
+			})
+		));
 	}
 
 	void ComponentUpdater::addComponent(std::weak_ptr<AObjectComponent> comp) {
@@ -69,14 +52,13 @@ namespace VoidEngine::Scene {
 
 	void ComponentUpdater::updateComponents(double delta) {
 		bool needsCleanup = false;
-		for(auto comp : components) {
+		for_each(components.begin(), components.end(), [&needsCleanup, delta](auto& comp) {
 			if(comp.expired()) {
 				needsCleanup = true;
-				continue;
+				return;
 			}
 			if(auto component = comp.lock()) component->update(delta);
-		}
+		});
 		if(needsCleanup) cleanComponents();
 	}
 }
-

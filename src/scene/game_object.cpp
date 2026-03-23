@@ -5,6 +5,7 @@
 
 namespace VoidEngine::Scene {
 	void GameObject::addComponent(shared_ptr<AObjectComponent> comp) {
+		if(comp == nullptr) return;
 		components.push_back(comp);
 		comp->tiedTo.push_back(weak_from_this());
 	}

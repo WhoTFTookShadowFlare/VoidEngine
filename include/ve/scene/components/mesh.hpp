@@ -12,10 +12,10 @@ namespace VoidEngine::Scene::Components {
 	using namespace VoidEngine::IO::GFX;
 
 	class MeshComponent : public AObjectComponent {
-		shared_ptr<Mesh> mesh;
-		shared_ptr<GraphicsProgram> program;
+		shared_ptr<Mesh> mesh = nullptr;
+		shared_ptr<GraphicsProgram> program = nullptr;
 
-		shared_ptr<TransformComponent> transform;
+		shared_ptr<TransformComponent> transform = nullptr;
 
 		optional<Uniform>
 			uProjection = nullopt,

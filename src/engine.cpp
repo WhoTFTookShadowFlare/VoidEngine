@@ -114,7 +114,7 @@ namespace VoidEngine {
 	}
 
 	void Engine::pollEvents() {
-		uint64_t time = SDL_GetTicks();
+		uint64_t time = SDL_GetPerformanceCounter();
 		delta = (double) (time - lastTime) * 1000.0 / (double) SDL_GetPerformanceFrequency();
 		lastTime = time;
 

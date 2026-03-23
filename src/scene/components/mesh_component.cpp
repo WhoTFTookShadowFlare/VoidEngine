@@ -11,6 +11,7 @@
 namespace VoidEngine::Scene::Components {
 	void MeshComponent::draw(double delta) {
 		if(program == nullptr) return;
+		if(mesh == nullptr) return;
 
 		vector<glm::mat4> defaultMatrix = { glm::mat4(1.0f) };
 		if(uProjection) program->setUniform(uProjection.value(), defaultMatrix);
@@ -24,7 +25,7 @@ namespace VoidEngine::Scene::Components {
 			}
 		}
 
-		if(program && mesh) program->draw(mesh);
+		program->draw(mesh);
 	}
 
 	void MeshComponent::update(double delta) {	}
@@ -46,7 +47,7 @@ namespace VoidEngine::Scene::Components {
 	}
 
 	void MeshComponent::setMesh(shared_ptr<Mesh> mesh) {
-		this->mesh = mesh;
+		this->mesh.swap(mesh);
 	}
 
 	void MeshComponent::setProgram(shared_ptr<GraphicsProgram> program) {
@@ -83,6 +84,10 @@ namespace VoidEngine::Scene::Components {
 				continue;
 			}
 		}
+	
+		if(uProjection == nullopt) std::cerr << "[WARN] uProjection was not found in the shader" << std::endl;
+		if(uView == nullopt) std::cerr << "[WARN] uView was not found in the shader" << std::endl;
+		if(uModel == nullopt) std::cerr << "[WARN] uModel was not found in the shader" << std::endl;
 	}
 }
 
