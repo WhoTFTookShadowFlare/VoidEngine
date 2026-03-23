@@ -34,11 +34,14 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/bin>)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/bin>)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/lib>)
 
 add_subdirectory(extern/SDL3)
+
+set(OPTION_BUILD_TOOLS OFF)
+set(OPTION_BUILD_EXAMPLES OFF)
 add_subdirectory(extern/glbinding)
 
 file(GLOB_RECURSE VESource "src/**.cpp")
@@ -59,4 +62,14 @@ target_include_directories(VoidEngine PUBLIC
 )
 target_include_directories(VoidEngine PUBLIC
 	extern/glm
+)
+
+add_custom_command(TARGET VoidEngine POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	$<TARGET_FILE:glbinding::glbinding> ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+)
+
+add_custom_command(TARGET VoidEngine POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	$<TARGET_FILE:glbinding::glbinding-aux> ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
 )

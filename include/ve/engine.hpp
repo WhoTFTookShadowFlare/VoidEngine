@@ -12,6 +12,9 @@
 namespace VoidEngine {
 	namespace IO {
 		class Window;
+		namespace GFX {
+			class Renderer;
+		}
 	}
 
 	class Engine final {
@@ -19,10 +22,14 @@ namespace VoidEngine {
 		Engine() {}
 	
 		static std::shared_ptr<Engine> instance;
+		std::shared_ptr<IO::GFX::Renderer> renderer;
 
 		std::filesystem::path dataSubdir;
 		uint64_t lastTime = 0;
 		double delta = 0.0;
+
+		int argc = 0;
+		char** argv = nullptr;
 
 		std::shared_ptr<IO::Window> mainWindow = nullptr;
 	public:
@@ -33,6 +40,7 @@ namespace VoidEngine {
 		Event::EventBus<Events::QuitEvent> onQuit;
 		Event::EventBus<Events::ScreenLayoutChangedEvent> onScreenLayoutChanged;
 
+		static void initialize(int argc, char** argv);
 		[[nodiscard]] static std::shared_ptr<Engine> getInstance();
 		[[nodiscard]] std::shared_ptr<IO::Window> getMainWindow() const;
 

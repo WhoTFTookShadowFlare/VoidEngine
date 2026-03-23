@@ -1,6 +1,7 @@
 #include "ve/engine.hpp"
 #include "ve/engine_events.hpp"
 #include "ve/io/window.hpp"
+#include "ve/io/gfx/renderer.hpp"
 #include "ve/math/rect2.hpp"
 #include "ve/scene/component_updater.hpp"
 #include <SDL3/SDL_events.h>
@@ -17,7 +18,6 @@
 #include <glm/ext/vector_int2.hpp>
 #include <iostream>
 #include <memory>
-// #include <glbinding/gl46core/gl.h>
 #include <SDL3/SDL.h>
 #include <vector>
 
@@ -31,11 +31,9 @@
 #endif // _WIN64
 
 namespace VoidEngine {
-	// using namespace gl;
-
 	std::shared_ptr<Engine> Engine::instance = nullptr;
 
-	void sigHandler(int signal) {
+	static void sigHandler(int signal) {
 		switch (signal) {
 		case SIGINT:
 		case SIGTERM: {
@@ -50,24 +48,31 @@ namespace VoidEngine {
 		SDL_Quit();
 	}
 
-	std::shared_ptr<Engine> Engine::getInstance() {
-		if(!instance) {
-			instance = std::shared_ptr<Engine>(new Engine());
+	void Engine::initialize(int argc, char** argv) {
+		instance = std::shared_ptr<Engine>(new Engine());
+		instance->argc = argc;
+		instance->argv = argv;
+
 #ifdef __linux__
-			setenv("SDL_VIDEODRIVER", "x11", 1);
+		setenv("SDL_VIDEODRIVER", "x11", 1);
 #endif // __linux__
 
-			SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
+		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 
-			SDL_Init(SDL_INIT_VIDEO);
+		SDL_Init(SDL_INIT_VIDEO);
 
-			signal(SIGINT, sigHandler);
-			signal(SIGTERM, sigHandler);
-			IO::Window::CreationOptions options {};
-			instance->mainWindow = IO::Window::create(options);
+		signal(SIGINT, sigHandler);
+		signal(SIGTERM, sigHandler);
+		IO::Window::CreationOptions options{};
+		instance->mainWindow = IO::Window::create(options);
 
-			Scene::ComponentUpdater::ensureSetup();
-		}
+		instance->renderer = IO::GFX::Renderer::getInstance();
+
+		Scene::ComponentUpdater::ensureSetup();
+	}
+
+	std::shared_ptr<Engine> Engine::getInstance() {
+		if(!instance) throw std::runtime_error("Engine is not initialized");
 		return instance;
 	}
 	
