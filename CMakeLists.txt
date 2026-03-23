@@ -41,30 +41,22 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 add_subdirectory(extern/SDL3)
 add_subdirectory(extern/glbinding)
 
-# execute_process(COMMAND pkg-config --cflags mono-2
-# 	OUTPUT_VARIABLE monoInclude
-# )
-# execute_process(COMMAND pkg-config --libs mono-2
-# 	OUTPUT_VARIABLE monoLink
-# )
-
 file(GLOB_RECURSE VESource "src/**.cpp")
 add_library(VoidEngine STATIC ${VESource})
 target_include_directories(VoidEngine PUBLIC
 	include
 )
 
-# target_compile_options(VoidEngine INTERFACE ${monoInclude})
-# target_link_options(VoidEngine INTERFACE ${monoLink})
-
 target_include_directories(VoidEngine PRIVATE
 	extern/stb
 )
 target_link_libraries(VoidEngine PRIVATE
-	SDL3
+	SDL3::SDL3
 	glbinding::glbinding glbinding::glbinding-aux
 )
-target_link_libraries(VoidEngine PUBLIC
-	glm
+target_include_directories(VoidEngine PUBLIC
+	extern/SDL3/include
 )
-
+target_include_directories(VoidEngine PUBLIC
+	extern/glm
+)

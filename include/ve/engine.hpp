@@ -21,8 +21,8 @@ namespace VoidEngine {
 		static std::shared_ptr<Engine> instance;
 
 		std::filesystem::path dataSubdir;
-		uint64_t lastTime;
-		double delta;
+		uint64_t lastTime = 0;
+		double delta = 0.0;
 
 		std::shared_ptr<IO::Window> mainWindow = nullptr;
 	public:

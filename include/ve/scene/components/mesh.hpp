@@ -5,7 +5,6 @@
 #include "ve/scene/components/transform.hpp"
 #include "ve/scene/object_component.hpp"
 #include <memory>
-#include <mono-2.0/mono/metadata/object-forward.h>
 #include <optional>
 
 namespace VoidEngine::Scene::Components {
@@ -33,8 +32,6 @@ namespace VoidEngine::Scene::Components {
 		void setTransform(shared_ptr<TransformComponent> transform);
 		void setMesh(shared_ptr<Mesh> mesh);
 		void setProgram(shared_ptr<GraphicsProgram> program);
-
-		MonoClass *getCSClass();
 	};
 }
 

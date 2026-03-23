@@ -1,4 +1,3 @@
-#include "ve/cs/scene/module.hpp"
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/program_uniform.hpp"
 #include "ve/scene/components/mesh.hpp"
@@ -7,7 +6,6 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <iostream>
 #include <memory>
-#include <mono-2.0/mono/metadata/object-forward.h>
 #include <optional>
 
 namespace VoidEngine::Scene::Components {
@@ -85,10 +83,6 @@ namespace VoidEngine::Scene::Components {
 				continue;
 			}
 		}
-	}
-
-	MonoClass *MeshComponent::getCSClass() {
-		return VoidEngine::CS::Scene::getMeshComponentClass();
 	}
 }
 

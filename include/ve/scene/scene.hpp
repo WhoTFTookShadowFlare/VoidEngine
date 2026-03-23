@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <string>
 
 namespace VoidEngine::Scene {
 	using namespace std;

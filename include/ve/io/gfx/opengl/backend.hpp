@@ -25,4 +25,3 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		shared_ptr<Texture> createTexture(uint8_t);
 	};
 }
-
