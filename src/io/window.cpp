@@ -29,6 +29,18 @@ namespace VoidEngine::IO {
 		return std::shared_ptr<Window>(new Window(options));
 	}
 
+	void Window::setClosing(bool value) {
+		closing = value;
+	}
+
+	void Window::close() {
+		setClosing(true);
+	}
+
+	bool Window::isClosing() const {
+		return closing;
+	}
+
 	void Window::setSize(glm::ivec2 size) {
 		SDL_SetWindowSize(window, size.x, size.y);
 	}

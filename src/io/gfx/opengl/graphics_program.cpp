@@ -42,7 +42,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		for(int32_t idx = 0; idx < count; idx++) {
 			char *name = new char[maxNameLength];
 			GLenum glType = GL_INVALID_VALUE;
-			glGetActiveUniform(program, idx, maxNameLength, nullptr, nullptr, &glType, name);
+			GLint uniformSize = 0; // Prevents crash on windows
+			glGetActiveUniform(program, idx, maxNameLength, nullptr, &uniformSize, &glType, name);
 			int32_t location = glGetUniformLocation(program, name);
 
 			UniformType type = UniformType::INVALID;

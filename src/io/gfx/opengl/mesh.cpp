@@ -39,9 +39,11 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex), (void*) 0);
 		glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(Vertex), (void*) offsetof(Vertex, color));
 		glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Vertex), (void*) offsetof(Vertex, UV));
+		glVertexAttribPointer(3, 4, GL_FLOAT, false, sizeof(Vertex), (void*) offsetof(Vertex, normal));
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(4);
 		glDrawArrays(GL_TRIANGLES, 0, builtVtxCount);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

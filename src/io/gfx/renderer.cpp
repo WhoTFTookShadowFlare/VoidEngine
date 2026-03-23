@@ -33,7 +33,7 @@ namespace VoidEngine::IO::GFX {
 		backend->destroyWindow(window);
 	}
 
-	void Renderer::bindRenderTarget(Window *target) {
+	void Renderer::bindRenderTarget(std::shared_ptr<Window> target) {
 		if(backend == nullptr) return;
 		backend->bindRenderTarget(target);
 	}
@@ -43,7 +43,7 @@ namespace VoidEngine::IO::GFX {
 		backend->clear(color);
 	}
 
-	void Renderer::swapBuffers(Window *window) {
+	void Renderer::swapBuffers(std::shared_ptr<Window> window) {
 		if(backend == nullptr) return;
 		backend->swapBuffers(window);
 	}

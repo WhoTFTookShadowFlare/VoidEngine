@@ -13,9 +13,9 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	public:
 		void setupWindow(Window*);
 		void destroyWindow(Window*);
-		void bindRenderTarget(Window*);
+		void bindRenderTarget(shared_ptr<Window>);
 		void clear(glm::vec4 color);
-		void swapBuffers(Window*);
+		void swapBuffers(shared_ptr<Window>);
 
 		shared_ptr<Mesh> createMesh();
 

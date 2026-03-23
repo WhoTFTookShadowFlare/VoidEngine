@@ -25,9 +25,9 @@ namespace VoidEngine::IO::GFX {
 		~Renderer();
 		static std::shared_ptr<Renderer> getInstance();
 
-		void bindRenderTarget(Window*);
+		void bindRenderTarget(shared_ptr<Window>);
 		void clear(glm::vec4 color = { 0.1, 0.1, 0.1, 1.0 });
-		void swapBuffers(Window*);
+		void swapBuffers(shared_ptr<Window>);
 
 		shared_ptr<Mesh> createMesh();
 

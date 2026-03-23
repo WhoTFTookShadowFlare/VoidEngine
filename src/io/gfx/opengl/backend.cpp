@@ -32,8 +32,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		contextMap.erase(window);
 	}
 
-	void RendererOpenGL::bindRenderTarget(Window *window) {
-		SDL_GL_MakeCurrent(window->window, contextMap[window]);
+	void RendererOpenGL::bindRenderTarget(std::shared_ptr<Window> window) {
+		SDL_GL_MakeCurrent(window->window, contextMap[window.get()]);
 	}
 
 	void RendererOpenGL::clear(glm::vec4 color) {
@@ -41,7 +41,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
-	void RendererOpenGL::swapBuffers(Window *window) {
+	void RendererOpenGL::swapBuffers(std::shared_ptr<Window> window) {
 		SDL_GL_SwapWindow(window->window);
 	}
 

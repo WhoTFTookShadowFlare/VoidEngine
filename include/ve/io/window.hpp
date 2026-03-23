@@ -21,10 +21,16 @@ namespace VoidEngine::IO {
 	private:
 		SDL_Window *window = nullptr;
 	
+		bool closing = false;
+
 		Window(CreationOptions&);
 	public:
 		~Window();
 		static std::shared_ptr<Window> create(CreationOptions&);
+
+		void setClosing(bool value);
+		void close();
+		bool isClosing() const;
 
 		void setSize(glm::ivec2);
 		glm::ivec2 getSize();
