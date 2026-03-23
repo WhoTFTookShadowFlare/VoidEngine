@@ -16,7 +16,7 @@ namespace VoidEngine::Math {
 			return position + size;
 		}
 
-		[[nodiscard]] std::string to_string() const {
+		[[nodiscard]] operator std::string() const {
 			std::stringstream stream;
 			stream << "( { x: " << position.x << " y: " << position.y << " }" <<
 				", { w: " << size.x << " h: " << size.y << " })";

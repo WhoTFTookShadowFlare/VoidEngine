@@ -161,11 +161,21 @@ namespace VoidEngine {
 
 		int count = 0;
 		SDL_DisplayID* displays = SDL_GetDisplays(&count);
+
+		glm::ivec2 offset = { 0, 0 };
+
 		for(int idx = 0; idx < count; idx++) {
 			SDL_Rect rect;
 			SDL_GetDisplayBounds(displays[idx], &rect);
 			areas.push_back({{ rect.x, rect.y }, { rect.w, rect.h }});
+
+			if(offset.x > areas.back().position.x) offset.x = areas.back().position.x;
+			if(offset.y > areas.back().position.y) offset.y = areas.back().position.y;
 		}
+
+		std::for_each(areas.begin(), areas.end(), [&offset](auto& area) {
+			area.position -= offset;
+		});
 
 		return areas;
 	}
