@@ -47,7 +47,7 @@ namespace VoidEngine::Scene::Components {
 	}
 
 	void MeshComponent::setMesh(shared_ptr<Mesh> mesh) {
-		this->mesh.swap(mesh);
+		this->mesh = mesh;
 	}
 
 	void MeshComponent::setProgram(shared_ptr<GraphicsProgram> program) {

@@ -1,16 +1,17 @@
 #pragma once
 
 #include "ve/io/gfx/mesh_provider.hpp"
+#include "ve/event/event_listener.hpp"
 #include "ve/io/gfx/vertex.hpp"
 #include <cstdint>
 #include <vector>
 
 namespace VoidEngine::IO::GFX {
 	class GraphicsProgram;
-	class Mesh {
+	class Mesh : public std::enable_shared_from_this<Mesh>, public Event::IEventListener<EMeshProviderChanged> {
 		friend class GraphicsProgram;
-		std::vector<Vertex> vertices;
-		std::vector<uint32_t> indices;
+
+		std::shared_ptr<AMeshProvider> provider = nullptr;
 		
 		virtual void draw() = 0;
 	protected:
@@ -18,10 +19,10 @@ namespace VoidEngine::IO::GFX {
 	public:
 		virtual ~Mesh() {}
 
-		std::vector<Vertex>& getVertexData();
-		std::vector<uint32_t>& getIndexData();
+		void setMeshProvider(std::shared_ptr<AMeshProvider>);
+		std::shared_ptr<AMeshProvider> getMeshProvider();
 
-		void setMeshFromProvider(AMeshProvider&);
+		void onEvent(EMeshProviderChanged& evt);
 	};
 }
 

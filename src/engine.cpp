@@ -39,7 +39,7 @@ namespace VoidEngine {
 		case SIGTERM: {
 			Events::QuitEvent event;
 			std::shared_ptr<Engine> engine = Engine::getInstance();
-			engine->onQuit.postEvent(event);
+			engine->onQuit(event);
 			}; break;
 		}
 	}
@@ -126,31 +126,31 @@ namespace VoidEngine {
 				case SDL_EVENT_DISPLAY_MOVED:
 				case SDL_EVENT_DISPLAY_ADDED: {
 					Events::ScreenLayoutChangedEvent event;
-					onScreenLayoutChanged.postEvent(event);
+					onScreenLayoutChanged(event);
 					}; break;
 				// case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
 				// 	IO::Window* window = IO::Window::windowMap[event.window.windowID];
 				// 	if(!window) continue;
 				// 	IO::Events::WindowCloseRequested closeRequest;
-				// 	window->onCloseRequested.postEvent(closeRequest);
+				// 	window->onCloseRequested(closeRequest);
 				// 	} break;
 				// case SDL_EVENT_MOUSE_MOTION: {
 				// 	IO::Window* window = IO::Window::windowMap[event.motion.windowID];
 				// 	if(!window) continue;
 				// 	IO::Events::MouseMoved motion(window, { event.motion.x, event.motion.y }, { event.motion.xrel, event.motion.yrel });
-				// 	window->onMouseMotion.postEvent(motion);
+				// 	window->onMouseMotion(motion);
 				// 	} break;
 				// case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 				// 	IO::Window* window = IO::Window::windowMap[event.button.windowID];
 				// 	if(!window) continue;
 				// 	IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, true);
-				// 	window->onMouseButtonPressed.postEvent(pressed);
+				// 	window->onMouseButtonPressed(pressed);
 				// 	}; break;
 				// case SDL_EVENT_MOUSE_BUTTON_UP: {
 				// 	IO::Window* window = IO::Window::windowMap[event.button.windowID];
 				// 	if(!window) continue;
 				// 	IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, false);
-				// 	window->onMouseButtonReleased.postEvent(pressed);
+				// 	window->onMouseButtonReleased(pressed);
 				// 	}; break;
 			}
 		}

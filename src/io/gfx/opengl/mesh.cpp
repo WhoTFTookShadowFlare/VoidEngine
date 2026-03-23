@@ -19,8 +19,9 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	}
 
 	void GLMesh::buildMesh() {
-		auto vertices = getVertexData();
-		auto indices = getIndexData();
+		auto provider = getMeshProvider();
+		auto vertices = provider->getVertices();
+		auto indices = provider->getIndices();
 
 		std::vector<Vertex> built(indices.size());
 

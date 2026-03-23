@@ -2,12 +2,24 @@
 #include "ve/io/gfx/mesh_provider.hpp"
 
 namespace VoidEngine::IO::GFX {
-	std::vector<Vertex>& Mesh::getVertexData() { return vertices; }
-	std::vector<uint32_t>& Mesh::getIndexData() { return indices; }
+	void Mesh::setMeshProvider(std::shared_ptr<AMeshProvider> provider) {
+		if(this->provider != nullptr) {
+			this->provider->meshChanged.removeListener(weak_from_this());
+		}
 
-	void Mesh::setMeshFromProvider(AMeshProvider& provider) {
-		vertices = provider.getVertices();
-		indices = provider.getIndices();
+		this->provider = provider;
+		buildMesh();
+
+		if(this->provider != nullptr) {
+			this->provider->meshChanged.addListener(weak_from_this());
+		}
+	}
+
+	std::shared_ptr<AMeshProvider> Mesh::getMeshProvider() {
+		return provider;
+	}
+
+	void Mesh::onEvent(EMeshProviderChanged& evt) {
 		buildMesh();
 	}
 }
