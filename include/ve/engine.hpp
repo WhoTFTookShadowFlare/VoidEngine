@@ -12,8 +12,13 @@
 namespace VoidEngine {
 	namespace IO {
 		class Window;
+		class Input;
 		namespace GFX {
 			class Renderer;
+		}
+
+		namespace Events {
+			class WindowCloseRequestedDefaultHandler;
 		}
 	}
 
@@ -23,26 +28,31 @@ namespace VoidEngine {
 	
 		static std::shared_ptr<Engine> instance;
 		std::shared_ptr<IO::GFX::Renderer> renderer;
+		std::shared_ptr<IO::Input> input;
 
 		std::filesystem::path dataSubdir;
-		uint64_t lastTime = 0;
+		std::chrono::time_point<std::chrono::steady_clock> lastTime;
 		double delta = 0.0;
 
 		int argc = 0;
 		char** argv = nullptr;
 
 		std::shared_ptr<IO::Window> mainWindow = nullptr;
+
+		std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> winDefaultClose = nullptr;
 	public:
 		Engine(const Engine&) = delete;
 		Engine& operator=(const Engine&) = delete;
 		~Engine();
 
-		Event::EventBus<Events::QuitEvent> onQuit;
-		Event::EventBus<Events::ScreenLayoutChangedEvent> onScreenLayoutChanged;
+		Event::EventBus<Events::EQuitEvent> onQuit;
+		Event::EventBus<Events::EScreenLayoutChangedEvent> onScreenLayoutChanged;
 
 		static void initialize(int argc, char** argv);
 		[[nodiscard]] static std::shared_ptr<Engine> getInstance();
 		[[nodiscard]] std::shared_ptr<IO::Window> getMainWindow() const;
+
+		[[nodiscard]] std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> getDefaultWindowCloseEvent() const;
 
 		[[nodiscard]] double getDelta() const;
 
@@ -61,4 +71,3 @@ namespace VoidEngine {
 		[[nodiscard]] std::vector<Math::Rect2i> getWorkspacePlateaus();
 	};
 }
-

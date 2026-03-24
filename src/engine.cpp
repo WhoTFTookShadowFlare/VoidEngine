@@ -1,6 +1,9 @@
 #include "ve/engine.hpp"
 #include "ve/engine_events.hpp"
 #include "ve/io/window.hpp"
+#include "ve/io/window_events.hpp"
+#include "ve/io/input.hpp"
+#include "ve/io/input_events.hpp"
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/math/rect2.hpp"
 #include "ve/scene/component_updater.hpp"
@@ -37,7 +40,7 @@ namespace VoidEngine {
 		switch (signal) {
 		case SIGINT:
 		case SIGTERM: {
-			Events::QuitEvent event;
+			Events::EQuitEvent event;
 			std::shared_ptr<Engine> engine = Engine::getInstance();
 			engine->onQuit(event);
 			}; break;
@@ -45,10 +48,16 @@ namespace VoidEngine {
 	}
 
 	Engine::~Engine() {
+		Events::EQuitEvent evt;
+		onQuit(evt);
+		mainWindow = nullptr;
+		renderer = nullptr;
 		SDL_Quit();
 	}
 
 	void Engine::initialize(int argc, char** argv) {
+		if(instance != nullptr) throw std::runtime_error("Engine is already initialized");
+
 		instance = std::shared_ptr<Engine>(new Engine());
 		instance->argc = argc;
 		instance->argv = argv;
@@ -63,10 +72,13 @@ namespace VoidEngine {
 
 		signal(SIGINT, sigHandler);
 		signal(SIGTERM, sigHandler);
-		IO::Window::CreationOptions options{};
+		IO::Window::CreationOptions options {};
 		instance->mainWindow = IO::Window::create(options);
 
 		instance->renderer = IO::GFX::Renderer::getInstance();
+		instance->input = IO::Input::getInstance();
+
+		instance->winDefaultClose = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
 
 		Scene::ComponentUpdater::ensureSetup();
 	}
@@ -78,6 +90,10 @@ namespace VoidEngine {
 	
 	std::shared_ptr<IO::Window> Engine::getMainWindow() const {
 		return mainWindow;
+	}
+
+	std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> Engine::getDefaultWindowCloseEvent() const {
+		return winDefaultClose;
 	}
 
 	double Engine::getDelta() const {
@@ -114,8 +130,9 @@ namespace VoidEngine {
 	}
 
 	void Engine::pollEvents() {
-		uint64_t time = SDL_GetPerformanceCounter();
-		delta = (double) (time - lastTime) * 1000.0 / (double) SDL_GetPerformanceFrequency();
+		std::chrono::time_point<std::chrono::steady_clock> time = std::chrono::steady_clock::now();
+		std::chrono::duration<double> diff = time - lastTime;
+		delta = diff.count();
 		lastTime = time;
 
 		SDL_Event event;
@@ -125,33 +142,66 @@ namespace VoidEngine {
 				case SDL_EVENT_DISPLAY_REMOVED:
 				case SDL_EVENT_DISPLAY_MOVED:
 				case SDL_EVENT_DISPLAY_ADDED: {
-					Events::ScreenLayoutChangedEvent event;
+					Events::EScreenLayoutChangedEvent event;
 					onScreenLayoutChanged(event);
 					}; break;
-				// case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
-				// 	IO::Window* window = IO::Window::windowMap[event.window.windowID];
-				// 	if(!window) continue;
-				// 	IO::Events::WindowCloseRequested closeRequest;
-				// 	window->onCloseRequested(closeRequest);
-				// 	} break;
-				// case SDL_EVENT_MOUSE_MOTION: {
-				// 	IO::Window* window = IO::Window::windowMap[event.motion.windowID];
-				// 	if(!window) continue;
-				// 	IO::Events::MouseMoved motion(window, { event.motion.x, event.motion.y }, { event.motion.xrel, event.motion.yrel });
-				// 	window->onMouseMotion(motion);
-				// 	} break;
-				// case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-				// 	IO::Window* window = IO::Window::windowMap[event.button.windowID];
-				// 	if(!window) continue;
-				// 	IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, true);
-				// 	window->onMouseButtonPressed(pressed);
-				// 	}; break;
-				// case SDL_EVENT_MOUSE_BUTTON_UP: {
-				// 	IO::Window* window = IO::Window::windowMap[event.button.windowID];
-				// 	if(!window) continue;
-				// 	IO::Events::MouseButtonPressed pressed(window, event.button.clicks, event.button.button, false);
-				// 	window->onMouseButtonReleased(pressed);
-				// 	}; break;
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EWindowCloseRequested closeRequest(winPtr);
+					winPtr->onCloseRequested(closeRequest);
+					} break;
+				case SDL_EVENT_WINDOW_RESIZED: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EWindowSizeChanged sizeChanged(winPtr);
+					winPtr->onSizeChanged(sizeChanged);
+					} break;
+				case SDL_EVENT_WINDOW_MOVED: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EWindowRepositioned moved(winPtr);
+					winPtr->onReposition(moved);
+					} break;
+				case SDL_EVENT_MOUSE_MOTION: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.motion.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EMouseMotion motion(
+						winPtr,
+						{ event.motion.x, event.motion.y },
+						{ event.motion.xrel, event.motion.yrel }
+					);
+					winPtr->onMouseMotion(motion);
+					input->onMouseMotion(motion);
+					} break;
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				case SDL_EVENT_MOUSE_BUTTON_UP: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.button.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EMouseButton button(
+						winPtr, event.button.which, event.button.button, event.button.down, event.button.clicks,
+						{ event.button.x, event.button.y }
+					);
+					winPtr->onMouseButton(button);
+					input->onMouseButton(button);
+					}; break;
+				case SDL_EVENT_KEY_DOWN:
+				case SDL_EVENT_KEY_UP: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.key.windowID];
+					auto winPtr = window.lock();
+					if (winPtr == nullptr) continue;
+					
+					IO::Events::EKeyButton button(winPtr, event.key.which, event.key.key,
+						event.key.mod, event.key.down, event.key.repeat
+					);
+					winPtr->onKeyButton(button);
+					input->onKeyButton(button);
+					} break;
 			}
 		}
 	}
@@ -289,4 +339,3 @@ namespace VoidEngine {
 		return plateaus;
 	}
 }
-

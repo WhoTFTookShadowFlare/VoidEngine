@@ -1,6 +1,6 @@
 #pragma once
 
 namespace VoidEngine::Events {
-	class QuitEvent {};
-	class ScreenLayoutChangedEvent {};
+	class EQuitEvent final {};
+	class EScreenLayoutChangedEvent final {};
 }

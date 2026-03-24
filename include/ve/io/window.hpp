@@ -3,11 +3,17 @@
 #include <SDL3/SDL_video.h>
 #include <glm/ext/vector_int2.hpp>
 #include <memory>
+#include <map>
 
+#include "input_events.hpp"
 #include "ve/io/gfx/opengl/backend.hpp"
+#include "ve/event/event_bus.hpp"
+#include "ve/io/window_events.hpp"
+#include "ve/io/input_events.hpp"
 
 namespace VoidEngine::IO {
 	class Window final {
+		friend class Engine;
 		friend class GFX::OpenGL::RendererOpenGL;
 	public:
 		struct CreationOptions {
@@ -19,6 +25,7 @@ namespace VoidEngine::IO {
 			bool utility = false;
 		};
 	private:
+		static std::map<SDL_WindowID, std::weak_ptr<Window>> WindowMap;
 		SDL_Window *window = nullptr;
 	
 		bool closing = false;
@@ -27,6 +34,14 @@ namespace VoidEngine::IO {
 	public:
 		~Window();
 		static std::shared_ptr<Window> create(CreationOptions&);
+
+		Event::EventBus<Events::EWindowCloseRequested> onCloseRequested;
+		Event::EventBus<Events::EWindowSizeChanged> onSizeChanged;
+		Event::EventBus<Events::EWindowRepositioned> onReposition;
+
+		Event::EventBus<Events::EMouseMotion> onMouseMotion;
+		Event::EventBus<Events::EMouseButton> onMouseButton;
+		Event::EventBus<Events::EKeyButton> onKeyButton;
 
 		void setClosing(bool value);
 		void close();
@@ -40,6 +55,14 @@ namespace VoidEngine::IO {
 
 		void setTitle(std::string);
 		std::string getTitle();
+
+		void setBorderless(bool value);
+		bool isBorderlress();
+
+		void setResizable(bool value);
+		bool isResizable();
+
+		void setAlwaysOnTop(bool value);
+		bool isAlwaysOnTop();
 	};
 }
-
