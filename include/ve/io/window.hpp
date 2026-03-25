@@ -38,6 +38,11 @@ namespace VoidEngine::IO {
 		Event::EventBus<Events::EWindowCloseRequested> onCloseRequested;
 		Event::EventBus<Events::EWindowSizeChanged> onSizeChanged;
 		Event::EventBus<Events::EWindowRepositioned> onReposition;
+		Event::EventBus<Events::EWindowFocus> onFocusChanged;
+		Event::EventBus<Events::EMouseEnter> onMouseEnter;
+		Event::EventBus<Events::EWindowMinimized> onMinimize;
+		Event::EventBus<Events::EWindowRestored> onRestore;
+		Event::EventBus<Events::EWindowMaximized> onMaximize;
 
 		Event::EventBus<Events::EMouseMotion> onMouseMotion;
 		Event::EventBus<Events::EMouseButton> onMouseButton;

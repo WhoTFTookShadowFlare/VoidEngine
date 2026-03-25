@@ -166,6 +166,43 @@ namespace VoidEngine {
 					IO::Events::EWindowRepositioned moved(winPtr);
 					winPtr->onReposition(moved);
 					} break;
+				case SDL_EVENT_WINDOW_FOCUS_GAINED:
+				case SDL_EVENT_WINDOW_FOCUS_LOST: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EWindowFocus focus(winPtr, event.type == SDL_EVENT_WINDOW_FOCUS_GAINED);
+					winPtr->onFocusChanged(focus);
+					} break;
+				case SDL_EVENT_WINDOW_MOUSE_ENTER:
+				case SDL_EVENT_WINDOW_MOUSE_LEAVE: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EMouseEnter enter(winPtr, event.type == SDL_EVENT_WINDOW_MOUSE_ENTER);
+					winPtr->onMouseEnter(enter);
+					} break;
+				case SDL_EVENT_WINDOW_MINIMIZED: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EWindowMinimized minimize(winPtr);
+					winPtr->onMinimize(minimize);
+					}; break;
+				case SDL_EVENT_WINDOW_MAXIMIZED: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if(winPtr == nullptr) continue;
+					IO::Events::EWindowMaximized maximize(winPtr);
+					winPtr->onMaximize(maximize);
+					} break;
+				case SDL_EVENT_WINDOW_RESTORED: {
+					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
+					auto winPtr = window.lock();
+					if (winPtr == nullptr) continue;
+					IO::Events::EWindowRestored restored(winPtr);
+					winPtr->onRestore(restored);
+					} break;
 				case SDL_EVENT_MOUSE_MOTION: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.motion.windowID];
 					auto winPtr = window.lock();
