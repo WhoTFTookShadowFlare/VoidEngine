@@ -9,7 +9,15 @@
 #include <optional>
 
 namespace VoidEngine::Scene::Components {
-	void MeshComponent::draw(double delta) {
+	MeshComponent::MeshComponent() {}
+
+	std::shared_ptr<MeshComponent> MeshComponent::create() {
+		auto self = std::shared_ptr<MeshComponent>(new MeshComponent);
+		self->onDraw += self;
+		return self;
+	}
+
+	void MeshComponent::onEvent(Events::EComponentDraw& delta) {
 		if(program == nullptr) return;
 		if(mesh == nullptr) return;
 
@@ -27,8 +35,6 @@ namespace VoidEngine::Scene::Components {
 
 		program->draw(mesh);
 	}
-
-	void MeshComponent::update(double delta) {	}
 
 	shared_ptr<TransformComponent> MeshComponent::getTransform() {
 		return transform;

@@ -52,12 +52,13 @@ namespace VoidEngine::Scene {
 
 	void ComponentUpdater::updateComponents(double delta) {
 		bool needsCleanup = false;
-		for_each(components.begin(), components.end(), [&needsCleanup, delta](auto& comp) {
+		Events::EComponentUpdate update(delta);
+		for_each(components.begin(), components.end(), [&needsCleanup, &update](auto& comp) {
 			if(comp.expired()) {
 				needsCleanup = true;
 				return;
 			}
-			if(auto component = comp.lock()) component->update(delta);
+			if(auto component = comp.lock()) component->onUpdate(update);
 		});
 		if(needsCleanup) cleanComponents();
 	}

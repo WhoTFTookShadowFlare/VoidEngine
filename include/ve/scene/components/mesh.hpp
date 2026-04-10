@@ -11,7 +11,9 @@ namespace VoidEngine::Scene::Components {
 	using namespace std;
 	using namespace VoidEngine::IO::GFX;
 
-	class MeshComponent : public AObjectComponent {
+	class MeshComponent : public AObjectComponent,
+		public Event::IEventListener<Events::EComponentDraw>
+	{
 		shared_ptr<Mesh> mesh = nullptr;
 		shared_ptr<GraphicsProgram> program = nullptr;
 
@@ -21,9 +23,12 @@ namespace VoidEngine::Scene::Components {
 			uProjection = nullopt,
 			uView = nullopt,
 			uModel = nullopt;
+
+		MeshComponent();
 	public:
-		void draw(double delta);
-		void update(double delta);
+		static std::shared_ptr<MeshComponent> create();
+
+		void onEvent(Events::EComponentDraw& evt);
 
 		shared_ptr<TransformComponent> getTransform();
 		shared_ptr<Mesh> getMesh();

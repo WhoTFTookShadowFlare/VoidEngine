@@ -33,7 +33,7 @@ namespace VoidEngine::Scene {
 		return components;
 	}
 
-	void GameObject::draw(double delta) {
-		for(auto& comp : components) comp->draw(delta);
+	void GameObject::draw(Events::EComponentDraw& draw) {
+		for(auto& comp : components) comp->onDraw(draw);
 	}
 }

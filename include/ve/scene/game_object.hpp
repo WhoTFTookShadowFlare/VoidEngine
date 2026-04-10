@@ -23,6 +23,6 @@ namespace VoidEngine::Scene {
 		Event::EventBus<Events::EAddedToObject> onComponentAdded;
 		Event::EventBus<Events::ERemovedFromObject> onComponentRemoved;
 
-		void draw(double delta);
+		void draw(Events::EComponentDraw& draw);
 	};
 }

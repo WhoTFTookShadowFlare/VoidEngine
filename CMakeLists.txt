@@ -60,6 +60,7 @@ target_link_libraries(VoidEngine PRIVATE
 target_include_directories(VoidEngine PUBLIC
 	extern/SDL3/include
 )
+target_compile_definitions(VoidEngine PUBLIC GLM_ENABLE_EXPERIMENTAL)
 target_include_directories(VoidEngine PUBLIC
 	extern/glm
 )

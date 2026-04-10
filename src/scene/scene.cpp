@@ -38,7 +38,8 @@ namespace VoidEngine::Scene {
 	}
 
 	void Scene::draw(double delta) {
+		Events::EComponentDraw draw(delta, shared_from_this());
 		for(auto obj = objects.begin(); obj != objects.end(); obj++)
-			obj->second->draw(delta);
+			obj->second->draw(draw);
 	}
 }

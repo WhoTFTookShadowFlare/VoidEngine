@@ -15,9 +15,6 @@ namespace VoidEngine::Scene::Components {
 			rotation = { 0.0f, 0.0f, 0.0f },
 			scale = { 1.0f, 1.0f, 1.0f };
 
-		void update(double delta) override {}
-		void draw(double delta) override {}
-
 		glm::mat4 getMatrix();
 	};
 }

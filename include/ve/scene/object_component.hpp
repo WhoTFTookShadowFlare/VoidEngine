@@ -18,11 +18,12 @@ namespace VoidEngine::Scene {
 
 	public:
 		virtual ~AObjectComponent() {}
-		virtual void update(double delta) = 0;
-		virtual void draw(double delta) = 0;
 
 		Event::EventBus<Events::EAddedToObject> onComponentAdded;
 		Event::EventBus<Events::ERemovedFromObject> onComponentRemoved;
+
+		Event::EventBus<Events::EComponentUpdate> onUpdate;
+		Event::EventBus<Events::EComponentDraw> onDraw;
 
 		std::vector<std::shared_ptr<GameObject>> getObjectsUsing();
 	};
