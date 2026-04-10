@@ -8,15 +8,14 @@
 
 namespace VoidEngine::Scene {
 	using namespace std;
-	class Scene final {
+	class Scene final : public enable_shared_from_this<Scene> {
 		map<string, shared_ptr<GameObject>> objects = {};
 	public:
-
-		shared_ptr<GameObject>& operator[](string);
+		std::shared_ptr<GameObject> getObject(string name);
+		void setObject(string name, std::shared_ptr<GameObject> obj);
 
 		vector<shared_ptr<GameObject>> getObjects();
 
 		void draw(double delta);
 	};
 }
-

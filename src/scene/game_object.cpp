@@ -8,20 +8,25 @@ namespace VoidEngine::Scene {
 		if(comp == nullptr) return;
 		components.push_back(comp);
 		comp->tiedTo.push_back(weak_from_this());
+
+		Events::EAddedToObject evt(shared_from_this(), comp);
+		comp->onComponentAdded(evt);
+		onComponentAdded(evt);
 	}
 
 	void GameObject::removeComponent(shared_ptr<AObjectComponent> comp) {
-		auto location = find_if(components.begin(), components.end(), [&comp](shared_ptr<AObjectComponent> iterEntry) {
-				return iterEntry == comp;
-				});
-		if(location == components.end()) return;
-		
-		auto forRemoval = *location;
-		erase_if(forRemoval->tiedTo, [&](weak_ptr<GameObject> obj) {
-				return obj.lock() == shared_from_this();
-				});
-		iter_swap(location, components.end());
-		components.pop_back();
+		components.resize(std::distance(
+			components.begin(),
+			std::remove_if(components.begin(), components.end(), [&](std::shared_ptr<AObjectComponent> iter) {
+				if(comp == iter) {
+					Events::ERemovedFromObject evt(shared_from_this(), comp);
+					comp->onComponentRemoved(evt);
+					onComponentRemoved(evt);
+					return true;
+				}
+				return false;
+			})
+		));
 	}
 
 	vector<shared_ptr<AObjectComponent>> GameObject::getComponents() {
@@ -32,4 +37,3 @@ namespace VoidEngine::Scene {
 		for(auto& comp : components) comp->draw(delta);
 	}
 }
-

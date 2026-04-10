@@ -4,6 +4,9 @@
 #include <memory>
 #include <vector>
 
+#include "ve/event/event_bus.hpp"
+#include "ve/scene/events.hpp"
+
 namespace VoidEngine::Scene {
 	using namespace std;
 	class GameObject final : public enable_shared_from_this<GameObject> {
@@ -14,7 +17,12 @@ namespace VoidEngine::Scene {
 		vector<shared_ptr<AObjectComponent>> getComponents();
 		void removeComponent(shared_ptr<AObjectComponent> component);
 
+		Event::EventBus<Events::EAddedToScene> onAddedToScene;
+		Event::EventBus<Events::ERemovedFromScene> onRemovedFromScene;
+
+		Event::EventBus<Events::EAddedToObject> onComponentAdded;
+		Event::EventBus<Events::ERemovedFromObject> onComponentRemoved;
+
 		void draw(double delta);
 	};
 }
-

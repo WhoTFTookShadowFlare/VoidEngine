@@ -5,19 +5,19 @@
 
 namespace VoidEngine::Scene {
 	void AObjectComponent::cleanTiedTo() {
-		for(auto obj = tiedTo.end() - 1; obj != tiedTo.begin(); obj--) {
-			if((*obj).expired()) {
-				std::iter_swap(obj, tiedTo.end());
-				tiedTo.pop_back();
-			}
-		}
+		tiedTo.resize(std::distance(
+			tiedTo.begin(),
+			std::remove_if(tiedTo.begin(), tiedTo.end(), [](auto& obj) {
+				return obj.lock() == nullptr;
+			})
+		));
 	}
 
 	std::vector<std::shared_ptr<GameObject>> AObjectComponent::getObjectsUsing() {
 		cleanTiedTo();
 		std::vector<std::shared_ptr<GameObject>> retVal(tiedTo.size());
 		std::transform(tiedTo.begin(), tiedTo.end(), retVal.begin(),
-				[](std::weak_ptr<GameObject> obj) { return obj.lock(); });
+				[](std::weak_ptr<GameObject>& obj) { return obj.lock(); });
 		return retVal;
 	}
 }
