@@ -2,6 +2,10 @@
 
 #include <memory>
 
+namespace VoidEngine::IO {
+	class Window;
+}
+
 namespace VoidEngine::Scene {
 	class Scene;
 	class GameObject;
@@ -21,11 +25,12 @@ namespace VoidEngine::Scene::Events {
 	class EComponentDraw final {
 		friend class Scene;
 	private:
-		EComponentDraw(double delta, std::shared_ptr<Scene> scene)
-			: delta(delta), scene(scene)
+		EComponentDraw(double delta, std::shared_ptr<IO::Window> window, std::shared_ptr<Scene> scene)
+			: delta(delta), window(window), scene(scene)
 		{}
 	public:
 		const double delta;
+		const std::shared_ptr<IO::Window> window;
 		const std::shared_ptr<Scene> scene;
 	};
 

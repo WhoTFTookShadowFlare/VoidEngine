@@ -34,6 +34,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 	void RendererOpenGL::bindRenderTarget(std::shared_ptr<Window> window) {
 		SDL_GL_MakeCurrent(window->window, contextMap[window.get()]);
+		auto size = window->getSize();
+		glViewport(0, 0, size.x, size.y);
 	}
 
 	void RendererOpenGL::clear(glm::vec4 color) {

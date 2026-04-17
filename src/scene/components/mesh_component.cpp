@@ -3,6 +3,8 @@
 #include "ve/scene/components/mesh.hpp"
 #include "ve/io/gfx/graphics_program.hpp"
 #include "ve/scene/components/transform.hpp"
+#include "ve/scene/scene.hpp"
+#include "ve/scene/components/camera.hpp"
 #include <glm/ext/matrix_float4x4.hpp>
 #include <iostream>
 #include <memory>
@@ -17,13 +19,25 @@ namespace VoidEngine::Scene::Components {
 		return self;
 	}
 
-	void MeshComponent::onEvent(Events::EComponentDraw& delta) {
+	void MeshComponent::onEvent(Events::EComponentDraw& draw) {
 		if(program == nullptr) return;
 		if(mesh == nullptr) return;
 
 		vector<glm::mat4> defaultMatrix = { glm::mat4(1.0f) };
-		if(uProjection) program->setUniform(uProjection.value(), defaultMatrix);
-		if(uView) program->setUniform(uView.value(), defaultMatrix);
+		if(draw.scene->currentCamera) {
+			vector<glm::mat4> matrixPass = { glm::mat4(1.0f) };
+			if(uProjection) {
+				matrixPass[0] = draw.scene->currentCamera->getProjection(draw.window);
+				program->setUniform(uProjection.value(), matrixPass);
+			}
+			if(uView) {
+				matrixPass[0] = draw.scene->currentCamera->getView();
+				program->setUniform(uView.value(), matrixPass);
+			}
+		} else {
+			if(uProjection) program->setUniform(uProjection.value(), defaultMatrix);
+			if(uView) program->setUniform(uView.value(), defaultMatrix);
+		}
 		if(uModel) {
 			if(transform) {
 				vector<glm::mat4> model = { transform->getMatrix() };

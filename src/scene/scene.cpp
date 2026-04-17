@@ -37,8 +37,8 @@ namespace VoidEngine::Scene {
 		return objVec;
 	}
 
-	void Scene::draw(double delta) {
-		Events::EComponentDraw draw(delta, shared_from_this());
+	void Scene::draw(double delta, std::shared_ptr<IO::Window> window) {
+		Events::EComponentDraw draw(delta, window, shared_from_this());
 		for(auto obj = objects.begin(); obj != objects.end(); obj++)
 			obj->second->draw(draw);
 	}
