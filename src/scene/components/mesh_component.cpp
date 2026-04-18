@@ -24,14 +24,18 @@ namespace VoidEngine::Scene::Components {
 		if(mesh == nullptr) return;
 
 		vector<glm::mat4> defaultMatrix = { glm::mat4(1.0f) };
-		if(draw.scene->currentCamera) {
+		if(draw.scene->getCamera()) {
 			vector<glm::mat4> matrixPass = { glm::mat4(1.0f) };
 			if(uProjection) {
-				matrixPass[0] = draw.scene->currentCamera->getProjection(draw.window);
+				matrixPass[0] = std::static_pointer_cast<ACamera>(
+					draw.scene->getCamera()->getFirstComponentOfInstance(&ACamera::ClassData)
+				)->getProjection(draw.window);
 				program->setUniform(uProjection.value(), matrixPass);
 			}
 			if(uView) {
-				matrixPass[0] = draw.scene->currentCamera->getView();
+				matrixPass[0] = std::static_pointer_cast<ACamera>(
+					draw.scene->getCamera()->getFirstComponentOfInstance(&ACamera::ClassData)
+				)->getView(draw.scene->getCamera());
 				program->setUniform(uView.value(), matrixPass);
 			}
 		} else {

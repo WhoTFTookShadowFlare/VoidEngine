@@ -2,14 +2,18 @@
 
 #include "ve/io/window.hpp"
 #include "ve/scene/components/transform.hpp"
+#include "ve/scene/game_object.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
 namespace VoidEngine::Scene::Components {
-	glm::mat4 ACamera::getView() {
-		// TODO: Properly handle transform
-		if (transform == nullptr) return glm::mat4(1.0f);
+	glm::mat4 ACamera::getView(std::shared_ptr<GameObject> obj) {
+		if(obj == nullptr) return glm::mat4(1.0f);
+		std::shared_ptr<TransformComponent> transform = std::static_pointer_cast<TransformComponent>(
+			obj->getComponent(&TransformComponent::ClassData)
+		);
+		if(transform == nullptr) return glm::mat4(1.0f);
 
 		glm::vec3 position = transform->position;
 		glm::vec3 direction = 

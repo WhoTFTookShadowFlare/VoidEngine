@@ -19,12 +19,10 @@ namespace VoidEngine::Scene {
 
 		bool operator==(ComponentClass RHS) const { return name == RHS.name; }
 
-		bool instanceOf(ComponentClass cls) const {
+		bool instanceOf(const ComponentClass* cls) const {
 			const ComponentClass *check = super;
-			std::cout << this << std::endl;
 			while(check != nullptr) {
-				std::cout << check << std::endl;
-				if(cls == *check) return true;
+				if(cls == check) return true;
 				check = check->super;
 			}
 			return false;

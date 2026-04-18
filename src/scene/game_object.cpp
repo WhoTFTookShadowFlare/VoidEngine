@@ -9,7 +9,6 @@ namespace VoidEngine::Scene {
 	void GameObject::addComponent(shared_ptr<AObjectComponent> comp) {
 		if(comp == nullptr) return;
 		components[comp->getClass()] = comp;
-		//components.push_back(comp);
 		comp->tiedTo.push_back(weak_from_this());
 
 		Events::EAddedToObject evt(shared_from_this(), comp);
@@ -18,18 +17,6 @@ namespace VoidEngine::Scene {
 	}
 
 	void GameObject::removeComponent(shared_ptr<AObjectComponent> comp) {
-		/*components.resize(std::distance(
-			components.begin(),
-			std::remove_if(components.begin(), components.end(), [&](std::shared_ptr<AObjectComponent> iter) {
-				if(comp == iter) {
-					Events::ERemovedFromObject evt(shared_from_this(), comp);
-					comp->onComponentRemoved(evt);
-					onComponentRemoved(evt);
-					return true;
-				}
-				return false;
-			})
-		));*/
 		Events::ERemovedFromObject evt(shared_from_this(), comp);
 		components[comp->getClass()]->onComponentRemoved(evt);
 		onComponentRemoved(evt);
@@ -46,5 +33,21 @@ namespace VoidEngine::Scene {
 
 	void GameObject::draw(Events::EComponentDraw& draw) {
 		for(auto& comp : components) comp.second->onDraw(draw);
+	}
+
+	std::shared_ptr<AObjectComponent> GameObject::getComponent(const ComponentClass* cls) {
+		const auto idx = std::find_if(components.cbegin(), components.cend(), [&cls](const auto& iter) {
+			return iter.first == cls;
+			});
+		if(idx == components.cend()) return nullptr;
+		return idx->second;
+	}
+
+	std::shared_ptr<AObjectComponent> GameObject::getFirstComponentOfInstance(const ComponentClass* cls) {
+		const auto idx = std::find_if(components.cbegin(), components.cend(), [&cls](const auto& iter) {
+			return iter.first->instanceOf(cls);
+			});
+		if (idx == components.cend()) return nullptr;
+		return idx->second;
 	}
 }

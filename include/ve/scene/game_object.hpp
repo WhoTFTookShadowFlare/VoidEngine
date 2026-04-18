@@ -33,12 +33,7 @@ namespace VoidEngine::Scene {
 
 		void draw(Events::EComponentDraw& draw);
 
-		template<IsObjectComponent T>
-		std::shared_ptr<T> getComponent() {
-			auto comp = find_if(components.begin(), components.end(), [](shared_ptr<AObjectComponent> comp) {
-				return dynamic_pointer_cast<T>(comp) != nullptr;
-			});
-			return comp;
-		}
+		std::shared_ptr<AObjectComponent> getComponent(const ComponentClass* cls);
+		std::shared_ptr<AObjectComponent> getFirstComponentOfInstance(const ComponentClass* cls);
 	};
 }

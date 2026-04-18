@@ -1,5 +1,6 @@
 #include "ve/scene/scene.hpp"
 #include "ve/scene/game_object.hpp"
+#include "ve/scene/components/camera.hpp"
 #include <map>
 #include <memory>
 #include <string>
@@ -35,6 +36,21 @@ namespace VoidEngine::Scene {
 		}
 
 		return objVec;
+	}
+
+	void Scene::setCamera(std::shared_ptr<GameObject> obj) {
+		if(obj == nullptr) {
+			currentCamera = nullptr;
+			return;
+		}
+
+		std::shared_ptr<AObjectComponent> camera = obj->getFirstComponentOfInstance(&Components::ACamera::ClassData);
+		if(camera == nullptr) return;
+		currentCamera = obj;
+	}
+
+	std::shared_ptr<GameObject> Scene::getCamera() {
+		return currentCamera;
 	}
 
 	void Scene::draw(double delta, std::shared_ptr<IO::Window> window) {

@@ -13,11 +13,10 @@ namespace VoidEngine::Scene::Components {
 
 	class ACamera : public AObjectComponent {
 	private:
-		std::shared_ptr<TransformComponent> transform;
 	public:
 		static const ComponentClass ClassData;
 		
-		virtual glm::mat4 getView();
+		virtual glm::mat4 getView(std::shared_ptr<GameObject> obj);
 
 		virtual glm::mat4 getProjection(std::shared_ptr<IO::Window> window) = 0;
 
