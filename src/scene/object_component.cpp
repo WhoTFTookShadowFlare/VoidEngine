@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "ve/scene/component_db.hpp"
+
 namespace VoidEngine::Scene {
 	void AObjectComponent::cleanTiedTo() {
 		tiedTo.resize(std::distance(
@@ -20,5 +22,9 @@ namespace VoidEngine::Scene {
 				[](std::weak_ptr<GameObject>& obj) { return obj.lock(); });
 		return retVal;
 	}
+
+	const ComponentClass AObjectComponent::ClassData = {
+		   .name = "AObjectComponent",
+	};
 }
 

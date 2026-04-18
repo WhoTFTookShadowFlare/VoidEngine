@@ -2,6 +2,7 @@
 
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/program_uniform.hpp"
+#include "ve/scene/component_db.hpp"
 #include "ve/scene/components/transform.hpp"
 #include "ve/scene/object_component.hpp"
 #include <memory>
@@ -26,6 +27,7 @@ namespace VoidEngine::Scene::Components {
 
 		MeshComponent();
 	public:
+		static const ComponentClass ClassData;
 		static std::shared_ptr<MeshComponent> create();
 
 		void onEvent(Events::EComponentDraw& evt);
@@ -37,6 +39,8 @@ namespace VoidEngine::Scene::Components {
 		void setTransform(shared_ptr<TransformComponent> transform);
 		void setMesh(shared_ptr<Mesh> mesh);
 		void setProgram(shared_ptr<GraphicsProgram> program);
+
+		virtual const ComponentClass* getClass() const override { return &ClassData; }
 	};
 }
 

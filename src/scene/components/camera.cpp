@@ -36,8 +36,28 @@ namespace VoidEngine::Scene::Components {
 		return glm::perspective(fov, aspectRatio, 0.01f, 200.0f);
 	}
 
+	std::shared_ptr<PerspectiveCamera> PerspectiveCamera::create() {
+		return std::make_shared<PerspectiveCamera>();
+	}
+
 	glm::mat4 OrthoCamera::getProjection(std::shared_ptr<IO::Window> window) {
 		glm::ivec2 size = window->getSize();
 		return glm::ortho(-size.x / 2.0f, size.x / 2.0f, -size.y / 2.0f, size.y / 2.0f, -100.0f, 100.0f);
 	}
+
+	std::shared_ptr<OrthoCamera> OrthoCamera::create() {
+		return std::make_shared<OrthoCamera>();
+	}
+
+	const ComponentClass ACamera::ClassData = {
+		.name = "ACamera"
+	};
+
+	const ComponentClass PerspectiveCamera::ClassData = {
+		.name = "PerspectiveCamera"
+	};
+
+	const ComponentClass OrthoCamera::ClassData = {
+		.name = "OrthoCamera"
+	};
 }

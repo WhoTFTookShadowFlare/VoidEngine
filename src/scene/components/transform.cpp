@@ -20,5 +20,13 @@ namespace VoidEngine::Scene::Components {
 		
 		return matrix;
 	}
+
+	std::shared_ptr<TransformComponent> TransformComponent::create() {
+		return std::make_shared<TransformComponent>();
+	}
+
+	const ComponentClass TransformComponent::ClassData = {
+		.name = "TransformComponent"
+	};
 }
 

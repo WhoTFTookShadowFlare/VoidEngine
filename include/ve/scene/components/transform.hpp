@@ -5,17 +5,24 @@
 #include <glm/ext/vector_float3.hpp>
 #include <memory>
 
+#include "ve/scene/component_db.hpp"
+
 namespace VoidEngine::Scene::Components {
 	class TransformComponent : public AObjectComponent {
 		std::weak_ptr<TransformComponent> parentTransform;
 
 	public:
+		static const ComponentClass ClassData;
+		static std::shared_ptr<TransformComponent> create();
+
 		glm::vec3
 			position = { 0.0f, 0.0f, 0.0f },
 			rotation = { 0.0f, 0.0f, 0.0f },
 			scale = { 1.0f, 1.0f, 1.0f };
 
 		glm::mat4 getMatrix();
+
+		virtual const ComponentClass* getClass() const override { return &ClassData; }
 	};
 }
 

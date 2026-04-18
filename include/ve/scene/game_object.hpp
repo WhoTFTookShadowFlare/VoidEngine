@@ -1,25 +1,28 @@
 #pragma once
 
 #include "ve/scene/object_component.hpp"
+
+#include <typeindex>
 #include <memory>
 #include <vector>
+#include <map>
 #include <ranges>
 
 #include "ve/event/event_bus.hpp"
 #include "ve/scene/events.hpp"
 
+#include "ve/scene/component_db.hpp"
+
 namespace VoidEngine::Scene {
 	using namespace std;
 
-	template<typename T>
-	concept IsObjectComponent = std::is_base_of<AObjectComponent, T>::value;
-
 	class GameObject final : public enable_shared_from_this<GameObject> {
-		vector<shared_ptr<AObjectComponent>> components = {};
+		std::map<const ComponentClass*, shared_ptr<AObjectComponent>> components;
 	public:
 		
-		void addComponent(shared_ptr<AObjectComponent> component);
 		vector<shared_ptr<AObjectComponent>> getComponents();
+
+		void addComponent(shared_ptr<AObjectComponent> component);
 		void removeComponent(shared_ptr<AObjectComponent> component);
 
 		Event::EventBus<Events::EAddedToScene> onAddedToScene;
