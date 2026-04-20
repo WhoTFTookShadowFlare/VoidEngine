@@ -16,6 +16,7 @@ namespace VoidEngine::IO {
 		if(options.borderless) flags |= SDL_WINDOW_BORDERLESS;
 		if(options.alwaysOnTop) flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 		if(options.utility) flags |= SDL_WINDOW_UTILITY;
+		if(!options.visible) flags |= SDL_WINDOW_HIDDEN;
 
 		window = SDL_CreateWindow(options.title.c_str(), options.size.x, options.size.y, flags);
 		if(window == nullptr) throw std::runtime_error(SDL_GetError());
@@ -107,5 +108,14 @@ namespace VoidEngine::IO {
 
 	bool Window::isAlwaysOnTop() {
 		return SDL_GetWindowFlags(window) | SDL_WINDOW_ALWAYS_ON_TOP;
+	}
+
+	void Window::setVisible(bool value) {
+		if(!(value ? SDL_ShowWindow : SDL_HideWindow)(window))
+			std::cerr << SDL_GetError() << std::endl;
+	}
+	
+	bool Window::isVisible() {
+		return SDL_GetWindowFlags(window) | SDL_WINDOW_HIDDEN;
 	}
 }

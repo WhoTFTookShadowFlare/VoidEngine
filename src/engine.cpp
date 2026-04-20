@@ -73,7 +73,9 @@ namespace VoidEngine {
 
 		signal(SIGINT, sigHandler);
 		signal(SIGTERM, sigHandler);
-		IO::Window::CreationOptions options {};
+		IO::Window::CreationOptions options {
+			.visible = false
+		};
 		instance->mainWindow = IO::Window::create(options);
 
 		instance->renderer = IO::GFX::Renderer::getInstance();

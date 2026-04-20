@@ -23,6 +23,7 @@ namespace VoidEngine::IO {
 			bool borderless = false;
 			bool alwaysOnTop = false;
 			bool utility = false;
+			bool visible = true;
 		};
 	private:
 		static std::map<SDL_WindowID, std::weak_ptr<Window>> WindowMap;
@@ -69,5 +70,8 @@ namespace VoidEngine::IO {
 
 		void setAlwaysOnTop(bool value);
 		bool isAlwaysOnTop();
+
+		void setVisible(bool value);
+		bool isVisible();
 	};
 }
