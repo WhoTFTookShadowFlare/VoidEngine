@@ -4,12 +4,13 @@
 #include <glbinding/gl/enum.h>
 #include <glbinding/gl/functions.h>
 #include <glbinding/gl46core/gl.h>
+#include <format>
 #include <stdexcept>
 
 namespace VoidEngine::IO::GFX::OpenGL {
 	using namespace gl;
 
-	GLShader::GLShader(ShaderType type, AShaderSourceProvider& sourceCode) : Shader(type) {
+	GLShader::GLShader(ShaderType type, VoidEngine::IO::ResourceProviders::AShaderSourceProvider& sourceCode) : Shader(type) {
 		std::string sourceStr = sourceCode.getShaderSource();
 		const char *sourceCStr = sourceStr.c_str();
 

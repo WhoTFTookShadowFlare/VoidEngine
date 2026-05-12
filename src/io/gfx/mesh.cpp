@@ -1,8 +1,8 @@
 #include "ve/io/gfx/mesh.hpp"
-#include "ve/io/gfx/mesh_provider.hpp"
+#include "ve/io/res_providers/mesh/a_provider.hpp"
 
 namespace VoidEngine::IO::GFX {
-	void Mesh::setMeshProvider(std::shared_ptr<AMeshProvider> provider) {
+	void Mesh::setMeshProvider(std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> provider) {
 		if(this->provider != nullptr) {
 			this->provider->meshChanged -= weak_from_this();
 		}
@@ -15,11 +15,11 @@ namespace VoidEngine::IO::GFX {
 		}
 	}
 
-	std::shared_ptr<AMeshProvider> Mesh::getMeshProvider() {
+	std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> Mesh::getMeshProvider() {
 		return provider;
 	}
 
-	void Mesh::onEvent(EMeshProviderChanged& evt) {
+	void Mesh::onEvent(VoidEngine::IO::ResourceProviders::EMeshProviderChanged& evt) {
 		buildMesh();
 	}
 }

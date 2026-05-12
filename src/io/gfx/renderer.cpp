@@ -53,7 +53,7 @@ namespace VoidEngine::IO::GFX {
 		return backend->createMesh();
 	}
 
-	shared_ptr<Shader> Renderer::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
+	shared_ptr<Shader> Renderer::createShader(ShaderType type, VoidEngine::IO::ResourceProviders::AShaderSourceProvider& sourceCode) {
 		if(backend == nullptr) return nullptr;
 		return backend->createShader(type, sourceCode);
 	}

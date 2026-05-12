@@ -29,6 +29,9 @@ endif()
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/stb)
 	message(FATAL_ERROR "Missing submodule stb")
 endif()
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/assimp)
+	message(FATAL_ERROR "Missing submodule assimp")
+endif()
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,6 +47,8 @@ set(OPTION_BUILD_TOOLS OFF)
 set(OPTION_BUILD_EXAMPLES OFF)
 add_subdirectory(extern/glbinding)
 
+add_subdirectory(extern/assimp)
+
 file(GLOB_RECURSE VESource "src/**.cpp")
 add_library(VoidEngine STATIC ${VESource})
 target_include_directories(VoidEngine PUBLIC
@@ -56,6 +61,7 @@ target_include_directories(VoidEngine PRIVATE
 target_link_libraries(VoidEngine PRIVATE
 	SDL3::SDL3
 	glbinding::glbinding glbinding::glbinding-aux
+	assimp::assimp
 )
 target_include_directories(VoidEngine PUBLIC
 	extern/SDL3/include

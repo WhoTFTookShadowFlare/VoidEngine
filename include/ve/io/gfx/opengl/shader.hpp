@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ve/io/gfx/shader.hpp"
-#include "ve/io/gfx/shader_source_provider.hpp"
+#include "ve/io/res_providers/shader/a_provider.hpp"
 #include <cstdint>
 
 namespace VoidEngine::IO::GFX::OpenGL {
@@ -10,7 +10,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		friend class GLGraphicsProgram;
 		uint32_t shader = 0;
 	public:
-		GLShader(ShaderType type, AShaderSourceProvider& sourceCode);
+		GLShader(ShaderType type, VoidEngine::IO::ResourceProviders::AShaderSourceProvider& sourceCode);
 		~GLShader();
 	};
 }

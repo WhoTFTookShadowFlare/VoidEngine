@@ -51,7 +51,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		return shared_ptr<Mesh>(new GLMesh);
 	}
 
-	shared_ptr<Shader> RendererOpenGL::createShader(ShaderType type, AShaderSourceProvider& sourceCode) {
+	shared_ptr<Shader> RendererOpenGL::createShader(ShaderType type, VoidEngine::IO::ResourceProviders::AShaderSourceProvider& sourceCode) {
 		return shared_ptr<Shader>(new GLShader(type, sourceCode));
 	}
 
