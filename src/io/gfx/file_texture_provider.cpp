@@ -1,4 +1,4 @@
-#include "ve/io/gfx/texture_provider.hpp"
+#include "ve/io/res_providers/texture/file_provider.hpp"
 #include "stb_image.h"
 #include <cstdint>
 #include <filesystem>
@@ -9,7 +9,7 @@
 #include <sys/types.h>
 #include <vector>
 
-namespace VoidEngine::IO::GFX {
+namespace VoidEngine::IO::ResourceProviders {
 	FileTextureProvider::FileTextureProvider(std::filesystem::path& filePath) {
 		if(!(std::filesystem::exists(filePath) && !std::filesystem::is_directory(filePath))) {
 			throw std::runtime_error(std::format("File {} is either a directory or does not exist", filePath.string()));

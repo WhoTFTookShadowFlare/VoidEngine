@@ -1,5 +1,5 @@
 #include "ve/io/gfx/texture.hpp"
-#include "ve/io/gfx/texture_provider.hpp"
+#include "ve/io/res_providers/texture/a_provider.hpp"
 #include <cstdint>
 
 namespace VoidEngine::IO::GFX::OpenGL {
@@ -11,7 +11,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		~GLTexture();
 
 		void bindTexture();
-		void setTextureProvider(ATextureProvider&);
+		void setTextureProvider(VoidEngine::IO::ResourceProviders::ATextureProvider&);
 
 		void setFiltered(bool);
 		bool isFiltered();

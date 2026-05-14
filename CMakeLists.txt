@@ -61,11 +61,14 @@ target_include_directories(VoidEngine PRIVATE
 target_link_libraries(VoidEngine PRIVATE
 	SDL3::SDL3
 	glbinding::glbinding glbinding::glbinding-aux
-	assimp::assimp
 )
 target_include_directories(VoidEngine PUBLIC
 	extern/SDL3/include
 )
+target_link_libraries(VoidEngine PUBLIC
+	assimp::assimp
+)
+
 target_compile_definitions(VoidEngine PUBLIC GLM_ENABLE_EXPERIMENTAL)
 target_include_directories(VoidEngine PUBLIC
 	extern/glm

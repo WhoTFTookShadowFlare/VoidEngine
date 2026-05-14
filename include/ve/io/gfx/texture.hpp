@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ve/io/gfx/texture_provider.hpp"
+#include "ve/io/res_providers/texture/a_provider.hpp"
 #include <cstdint>
 
 namespace VoidEngine::IO::GFX {
@@ -16,7 +16,7 @@ namespace VoidEngine::IO::GFX {
 		virtual bool isFiltered() = 0;
 
 		virtual void bindTexture() = 0;
-		virtual void setTextureProvider(ATextureProvider&) = 0;
+		virtual void setTextureProvider(VoidEngine::IO::ResourceProviders::ATextureProvider&) = 0;
 	};
 }
 

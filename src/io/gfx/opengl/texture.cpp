@@ -1,6 +1,6 @@
 #include "ve/io/gfx/opengl/texture.hpp"
 #include "ve/io/gfx/texture.hpp"
-#include "ve/io/gfx/texture_provider.hpp"
+#include "ve/io/res_providers/texture/a_provider.hpp"
 #include <cstdint>
 #include <glbinding/gl/enum.h>
 #include <glbinding/gl/functions.h>
@@ -23,7 +23,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 
-	void GLTexture::setTextureProvider(ATextureProvider& textureData) {
+	void GLTexture::setTextureProvider(VoidEngine::IO::ResourceProviders::ATextureProvider& textureData) {
 		glm::ivec2 size = textureData.getSize();
 		std::vector<uint8_t> data = textureData.getData();
 		bindTexture();
