@@ -15,7 +15,7 @@ namespace VoidEngine::Scene {
 
 namespace VoidEngine::Scene::Events {
 	class EComponentUpdate final {
-		friend class ComponentUpdater;
+		friend class VoidEngine::Scene::ComponentUpdater;
 	private:
 		EComponentUpdate(double delta) : delta(delta) {}
 	public:
@@ -23,7 +23,7 @@ namespace VoidEngine::Scene::Events {
 	};
 
 	class EComponentDraw final {
-		friend class Scene;
+		friend class VoidEngine::Scene::Scene;
 	private:
 		EComponentDraw(double delta, std::shared_ptr<IO::Window> window, std::shared_ptr<Scene> scene)
 			: delta(delta), window(window), scene(scene)
@@ -35,7 +35,7 @@ namespace VoidEngine::Scene::Events {
 	};
 
 	class EAddedToScene final {
-		friend class Scene;
+		friend class VoidEngine::Scene::Scene;
 	private:
 		EAddedToScene(std::shared_ptr<Scene> scene, std::shared_ptr<GameObject> object)
 			: scene(scene), object(object)
@@ -46,7 +46,7 @@ namespace VoidEngine::Scene::Events {
 	};
 
 	class ERemovedFromScene final {
-		friend class Scene;
+		friend class VoidEngine::Scene::Scene;
 	private:
 		ERemovedFromScene(std::shared_ptr<Scene> scene, std::shared_ptr<GameObject> object)
 			: scene(scene), object(object)
@@ -57,7 +57,7 @@ namespace VoidEngine::Scene::Events {
 	};
 
 	class EAddedToObject final {
-		friend class GameObject;
+		friend class VoidEngine::Scene::GameObject;
 	private:
 		EAddedToObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
 			: object(object), component(component)
@@ -68,7 +68,7 @@ namespace VoidEngine::Scene::Events {
 	};
 
 	class ERemovedFromObject final {
-		friend class GameObject;
+		friend class VoidEngine::Scene::GameObject;
 	private:
 		ERemovedFromObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
 			: object(object), component(component)

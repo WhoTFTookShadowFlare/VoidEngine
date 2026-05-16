@@ -7,6 +7,7 @@ A game engine made specifically for desktop platforms.
 Install:
 - cmake
 - git
+- assimp (if on non-windows system)
 
 Building:
 1. Clone the repository recursivly to get all dependencies.

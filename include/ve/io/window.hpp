@@ -11,9 +11,13 @@
 #include "ve/io/window_events.hpp"
 #include "ve/io/input_events.hpp"
 
+namespace VoidEngine {
+	class Engine;
+}
+
 namespace VoidEngine::IO {
 	class Window final {
-		friend class Engine;
+		friend class VoidEngine::Engine;
 		friend class GFX::OpenGL::RendererOpenGL;
 	public:
 		struct CreationOptions {
