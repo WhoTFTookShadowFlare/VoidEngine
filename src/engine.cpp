@@ -4,6 +4,7 @@
 #include "ve/io/window_events.hpp"
 #include "ve/io/input.hpp"
 #include "ve/io/input_events.hpp"
+#include "ve/io/sfx/audio.hpp"
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/math/rect2.hpp"
 #include "ve/scene/component_db.hpp"
@@ -78,6 +79,7 @@ namespace VoidEngine {
 		};
 		instance->mainWindow = IO::Window::create(options);
 
+		instance->audio = IO::SFX::Audio::getInstance();
 		instance->renderer = IO::GFX::Renderer::getInstance();
 		instance->input = IO::Input::getInstance();
 

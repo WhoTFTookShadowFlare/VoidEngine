@@ -29,6 +29,9 @@ endif()
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/stb)
 	message(FATAL_ERROR "Missing submodule stb")
 endif()
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/openal)
+	message(FATAL_ERROR "Missing submodule openal")
+endif()
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -53,6 +56,8 @@ else()
 	find_package(assimp REQUIRED)
 endif()
 
+add_subdirectory(extern/openal)
+
 file(GLOB_RECURSE VESource "src/**.cpp")
 add_library(VoidEngine STATIC ${VESource})
 target_include_directories(VoidEngine PUBLIC
@@ -65,6 +70,7 @@ target_include_directories(VoidEngine PRIVATE
 target_link_libraries(VoidEngine PRIVATE
 	SDL3::SDL3
 	glbinding::glbinding glbinding::glbinding-aux
+	OpenAL::OpenAL
 )
 target_include_directories(VoidEngine PUBLIC
 	extern/SDL3/include

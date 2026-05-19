@@ -13,6 +13,9 @@ namespace VoidEngine {
 	namespace IO {
 		class Window;
 		class Input;
+		namespace SFX {
+			class Audio;
+		}
 		namespace GFX {
 			class Renderer;
 		}
@@ -28,6 +31,7 @@ namespace VoidEngine {
 	
 		static std::shared_ptr<Engine> instance;
 		std::shared_ptr<IO::GFX::Renderer> renderer;
+		std::shared_ptr<IO::SFX::Audio> audio;
 		std::shared_ptr<IO::Input> input;
 
 		std::filesystem::path dataSubdir;

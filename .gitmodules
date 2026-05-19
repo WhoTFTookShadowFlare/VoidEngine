@@ -13,3 +13,6 @@
 [submodule "extern/assimp"]
 	path = extern/assimp
 	url = https://github.com/assimp/assimp
+[submodule "extern/openal"]
+	path = extern/openal
+	url = https://github.com/kcat/openal-soft
