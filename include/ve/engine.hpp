@@ -31,7 +31,7 @@ namespace VoidEngine {
 		std::shared_ptr<IO::Input> input;
 
 		std::filesystem::path dataSubdir;
-		std::chrono::time_point<std::chrono::steady_clock> lastTime;
+		std::chrono::time_point<std::chrono::steady_clock> lastTime = std::chrono::steady_clock::now();
 		double delta = 0.0;
 
 		int argc = 0;
