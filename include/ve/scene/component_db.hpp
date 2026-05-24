@@ -20,7 +20,7 @@ namespace VoidEngine::Scene {
 		bool operator==(ComponentClass RHS) const { return name == RHS.name; }
 
 		bool instanceOf(const ComponentClass* cls) const {
-			const ComponentClass *check = super;
+			const ComponentClass *check = this;
 			while(check != nullptr) {
 				if(cls == check) return true;
 				check = check->super;

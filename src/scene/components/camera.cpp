@@ -1,5 +1,8 @@
 #include "ve/scene/components/camera.hpp"
 
+#include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/geometric.hpp"
 #include "ve/io/window.hpp"
 #include "ve/scene/components/transform.hpp"
 #include "ve/scene/game_object.hpp"
@@ -37,7 +40,7 @@ namespace VoidEngine::Scene::Components {
 	glm::mat4 PerspectiveCamera::getProjection(std::shared_ptr<IO::Window> window) {
 		auto size = window->getSize();
 		float aspectRatio = (float) size.x / (float) size.y;
-		return glm::perspective(fov, aspectRatio, 0.01f, 200.0f);
+		return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 200.0f);
 	}
 
 	std::shared_ptr<PerspectiveCamera> PerspectiveCamera::create() {
@@ -46,7 +49,7 @@ namespace VoidEngine::Scene::Components {
 
 	glm::mat4 OrthoCamera::getProjection(std::shared_ptr<IO::Window> window) {
 		glm::ivec2 size = window->getSize();
-		return glm::ortho(-size.x / 2.0f, size.x / 2.0f, -size.y / 2.0f, size.y / 2.0f, -100.0f, 100.0f);
+		return glm::ortho(-size.x / 2.0f, size.x / 2.0f, -size.y / 2.0f, size.y / 2.0f, 0.0f, 200.0f);
 	}
 
 	std::shared_ptr<OrthoCamera> OrthoCamera::create() {
