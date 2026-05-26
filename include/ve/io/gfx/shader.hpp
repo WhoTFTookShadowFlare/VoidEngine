@@ -15,4 +15,3 @@ namespace VoidEngine::IO::GFX {
 		virtual ~Shader() {}
 	};
 }
-

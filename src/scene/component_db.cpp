@@ -2,6 +2,7 @@
 
 #include "ve/scene/components/transform.hpp"
 #include "ve/scene/components/mesh.hpp"
+#include "ve/scene/components/sound.hpp"
 #include "ve/scene/components/camera.hpp"
 
 namespace VoidEngine::Scene {
@@ -10,6 +11,8 @@ namespace VoidEngine::Scene {
 	ComponentDB::ComponentDB() {
 		registerClass<Components::TransformComponent, AObjectComponent>();
 		registerClass<Components::MeshComponent, AObjectComponent>();
+
+		registerClass<Components::SoundComponent, AObjectComponent>();
 
 		registerAbstractClass<Components::ACamera, AObjectComponent>();
 		registerClass<Components::OrthoCamera, Components::ACamera>();
