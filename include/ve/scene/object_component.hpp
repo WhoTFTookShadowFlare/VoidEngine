@@ -35,8 +35,8 @@ namespace VoidEngine::Scene {
 		static const ComponentClass ClassData;
 		virtual ~AObjectComponent() {}
 
-		Event::EventBus<Events::EAddedToObject> onComponentAdded;
-		Event::EventBus<Events::ERemovedFromObject> onComponentRemoved;
+		Event::EventBus<Events::EComponentAddedToObject> onComponentAdded;
+		Event::EventBus<Events::EComponentRemovedFromObject> onComponentRemoved;
 
 		Event::EventBus<Events::EComponentUpdate> onUpdate;
 		Event::EventBus<Events::EComponentDraw> onDraw;

@@ -1,4 +1,5 @@
 #include "ve/scene/scene.hpp"
+#include "ve/scene/events.hpp"
 #include "ve/scene/game_object.hpp"
 #include "ve/scene/components/camera.hpp"
 #include <map>
@@ -7,20 +8,18 @@
 #include <vector>
 
 namespace VoidEngine::Scene {
-	using namespace std;
-
-	std::shared_ptr<GameObject> Scene::getObject(string name) {
+	std::shared_ptr<GameObject> Scene::getObject(std::string name) {
 		return objects[name];
 	}
 
-	void Scene::setObject(string name, std::shared_ptr<GameObject> obj) {
-		auto prev = getObject(name);
+	void Scene::addObject(std::shared_ptr<GameObject> obj) {
+		auto prev = getObject(obj->getName());
 		if(prev != nullptr) {
 			Events::ERemovedFromScene evt(shared_from_this(), prev);
 			prev->onRemovedFromScene(evt);
 		}
 
-		objects[name] = obj;
+		objects[obj->getName()] = obj;
 
 		if(obj != nullptr) {
 			Events::EAddedToScene evt(shared_from_this(), obj);
@@ -28,8 +27,8 @@ namespace VoidEngine::Scene {
 		}
 	}
 
-	vector<shared_ptr<GameObject>> Scene::getObjects() {
-		vector<shared_ptr<GameObject>> objVec;
+	std::vector<std::shared_ptr<GameObject>> Scene::getObjects() {
+		std::vector<std::shared_ptr<GameObject>> objVec;
 
 		for(auto obj = objects.begin(); obj != objects.end(); obj++) {
 			objVec.push_back(obj->second);
@@ -54,7 +53,7 @@ namespace VoidEngine::Scene {
 	}
 
 	void Scene::draw(double delta, std::shared_ptr<IO::Window> window) {
-		Events::EComponentDraw draw(delta, window, shared_from_this());
+		Events::ESceneDraw draw(delta, window, shared_from_this());
 		for(auto obj = objects.begin(); obj != objects.end(); obj++)
 			obj->second->draw(draw);
 	}
