@@ -18,4 +18,9 @@ namespace VoidEngine::IO::SFX {
 		if(instance == nullptr) instance = std::shared_ptr<Audio>(new Audio);
 		return instance;
 	}
+
+	std::shared_ptr<AudioSource> Audio::createSource() {
+		if(backend == nullptr) return nullptr;
+		return backend->createSource();
+	}
 }
