@@ -2,7 +2,6 @@
 #include "ve/io/gfx/program_uniform.hpp"
 #include "ve/scene/components/mesh.hpp"
 #include "ve/io/gfx/graphics_program.hpp"
-#include "ve/scene/components/transform.hpp"
 #include "ve/scene/scene.hpp"
 #include "ve/scene/components/camera.hpp"
 #include <glm/ext/matrix_float4x4.hpp>
@@ -11,6 +10,7 @@
 #include <optional>
 
 namespace VoidEngine::Scene::Components {
+	using namespace std;
 	MeshComponent::MeshComponent() {}
 
 	std::shared_ptr<MeshComponent> MeshComponent::create() {
@@ -23,7 +23,7 @@ namespace VoidEngine::Scene::Components {
 		if(program == nullptr) return;
 		if(mesh == nullptr) return;
 
-		vector<glm::mat4> defaultMatrix = { glm::mat4(1.0f) };
+		std::vector<glm::mat4> defaultMatrix = { glm::mat4(1.0f) };
 		if(draw.scene->getCamera()) {
 			vector<glm::mat4> matrixPass = { glm::mat4(1.0f) };
 			if(uProjection) {
@@ -43,38 +43,28 @@ namespace VoidEngine::Scene::Components {
 			if(uView) program->setUniform(uView.value(), defaultMatrix);
 		}
 		if(uModel) {
-			if(transform) {
-				vector<glm::mat4> model = { transform->getMatrix() };
-				program->setUniform(uModel.value(), model);
-			} else {
-				program->setUniform(uModel.value(), defaultMatrix);
-			}
+			vector<glm::mat4> model = { draw.object->getModelMatrix() };
+			program->setUniform(uModel.value(), model);
 		}
 
 		program->draw(mesh);
 	}
 
-	shared_ptr<TransformComponent> MeshComponent::getTransform() {
-		return transform;
-	}
-
-	shared_ptr<Mesh> MeshComponent::getMesh() {
+	std::shared_ptr<VoidEngine::IO::GFX::Mesh> MeshComponent::getMesh() {
 		return mesh;
 	}
 
-	shared_ptr<GraphicsProgram> MeshComponent::getProgram() {
+	std::shared_ptr<VoidEngine::IO::GFX::GraphicsProgram> MeshComponent::getProgram() {
 		return program;
 	}
 
-	void MeshComponent::setTransform(shared_ptr<TransformComponent> transform) {
-		this->transform = transform;
-	}
-
-	void MeshComponent::setMesh(shared_ptr<Mesh> mesh) {
+	void MeshComponent::setMesh(std::shared_ptr<VoidEngine::IO::GFX::Mesh> mesh) {
 		this->mesh = mesh;
 	}
 
-	void MeshComponent::setProgram(shared_ptr<GraphicsProgram> program) {
+	void MeshComponent::setProgram(std::shared_ptr<VoidEngine::IO::GFX::GraphicsProgram> program) {
+		using VoidEngine::IO::GFX::UniformType;
+
 		this->program = program;
 		uProjection = nullopt;
 		uView = nullopt;

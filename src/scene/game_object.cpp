@@ -1,29 +1,47 @@
 #include "ve/scene/game_object.hpp"
+#include "ve/scene/events.hpp"
 #include "ve/scene/object_component.hpp"
 #include <algorithm>
+#include <format>
 #include <memory>
 
-#include <iostream>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/trigonometric.hpp>
+#include <stdexcept>
 
 namespace VoidEngine::Scene {
-	void GameObject::addComponent(shared_ptr<AObjectComponent> comp) {
+	GameObject::GameObject(std::string name)
+		: name(name)
+	{	}
+
+	std::shared_ptr<GameObject> GameObject::create(std::string name) {
+		return std::shared_ptr<GameObject>(new GameObject(name));
+	}
+
+	std::string GameObject::getName() const {
+		return name;
+	}
+
+	void GameObject::addComponent(std::shared_ptr<AObjectComponent> comp) {
 		if(comp == nullptr) return;
 		components[comp->getClass()] = comp;
 		comp->tiedTo.push_back(weak_from_this());
 
-		Events::EAddedToObject evt(shared_from_this(), comp);
+		Events::EComponentAddedToObject evt(shared_from_this(), comp);
 		comp->onComponentAdded(evt);
 		onComponentAdded(evt);
 	}
 
-	void GameObject::removeComponent(shared_ptr<AObjectComponent> comp) {
-		Events::ERemovedFromObject evt(shared_from_this(), comp);
+	void GameObject::removeComponent(std::shared_ptr<AObjectComponent> comp) {
+		Events::EComponentRemovedFromObject evt(shared_from_this(), comp);
 		components[comp->getClass()]->onComponentRemoved(evt);
 		onComponentRemoved(evt);
 		components.erase(comp->getClass());
 	}
 
-	vector<shared_ptr<AObjectComponent>> GameObject::getComponents() {
+	std::vector<std::shared_ptr<AObjectComponent>> GameObject::getComponents() {
 		std::vector<std::shared_ptr<AObjectComponent>> compList;
 		std::for_each(components.cbegin(), components.cend(), [&compList](const auto& iter) {
 			compList.emplace_back(iter.second);
@@ -31,7 +49,61 @@ namespace VoidEngine::Scene {
 		return compList;
 	}
 
-	void GameObject::draw(Events::EComponentDraw& draw) {
+	glm::mat4 GameObject::getModelMatrix() {
+		glm::mat4 matrix(1.0f);
+
+		matrix = glm::translate(matrix, position);
+		matrix = glm::rotate(matrix, glm::radians(rotation.x), { 1.0f, 0.0f, 0.0f });
+		matrix = glm::rotate(matrix, glm::radians(rotation.y), { 0.0f, 1.0f, 0.0f });
+		matrix = glm::rotate(matrix, glm::radians(rotation.z), { 0.0f, 0.0f, 1.0f });
+		matrix = glm::scale(matrix, scale);
+
+		if(auto parent = this->parent.lock())
+			return parent->getModelMatrix() * matrix;
+		return matrix;
+	}
+
+	void GameObject::addChild(std::shared_ptr<GameObject> child) {
+		if(children.contains(child->getName())) {
+			throw std::runtime_error(std::format("Duplicate name on child ({})", child->getName()));
+		}
+
+		if(!child->parent.expired()) {
+			throw std::runtime_error(std::format("An object cannot have multiple parents."));
+		}
+
+		child->parent = weak_from_this();
+
+		children[child->getName()] = child;
+		Events::EChildAdded evt(shared_from_this(), child);
+		onChildAdded(evt);
+	}
+
+	void GameObject::removeChild(std::string name) {
+		if(!children.contains(name)) return;
+
+		std::shared_ptr<GameObject> child = children[name];
+		children.erase(name);
+		Events::EChildRemoved evt(shared_from_this(), child);
+		onChildRemoved(evt);
+	}
+
+	std::shared_ptr<GameObject> GameObject::getChild(std::string name) {
+		if(!children.contains(name)) return nullptr;
+		return children[name];
+	}
+
+	std::vector<std::shared_ptr<GameObject>> GameObject::getChildren() {
+		std::vector<std::shared_ptr<GameObject>> children;
+		std::for_each(this->children.cbegin(), this->children.cend(), [&children](const auto& iter) {
+			children.emplace_back(iter.second);
+			});
+		return children;
+	}
+
+	void GameObject::draw(Events::ESceneDraw& scnDraw) {
+		Events::EComponentDraw draw(scnDraw, shared_from_this());
+		for(auto& child : children) child.second->draw(scnDraw);
 		for(auto& comp : components) comp.second->onDraw(draw);
 	}
 

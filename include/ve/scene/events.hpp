@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cinttypes>
 #include <memory>
 
 namespace VoidEngine::IO {
@@ -22,16 +23,29 @@ namespace VoidEngine::Scene::Events {
 		const double delta;
 	};
 
-	class EComponentDraw final {
+	class ESceneDraw final {
 		friend class VoidEngine::Scene::Scene;
 	private:
-		EComponentDraw(double delta, std::shared_ptr<IO::Window> window, std::shared_ptr<Scene> scene)
+		ESceneDraw(double delta, std::shared_ptr<IO::Window> window, std::shared_ptr<Scene> scene)
 			: delta(delta), window(window), scene(scene)
 		{}
 	public:
 		const double delta;
 		const std::shared_ptr<IO::Window> window;
 		const std::shared_ptr<Scene> scene;
+	};
+
+	class EComponentDraw final {
+		friend class VoidEngine::Scene::GameObject;
+	private:
+		EComponentDraw(ESceneDraw& sceneDraw, std::shared_ptr<GameObject> object)
+			: delta(sceneDraw.delta), window(sceneDraw.window), scene(sceneDraw.scene), object(object)
+		{}
+	public:
+		const double delta;
+		const std::shared_ptr<IO::Window> window;
+		const std::shared_ptr<Scene> scene;
+		const std::shared_ptr<GameObject> object;
 	};
 
 	class EAddedToScene final {
@@ -56,10 +70,10 @@ namespace VoidEngine::Scene::Events {
 		const std::shared_ptr<GameObject> object;
 	};
 
-	class EAddedToObject final {
+	class EComponentAddedToObject final {
 		friend class VoidEngine::Scene::GameObject;
 	private:
-		EAddedToObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
+		EComponentAddedToObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
 			: object(object), component(component)
 		{}
 	public:
@@ -67,14 +81,36 @@ namespace VoidEngine::Scene::Events {
 		const std::shared_ptr<AObjectComponent> component;
 	};
 
-	class ERemovedFromObject final {
+	class EComponentRemovedFromObject final {
 		friend class VoidEngine::Scene::GameObject;
 	private:
-		ERemovedFromObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
+		EComponentRemovedFromObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
 			: object(object), component(component)
 		{}
 	public:
 		const std::shared_ptr<GameObject> object;
 		const std::shared_ptr<AObjectComponent> component;
+	};
+
+	class EChildAdded final {
+		friend class VoidEngine::Scene::GameObject;
+	private:
+		EChildAdded(std::shared_ptr<GameObject> parent, std::shared_ptr<GameObject> child)
+			: parent(parent), child(child)
+		{}
+	public:
+		const std::shared_ptr<GameObject> parent;
+		const std::shared_ptr<GameObject> child;
+	};
+
+	class EChildRemoved final {
+		friend class VoidEngine::Scene::GameObject;
+	private:
+		EChildRemoved(std::shared_ptr<GameObject> parent, std::shared_ptr<GameObject> child)
+			: parent(parent), child(child)
+		{}
+	public:
+		const std::shared_ptr<GameObject> parent;
+		const std::shared_ptr<GameObject> child;
 	};
 }

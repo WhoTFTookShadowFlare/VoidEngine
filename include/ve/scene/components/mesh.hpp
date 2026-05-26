@@ -3,27 +3,21 @@
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/program_uniform.hpp"
 #include "ve/scene/component_db.hpp"
-#include "ve/scene/components/transform.hpp"
 #include "ve/scene/object_component.hpp"
 #include <memory>
 #include <optional>
 
 namespace VoidEngine::Scene::Components {
-	using namespace std;
-	using namespace VoidEngine::IO::GFX;
-
 	class MeshComponent : public AObjectComponent,
 		public Event::IEventListener<Events::EComponentDraw>
 	{
-		shared_ptr<Mesh> mesh = nullptr;
-		shared_ptr<GraphicsProgram> program = nullptr;
+		std::shared_ptr<VoidEngine::IO::GFX::Mesh> mesh = nullptr;
+		std::shared_ptr<VoidEngine::IO::GFX::GraphicsProgram> program = nullptr;
 
-		shared_ptr<TransformComponent> transform = nullptr;
-
-		optional<Uniform>
-			uProjection = nullopt,
-			uView = nullopt,
-			uModel = nullopt;
+		std::optional<VoidEngine::IO::GFX::Uniform>
+			uProjection = std::nullopt,
+			uView = std::nullopt,
+			uModel = std::nullopt;
 
 		MeshComponent();
 	public:
@@ -32,13 +26,11 @@ namespace VoidEngine::Scene::Components {
 
 		void onEvent(Events::EComponentDraw& evt);
 
-		shared_ptr<TransformComponent> getTransform();
-		shared_ptr<Mesh> getMesh();
-		shared_ptr<GraphicsProgram> getProgram();
+		std::shared_ptr<VoidEngine::IO::GFX::Mesh> getMesh();
+		std::shared_ptr<VoidEngine::IO::GFX::GraphicsProgram> getProgram();
 
-		void setTransform(shared_ptr<TransformComponent> transform);
-		void setMesh(shared_ptr<Mesh> mesh);
-		void setProgram(shared_ptr<GraphicsProgram> program);
+		void setMesh(std::shared_ptr<VoidEngine::IO::GFX::Mesh> mesh);
+		void setProgram(std::shared_ptr<VoidEngine::IO::GFX::GraphicsProgram> program);
 
 		virtual const ComponentClass* getClass() const override { return &ClassData; }
 	};
