@@ -5,7 +5,8 @@
 #include "ve/io/res_providers/mesh/a_provider.hpp"
 #include "ve/io/res_providers/model/a_provider.hpp"
 
-#include <print>
+#include <assimp/scene.h>
+#include <assimp/mesh.h>
 
 namespace VoidEngine::IO::ResourceProviders {
 	class MeshModelProvider : public AMeshProvider {

@@ -3,6 +3,7 @@
 #include "ve/io/res_providers/model/a_provider.hpp"
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <fstream>
 #include <filesystem>
 
 namespace VoidEngine::IO::ResourceProviders {
