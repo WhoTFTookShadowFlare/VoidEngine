@@ -4,6 +4,7 @@
 #include "ve/io/gfx/opengl/mesh.hpp"
 #include "ve/io/gfx/opengl/shader.hpp"
 #include "ve/io/gfx/opengl/texture.hpp"
+#include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/io/window.hpp"
 #include <cstdint>
 #include <glbinding/glbinding.h>
@@ -51,7 +52,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		return shared_ptr<Mesh>(new GLMesh);
 	}
 
-	shared_ptr<Shader> RendererOpenGL::createShader(ShaderType type, VoidEngine::IO::ResourceProviders::AShaderSourceProvider& sourceCode) {
+	shared_ptr<Shader> RendererOpenGL::createShader(ShaderType type, VoidEngine::IO::ResourceProviders::ASourceProvider& sourceCode) {
 		return shared_ptr<Shader>(new GLShader(type, sourceCode));
 	}
 

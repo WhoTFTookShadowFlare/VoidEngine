@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ve/io/gfx/renderer_backend.hpp"
+#include "ve/io/res_providers/source/a_provider.hpp"
 #include <SDL3/SDL_video.h>
 #include <cstdint>
 #include <map>
@@ -19,7 +20,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 		shared_ptr<Mesh> createMesh();
 
-		shared_ptr<Shader> createShader(ShaderType, VoidEngine::IO::ResourceProviders::AShaderSourceProvider&);
+		shared_ptr<Shader> createShader(ShaderType, VoidEngine::IO::ResourceProviders::ASourceProvider&);
 		shared_ptr<GraphicsProgram> createGraphicsProgram(shared_ptr<Shader> vertex, shared_ptr<Shader> fragment);
 
 		shared_ptr<Texture> createTexture(uint8_t);

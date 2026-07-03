@@ -8,6 +8,10 @@
 #include <vector>
 
 namespace VoidEngine::Scene {
+	std::shared_ptr<Scene> Scene::create() {
+		return std::shared_ptr<Scene>(new Scene);
+	}
+
 	std::shared_ptr<GameObject> Scene::getObject(std::string name) {
 		return objects[name];
 	}

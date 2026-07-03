@@ -1,16 +1,16 @@
 #pragma once
 
-#include "ve/io/res_providers/shader/a_provider.hpp"
+#include "ve/io/res_providers/source/a_provider.hpp"
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <format>
 
 namespace VoidEngine::IO::ResourceProviders {
-	class FileShaderSourceProvider : public AShaderSourceProvider {
+	class FileSourceProvider : public ASourceProvider {
 		std::string shaderSourceCode = "";
 	public:
-		FileShaderSourceProvider(std::filesystem::path& filePath) {
+		FileSourceProvider(std::filesystem::path& filePath) {
 			if (!(std::filesystem::exists(filePath) && !std::filesystem::is_directory(filePath))) {
 				throw std::runtime_error(std::format("File {} is either a directory or does not exist", filePath.string()));
 			}

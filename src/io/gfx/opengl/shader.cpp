@@ -1,4 +1,5 @@
 #include "ve/io/gfx/opengl/shader.hpp"
+#include "ve/io/res_providers/source/a_provider.hpp"
 #include <cstdint>
 #include <glbinding/gl/boolean.h>
 #include <glbinding/gl/enum.h>
@@ -10,7 +11,7 @@
 namespace VoidEngine::IO::GFX::OpenGL {
 	using namespace gl;
 
-	GLShader::GLShader(ShaderType type, VoidEngine::IO::ResourceProviders::AShaderSourceProvider& sourceCode) : Shader(type) {
+	GLShader::GLShader(ShaderType type, VoidEngine::IO::ResourceProviders::ASourceProvider& sourceCode) : Shader(type) {
 		std::string sourceStr = sourceCode.getShaderSource();
 		const char *sourceCStr = sourceStr.c_str();
 

@@ -20,6 +20,8 @@ namespace VoidEngine::Scene {
 
 		std::shared_ptr<GameObject> currentCamera = nullptr;
 	public:
+		static std::shared_ptr<Scene> create();
+
 		std::shared_ptr<GameObject> getObject(std::string name);
 		void addObject(std::shared_ptr<GameObject> obj);
 

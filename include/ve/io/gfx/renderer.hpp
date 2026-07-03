@@ -3,7 +3,7 @@
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/renderer_backend.hpp"
 #include "ve/io/gfx/shader.hpp"
-#include "ve/io/res_providers/shader/a_provider.hpp"
+#include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/io/gfx/texture.hpp"
 #include <cstdint>
 #include <glm/ext/vector_float4.hpp>
@@ -31,7 +31,7 @@ namespace VoidEngine::IO::GFX {
 
 		shared_ptr<Mesh> createMesh();
 
-		shared_ptr<Shader> createShader(ShaderType, VoidEngine::IO::ResourceProviders::AShaderSourceProvider&);
+		shared_ptr<Shader> createShader(ShaderType, VoidEngine::IO::ResourceProviders::ASourceProvider&);
 		shared_ptr<GraphicsProgram> createGraphicsProgram(shared_ptr<Shader> vertex, shared_ptr<Shader> fragment);
 		
 		shared_ptr<Texture> createTexture(uint8_t slot);

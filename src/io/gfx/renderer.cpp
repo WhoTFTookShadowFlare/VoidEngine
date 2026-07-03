@@ -1,5 +1,6 @@
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/opengl/backend.hpp"
+#include "ve/io/res_providers/source/a_provider.hpp"
 #include <cstdint>
 #include <memory>
 
@@ -53,7 +54,7 @@ namespace VoidEngine::IO::GFX {
 		return backend->createMesh();
 	}
 
-	shared_ptr<Shader> Renderer::createShader(ShaderType type, VoidEngine::IO::ResourceProviders::AShaderSourceProvider& sourceCode) {
+	shared_ptr<Shader> Renderer::createShader(ShaderType type, VoidEngine::IO::ResourceProviders::ASourceProvider& sourceCode) {
 		if(backend == nullptr) return nullptr;
 		return backend->createShader(type, sourceCode);
 	}
