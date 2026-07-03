@@ -47,7 +47,7 @@ namespace VoidEngine::Scene {
 			return;
 		}
 
-		std::shared_ptr<AObjectComponent> camera = obj->getFirstComponentOfInstance(&Components::ACamera::ClassData);
+		std::shared_ptr<AObjectComponent> camera = obj->getFirstOfType(&Components::ACamera::ClassData);
 		if(camera == nullptr) return;
 		currentCamera = obj;
 	}

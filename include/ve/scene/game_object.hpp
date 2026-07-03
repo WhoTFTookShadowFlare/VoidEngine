@@ -60,6 +60,7 @@ namespace VoidEngine::Scene {
 		void draw(Events::ESceneDraw& draw);
 
 		std::shared_ptr<AObjectComponent> getComponent(const ComponentClass* cls);
-		std::shared_ptr<AObjectComponent> getFirstComponentOfInstance(const ComponentClass* cls);
+		std::shared_ptr<AObjectComponent> getFirstOfType(const ComponentClass* cls);
+		std::vector<std::shared_ptr<AObjectComponent>> gatherComponentsOfType(const ComponentClass* cls);
 	};
 }

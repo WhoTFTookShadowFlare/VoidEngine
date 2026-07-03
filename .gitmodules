@@ -16,3 +16,6 @@
 [submodule "extern/openal"]
 	path = extern/openal
 	url = https://github.com/kcat/openal-soft
+[submodule "extern/toml++"]
+	path = extern/toml++
+	url = https://github.com/marzer/tomlplusplus

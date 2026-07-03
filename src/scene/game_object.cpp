@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
 #include <stdexcept>
+#include <vector>
 
 namespace VoidEngine::Scene {
 	GameObject::GameObject(std::string name)
@@ -26,6 +27,8 @@ namespace VoidEngine::Scene {
 
 	void GameObject::addComponent(std::shared_ptr<AObjectComponent> comp) {
 		if(comp == nullptr) return;
+		if(components[comp->getClass()] != nullptr) return;
+		
 		components[comp->getClass()] = comp;
 		comp->tiedTo.push_back(weak_from_this());
 
@@ -108,18 +111,31 @@ namespace VoidEngine::Scene {
 	}
 
 	std::shared_ptr<AObjectComponent> GameObject::getComponent(const ComponentClass* cls) {
+		return components[cls];
+	}
+
+	std::shared_ptr<AObjectComponent> GameObject::getFirstOfType(const ComponentClass* cls) {
 		const auto idx = std::find_if(components.cbegin(), components.cend(), [&cls](const auto& iter) {
-			return iter.first == cls;
+			return iter.first->instanceOf(cls);
 			});
 		if(idx == components.cend()) return nullptr;
 		return idx->second;
 	}
 
-	std::shared_ptr<AObjectComponent> GameObject::getFirstComponentOfInstance(const ComponentClass* cls) {
-		const auto idx = std::find_if(components.cbegin(), components.cend(), [&cls](const auto& iter) {
-			return iter.first->instanceOf(cls);
-			});
-		if (idx == components.cend()) return nullptr;
-		return idx->second;
+
+	void find_component(const ComponentClass* cls, std::shared_ptr<GameObject> object, std::vector<std::shared_ptr<AObjectComponent>>& found) {
+		auto comp = object->getComponent(cls);
+		if(comp != nullptr) found.push_back(comp);
+		auto children = object->getChildren();
+		std::for_each(children.cbegin(), children.cend(), [&](const auto& child) {
+			find_component(cls, child, found);
+		});
 	}
+
+	std::vector<std::shared_ptr<AObjectComponent>> GameObject::gatherComponentsOfType(const ComponentClass* cls) {
+		std::vector<std::shared_ptr<AObjectComponent>> components;
+		find_component(cls, shared_from_this(), components);
+		return components;
+	}
+
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <unordered_map>
 #include <vector>
 #include <functional>
 #include <iostream>
@@ -37,9 +39,13 @@ namespace VoidEngine::Scene {
 	private:
 		static std::shared_ptr<ComponentDB> instance;
 
+		std::unordered_map<std::string, const ComponentClass*> componentClasses;
+
 		ComponentDB();
 	public:
 		static std::shared_ptr<ComponentDB> getInstance();
+
+		const ComponentClass* getClassByName(std::string);
 
 		template<IsAbstractObjectComponent component, IsAbstractObjectComponent parent>
 		void registerAbstractClass() {

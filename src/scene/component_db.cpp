@@ -21,4 +21,8 @@ namespace VoidEngine::Scene {
 		if(instance == nullptr) instance = std::shared_ptr<ComponentDB>(new ComponentDB);
 		return instance;
 	}
+
+	const ComponentClass* ComponentDB::getClassByName(std::string name) {
+		return componentClasses[name];
+	}
 }

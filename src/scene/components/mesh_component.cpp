@@ -28,13 +28,13 @@ namespace VoidEngine::Scene::Components {
 			vector<glm::mat4> matrixPass = { glm::mat4(1.0f) };
 			if(uProjection) {
 				matrixPass[0] = std::static_pointer_cast<ACamera>(
-					draw.scene->getCamera()->getFirstComponentOfInstance(&ACamera::ClassData)
+					draw.scene->getCamera()->getFirstOfType(&ACamera::ClassData)
 				)->getProjection(draw.window);
 				program->setUniform(uProjection.value(), matrixPass);
 			}
 			if(uView) {
 				matrixPass[0] = std::static_pointer_cast<ACamera>(
-					draw.scene->getCamera()->getFirstComponentOfInstance(&ACamera::ClassData)
+					draw.scene->getCamera()->getFirstOfType(&ACamera::ClassData)
 				)->getView(draw.scene->getCamera());
 				program->setUniform(uView.value(), matrixPass);
 			}

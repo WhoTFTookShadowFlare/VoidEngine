@@ -29,8 +29,11 @@ endif()
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/stb)
 	message(FATAL_ERROR "Missing submodule stb")
 endif()
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/openal)
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/openal/CMakeLists.txt)
 	message(FATAL_ERROR "Missing submodule openal")
+endif()
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/toml++/CMakeLists.txt)
+	message(FATAL_ERROR "Missing submodule toml++")
 endif()
 
 set(CMAKE_CXX_STANDARD 23)
@@ -57,6 +60,7 @@ else()
 endif()
 
 add_subdirectory(extern/openal)
+add_subdirectory(extern/toml++)
 
 file(GLOB_RECURSE VESource "src/**.cpp")
 add_library(VoidEngine STATIC ${VESource})
@@ -77,6 +81,7 @@ target_include_directories(VoidEngine PUBLIC
 )
 target_link_libraries(VoidEngine PUBLIC
 	assimp::assimp
+	tomlplusplus::tomlplusplus
 )
 
 target_compile_definitions(VoidEngine PUBLIC GLM_ENABLE_EXPERIMENTAL)
