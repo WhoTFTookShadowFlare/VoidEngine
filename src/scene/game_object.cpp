@@ -123,11 +123,11 @@ namespace VoidEngine::Scene {
 		for(auto& comp : components) if(comp.second != nullptr) comp.second->onDraw(draw);
 	}
 
-	std::shared_ptr<AObjectComponent> GameObject::getComponent(const ComponentClass* cls) {
+	std::shared_ptr<AObjectComponent> GameObject::getComponent(const Class* cls) {
 		return components[cls];
 	}
 
-	std::shared_ptr<AObjectComponent> GameObject::getFirstOfType(const ComponentClass* cls) {
+	std::shared_ptr<AObjectComponent> GameObject::getFirstOfType(const Class* cls) {
 		const auto idx = std::find_if(components.cbegin(), components.cend(), [&cls](const auto& iter) {
 			return iter.first->instanceOf(cls);
 			});
@@ -136,7 +136,7 @@ namespace VoidEngine::Scene {
 	}
 
 
-	void find_component(const ComponentClass* cls, std::shared_ptr<GameObject> object, std::vector<std::shared_ptr<AObjectComponent>>& found) {
+	void find_component(const Class* cls, std::shared_ptr<GameObject> object, std::vector<std::shared_ptr<AObjectComponent>>& found) {
 		auto comp = object->getComponent(cls);
 		if(comp != nullptr) found.push_back(comp);
 		auto children = object->getChildren();
@@ -145,7 +145,7 @@ namespace VoidEngine::Scene {
 		});
 	}
 
-	std::vector<std::shared_ptr<AObjectComponent>> GameObject::gatherComponentsOfType(const ComponentClass* cls) {
+	std::vector<std::shared_ptr<AObjectComponent>> GameObject::gatherComponentsOfType(const Class* cls) {
 		std::vector<std::shared_ptr<AObjectComponent>> components;
 		find_component(cls, shared_from_this(), components);
 		return components;

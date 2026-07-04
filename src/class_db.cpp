@@ -1,13 +1,13 @@
-#include "ve/scene/component_db.hpp"
+#include "ve/class_db.hpp"
 
 #include "ve/scene/components/mesh.hpp"
 #include "ve/scene/components/sound.hpp"
 #include "ve/scene/components/camera.hpp"
 
 namespace VoidEngine::Scene {
-	std::shared_ptr<ComponentDB> ComponentDB::instance = nullptr;
+	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
 
-	ComponentDB::ComponentDB() {
+	ClassDB::ClassDB() {
 		registerClass<Components::MeshComponent, AObjectComponent>();
 
 		registerClass<Components::SoundComponent, AObjectComponent>();
@@ -17,12 +17,12 @@ namespace VoidEngine::Scene {
 		registerClass<Components::PerspectiveCamera, Components::ACamera>();
 	}
 
-	std::shared_ptr<ComponentDB> ComponentDB::getInstance() {
-		if(instance == nullptr) instance = std::shared_ptr<ComponentDB>(new ComponentDB);
+	std::shared_ptr<ClassDB> ClassDB::getInstance() {
+		if(instance == nullptr) instance = std::shared_ptr<ClassDB>(new ClassDB);
 		return instance;
 	}
 
-	const ComponentClass* ComponentDB::getClassByName(std::string name) {
+	const Class* ClassDB::getClassByName(std::string name) {
 		return componentClasses[name];
 	}
 }

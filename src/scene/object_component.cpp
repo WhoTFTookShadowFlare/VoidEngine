@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "ve/scene/component_db.hpp"
+#include "ve/class_db.hpp"
 
 namespace VoidEngine::Scene {
 	void AObjectComponent::cleanTiedTo() {
@@ -23,7 +23,7 @@ namespace VoidEngine::Scene {
 		return retVal;
 	}
 
-	const ComponentClass AObjectComponent::ClassData = {
+	const Class AObjectComponent::ClassData = {
 		   .name = "AObjectComponent",
 	};
 }

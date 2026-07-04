@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <print>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -11,18 +10,18 @@
 #include "ve/scene/object_component.hpp"
 
 namespace VoidEngine::Scene {
-	struct ComponentClass {
+	struct Class {
 		const char* name;
 
-		const ComponentClass *super;
-		std::vector<const ComponentClass*> childTypes;
+		const Class *super;
+		std::vector<const Class*> childTypes;
 
 		std::function<std::shared_ptr<AObjectComponent>()> create;
 
-		bool operator==(ComponentClass RHS) const { return name == RHS.name; }
+		bool operator==(Class RHS) const { return name == RHS.name; }
 
-		bool instanceOf(const ComponentClass* cls) const {
-			const ComponentClass *check = this;
+		bool instanceOf(const Class* cls) const {
+			const Class *check = this;
 			while(check != nullptr) {
 				if(cls == check) return true;
 				check = check->super;
@@ -35,24 +34,24 @@ namespace VoidEngine::Scene {
 		}
 	};
 
-	class ComponentDB {
+	class ClassDB {
 	private:
-		static std::shared_ptr<ComponentDB> instance;
+		static std::shared_ptr<ClassDB> instance;
 
-		std::unordered_map<std::string, const ComponentClass*> componentClasses;
+		std::unordered_map<std::string, const Class*> componentClasses;
 
-		ComponentDB();
+		ClassDB();
 	public:
-		static std::shared_ptr<ComponentDB> getInstance();
+		static std::shared_ptr<ClassDB> getInstance();
 
-		const ComponentClass* getClassByName(std::string);
+		const Class* getClassByName(std::string);
 
 		template<IsAbstractObjectComponent component, IsAbstractObjectComponent parent>
 		void registerAbstractClass() {
-			ComponentClass *cls = (ComponentClass*) &component::ClassData;
+			Class *cls = (Class*) &component::ClassData;
 			cls->super = &parent::ClassData;
 
-			ComponentClass *parentCls = (ComponentClass*) &parent::ClassData;
+			Class *parentCls = (Class*) &parent::ClassData;
 			parentCls->childTypes.emplace_back(cls);
 
 			componentClasses[cls->name] = cls;
@@ -61,7 +60,7 @@ namespace VoidEngine::Scene {
 		template<IsObjectComponent component, IsAbstractObjectComponent parent>
 		void registerClass() {
 			registerAbstractClass<component, parent>();
-			ComponentClass *cls = (ComponentClass*) &component::ClassData;
+			Class *cls = (Class*) &component::ClassData;
 			cls->create = component::create;
 		}
 	};

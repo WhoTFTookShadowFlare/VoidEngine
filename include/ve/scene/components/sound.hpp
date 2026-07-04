@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ve/scene/object_component.hpp"
-#include "ve/scene/component_db.hpp"
+#include "ve/class_db.hpp"
 
 #include "ve/io/sfx/audio_source.hpp"
 
@@ -12,11 +12,11 @@ namespace VoidEngine::Scene::Components {
 
 		std::shared_ptr<VoidEngine::IO::SFX::AudioSource> source;
 	public:
-		static const ComponentClass ClassData;
+		static const Class ClassData;
 		static std::shared_ptr<SoundComponent> create();
 
 		std::shared_ptr<VoidEngine::IO::SFX::AudioSource> getSource();
 
-		virtual const ComponentClass* getClass() const override { return &ClassData; }
+		virtual const Class* getClass() const override { return &ClassData; }
 	};
 }

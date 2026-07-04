@@ -1,6 +1,6 @@
 #include "ve/scene/scene.hpp"
 #include "ve/io/res_providers/model/file_provider.hpp"
-#include "ve/scene/component_db.hpp"
+#include "ve/class_db.hpp"
 #include "ve/scene/component_updater.hpp"
 #include "ve/scene/events.hpp"
 #include "ve/scene/game_object.hpp"
@@ -35,7 +35,7 @@ namespace VoidEngine::Scene {
 			return nullptr;
 		}
 
-		auto compDB = ComponentDB::getInstance();
+		auto compDB = ClassDB::getInstance();
 		auto compUpdater = ComponentUpdater::getInstance();
 
 		auto deserializedScene = Scene::create();
@@ -64,7 +64,7 @@ namespace VoidEngine::Scene {
 
 					for(size_t idx = 0; idx < chunk_components->size(); idx++) {
 						std::string clsName = chunk_components->get(idx)->as_table()->get("type")->as_string()->get();
-						const VoidEngine::Scene::ComponentClass* cls = compDB->getClassByName(clsName);
+						const VoidEngine::Scene::Class* cls = compDB->getClassByName(clsName);
 						if(cls == nullptr) {
 							std::println("[ERR] Could not find class {}", clsName);
 							continue;
@@ -109,7 +109,7 @@ namespace VoidEngine::Scene {
 								compRefs.push_back(entry->as_string()->get());
 							} else if(entry->is_table()) {
 								std::string clsName = entry->as_table()->get("type")->as_string()->get();
-								const VoidEngine::Scene::ComponentClass* cls = compDB->getClassByName(clsName);
+								const VoidEngine::Scene::Class* cls = compDB->getClassByName(clsName);
 								if(cls == nullptr) {
 									std::println("[ERR] Could not find class {}", clsName);
 									continue;

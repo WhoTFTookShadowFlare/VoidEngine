@@ -13,11 +13,11 @@
 #include "ve/event/event_bus.hpp"
 #include "ve/scene/events.hpp"
 
-#include "ve/scene/component_db.hpp"
+#include "ve/class_db.hpp"
 
 namespace VoidEngine::Scene {
 	class GameObject final : public std::enable_shared_from_this<GameObject> {
-		std::map<const ComponentClass*, std::shared_ptr<AObjectComponent>> components;
+		std::map<const Class*, std::shared_ptr<AObjectComponent>> components;
 
 		std::map<std::string, std::shared_ptr<GameObject>> children;
 		std::weak_ptr<GameObject> parent;
@@ -60,8 +60,8 @@ namespace VoidEngine::Scene {
 
 		void draw(Events::ESceneDraw& draw);
 
-		std::shared_ptr<AObjectComponent> getComponent(const ComponentClass* cls);
-		std::shared_ptr<AObjectComponent> getFirstOfType(const ComponentClass* cls);
-		std::vector<std::shared_ptr<AObjectComponent>> gatherComponentsOfType(const ComponentClass* cls);
+		std::shared_ptr<AObjectComponent> getComponent(const Class* cls);
+		std::shared_ptr<AObjectComponent> getFirstOfType(const Class* cls);
+		std::vector<std::shared_ptr<AObjectComponent>> gatherComponentsOfType(const Class* cls);
 	};
 }

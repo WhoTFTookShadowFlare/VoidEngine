@@ -104,7 +104,7 @@ namespace VoidEngine::Scene::Components {
 		if(uModel == nullopt) std::cerr << "[WARN] uModel was not found in the shader" << std::endl;
 	}
 
-	const ComponentClass MeshComponent::ClassData = {
+	const Class MeshComponent::ClassData = {
 		.name = "MeshComponent",
 	};
 }

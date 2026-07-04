@@ -51,15 +51,15 @@ namespace VoidEngine::Scene::Components {
 		return std::make_shared<OrthoCamera>();
 	}
 
-	const ComponentClass ACamera::ClassData = {
+	const Class ACamera::ClassData = {
 		.name = "ACamera"
 	};
 
-	const ComponentClass PerspectiveCamera::ClassData = {
+	const Class PerspectiveCamera::ClassData = {
 		.name = "PerspectiveCamera"
 	};
 
-	const ComponentClass OrthoCamera::ClassData = {
+	const Class OrthoCamera::ClassData = {
 		.name = "OrthoCamera"
 	};
 }

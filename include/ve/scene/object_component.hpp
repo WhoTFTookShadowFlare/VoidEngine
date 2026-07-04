@@ -8,14 +8,14 @@
 #include "ve/scene/events.hpp"
 
 namespace VoidEngine::Scene {
-	struct ComponentClass;
+	struct Class;
 	class GameObject;
 
 	template<typename T>
 	concept IsAbstractObjectComponent =
 		std::is_base_of<AObjectComponent, T>::value &&
 		requires(T a) {
-			{ T::ClassData } -> std::convertible_to<ComponentClass>;
+			{ T::ClassData } -> std::convertible_to<Class>;
 		};
 
 	template<typename T>
@@ -34,7 +34,7 @@ namespace VoidEngine::Scene {
 		void cleanTiedTo();
 
 	public:
-		static const ComponentClass ClassData;
+		static const Class ClassData;
 		virtual ~AObjectComponent() {}
 
 		Event::EventBus<Events::EComponentAddedToObject> onComponentAdded;
@@ -45,6 +45,6 @@ namespace VoidEngine::Scene {
 
 		std::vector<std::shared_ptr<GameObject>> getObjectsUsing();
 
-		virtual const ComponentClass* getClass() const { return &ClassData; }
+		virtual const Class* getClass() const { return &ClassData; }
 	};
 }
