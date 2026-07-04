@@ -44,6 +44,7 @@ namespace VoidEngine::Scene {
 		void addChild(std::shared_ptr<GameObject> child);
 		void removeChild(std::string name);
 		std::shared_ptr<GameObject> getChild(std::string name);
+		std::shared_ptr<GameObject> getChildFromPath(std::string path);
 
 		void addComponent(std::shared_ptr<AObjectComponent> component);
 		void removeComponent(std::shared_ptr<AObjectComponent> component);

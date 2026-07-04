@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <filesystem>
 
 namespace VoidEngine::IO {
 	class Window;
@@ -21,9 +22,12 @@ namespace VoidEngine::Scene {
 		std::shared_ptr<GameObject> currentCamera = nullptr;
 	public:
 		static std::shared_ptr<Scene> create();
+		static std::shared_ptr<Scene> loadFrom(std::filesystem::path);
 
 		std::shared_ptr<GameObject> getObject(std::string name);
 		void addObject(std::shared_ptr<GameObject> obj);
+
+		std::shared_ptr<GameObject> getObjectFromPath(std::string path);
 
 		std::vector<std::shared_ptr<GameObject>> getObjects();
 

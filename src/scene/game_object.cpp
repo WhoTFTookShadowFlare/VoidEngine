@@ -96,6 +96,19 @@ namespace VoidEngine::Scene {
 		return children[name];
 	}
 
+	std::shared_ptr<GameObject> GameObject::getChildFromPath(std::string path) {
+		size_t split = path.find_first_of('/');
+		if(split == std::string::npos) {
+			return getChild(path);
+		}
+
+		std::string next = path.substr(0, split), remaining = path.substr(split + 1);
+
+		std::shared_ptr<GameObject> child = getChild(next);
+		if(child == nullptr) return nullptr;
+		return child->getChildFromPath(remaining);
+	}
+
 	std::vector<std::shared_ptr<GameObject>> GameObject::getChildren() {
 		std::vector<std::shared_ptr<GameObject>> children;
 		std::for_each(this->children.cbegin(), this->children.cend(), [&children](const auto& iter) {
@@ -106,8 +119,8 @@ namespace VoidEngine::Scene {
 
 	void GameObject::draw(Events::ESceneDraw& scnDraw) {
 		Events::EComponentDraw draw(scnDraw, shared_from_this());
-		for(auto& child : children) child.second->draw(scnDraw);
-		for(auto& comp : components) comp.second->onDraw(draw);
+		for(auto& child : children) if(child.second != nullptr) child.second->draw(scnDraw);
+		for(auto& comp : components) if(comp.second != nullptr) comp.second->onDraw(draw);
 	}
 
 	std::shared_ptr<AObjectComponent> GameObject::getComponent(const ComponentClass* cls) {

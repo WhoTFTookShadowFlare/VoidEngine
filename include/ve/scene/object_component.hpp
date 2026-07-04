@@ -1,5 +1,6 @@
 #pragma once
 
+#include <concepts>
 #include <memory>
 #include <vector>
 
@@ -22,6 +23,7 @@ namespace VoidEngine::Scene {
 		IsAbstractObjectComponent<T> &&
 		requires(T a) {
 			{ T::create() } -> std::convertible_to<std::shared_ptr<AObjectComponent>>;
+			// { T::deserialize() } -> std::convertible_to<std::shared_ptr<AObjectComponent>>;
 		};
 
 	class AObjectComponent {

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <print>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <functional>
-#include <iostream>
 #include <cassert>
 
 #include "ve/scene/object_component.hpp"
@@ -31,7 +31,7 @@ namespace VoidEngine::Scene {
 		}
 
 		bool isAbstract() const {
-			return create != nullptr;
+			return create == nullptr;
 		}
 	};
 
@@ -54,6 +54,8 @@ namespace VoidEngine::Scene {
 
 			ComponentClass *parentCls = (ComponentClass*) &parent::ClassData;
 			parentCls->childTypes.emplace_back(cls);
+
+			componentClasses[cls->name] = cls;
 		}
 
 		template<IsObjectComponent component, IsAbstractObjectComponent parent>
