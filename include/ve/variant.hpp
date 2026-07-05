@@ -3,6 +3,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
 #include <memory>
 #include <expected>
 
@@ -17,7 +20,11 @@ namespace VoidEngine {
 		STRING,
 		ARRAY,
 		MAP,
-		OBJECT
+		OBJECT,
+
+		VEC2,
+		VEC3,
+		VEC4
 	};
 
 	class TypeError final : public std::exception {
@@ -44,6 +51,10 @@ namespace VoidEngine {
 		// Variant(uint32_t);
 		Variant(std::shared_ptr<Object>);
 
+		Variant(glm::vec2);
+		Variant(glm::vec3);
+		Variant(glm::vec4);
+
 		~Variant();
 
 		constexpr bool isType(VariantType type);
@@ -57,6 +68,10 @@ namespace VoidEngine {
 		bool isMap() const;
 		bool isObject() const;
 
+		bool isVec2() const;
+		bool isVec3() const;
+		bool isVec4() const;
+
 		std::expected<int32_t, TypeError> asInt();
 		std::expected<float, TypeError> asFloat();
 		std::expected<bool, TypeError> asBool();
@@ -64,5 +79,9 @@ namespace VoidEngine {
 		// std::expected<, TypeError> asArray();
 		// std::expected<, TypeError> asMap();
 		std::expected<std::shared_ptr<Object>, TypeError> asObject();
+
+		std::expected<glm::vec2, TypeError> asVec2();
+		std::expected<glm::vec3, TypeError> asVec3();
+		std::expected<glm::vec4, TypeError> asVec4();
 	};
 }

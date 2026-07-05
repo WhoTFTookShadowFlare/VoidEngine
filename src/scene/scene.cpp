@@ -16,6 +16,10 @@
 #include <vector>
 
 namespace VoidEngine::Scene {
+	const Class Scene::ClassData = {
+		.name = "Scene"
+	};
+
 	std::shared_ptr<Scene> Scene::create() {
 		return std::shared_ptr<Scene>(new Scene);
 	}

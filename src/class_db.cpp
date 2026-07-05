@@ -1,14 +1,19 @@
 #include "ve/class_db.hpp"
 
+#include "ve/object.hpp"
 #include "ve/scene/components/mesh.hpp"
 #include "ve/scene/components/sound.hpp"
 #include "ve/scene/components/camera.hpp"
 #include "ve/scene/object_component.hpp"
+#include "ve/scene/scene.hpp"
 
 namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
 
 	ClassDB::ClassDB() {
+		registerClass<Scene::Scene, Object>();
+		// registerClass<Scene::GameObject, Object>();
+
 		registerAbstractClass<Scene::AObjectComponent, Object>();
 
 		registerClass<Scene::Components::MeshComponent, Scene::AObjectComponent>();

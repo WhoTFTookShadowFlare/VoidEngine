@@ -1,4 +1,5 @@
 #include "ve/scene/game_object.hpp"
+#include "ve/class_property.hpp"
 #include "ve/scene/events.hpp"
 #include "ve/scene/object_component.hpp"
 #include <algorithm>
@@ -13,6 +14,15 @@
 #include <vector>
 
 namespace VoidEngine::Scene {
+	const Class GameObject::ClassData = {
+		.name = "GameObject",
+		.properties = {
+			new Property<GameObject>("position", &GameObject::getPosition, &GameObject::setPosition),
+			new Property<GameObject>("rotation", &GameObject::getRotation, &GameObject::setRotation),
+			new Property<GameObject>("scale", &GameObject::getScale, &GameObject::setScale),
+		}
+	};
+
 	GameObject::GameObject(std::string name)
 		: name(name)
 	{	}
@@ -151,4 +161,30 @@ namespace VoidEngine::Scene {
 		return components;
 	}
 
+	void GameObject::setPosition(Variant value) {
+		if(!value.isVec3()) return;
+		position = value.asVec3().value();
+	}
+
+	void GameObject::setRotation(Variant value) {
+		if(!value.isVec3()) return;
+		rotation = value.asVec3().value();
+	}
+
+	void GameObject::setScale(Variant value) {
+		if(!value.isVec3()) return;
+		scale = value.asVec3().value();
+	}
+
+	Variant GameObject::getPosition() const {
+		return position;
+	}
+
+	Variant GameObject::getRotation() const {
+		return rotation;
+	}
+
+	Variant GameObject::getScale() const {
+		return scale;
+	}	
 }

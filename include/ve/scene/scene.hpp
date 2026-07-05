@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ve/object.hpp"
 #include "ve/scene/game_object.hpp"
 #include <memory>
 #include <map>
@@ -16,11 +17,14 @@ namespace VoidEngine::Scene::Components {
 }
 
 namespace VoidEngine::Scene {
-	class Scene final : public std::enable_shared_from_this<Scene> {
+	class Scene final : public Object, public std::enable_shared_from_this<Scene> {
 		std::map<std::string, std::shared_ptr<GameObject>> objects = {};
 
 		std::shared_ptr<GameObject> currentCamera = nullptr;
 	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
+
 		static std::shared_ptr<Scene> create();
 		static std::shared_ptr<Scene> loadFrom(std::filesystem::path);
 

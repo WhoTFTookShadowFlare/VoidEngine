@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/ext/matrix_float4x4.hpp"
+#include "ve/object.hpp"
 #include "ve/scene/object_component.hpp"
 
 #include <memory>
@@ -14,9 +15,10 @@
 #include "ve/scene/events.hpp"
 
 #include "ve/class_db.hpp"
+#include "ve/variant.hpp"
 
 namespace VoidEngine::Scene {
-	class GameObject final : public std::enable_shared_from_this<GameObject> {
+	class GameObject final : public Object, public std::enable_shared_from_this<GameObject> {
 		std::map<const Class*, std::shared_ptr<AObjectComponent>> components;
 
 		std::map<std::string, std::shared_ptr<GameObject>> children;
@@ -26,11 +28,14 @@ namespace VoidEngine::Scene {
 
 		const std::string name;
 
-	public:
 		glm::vec3
 			position = { 0.0f, 0.0f, 0.0f },
 			rotation = { 0.0f, 0.0f, 0.0f },
 			scale = { 1.0f, 1.0f, 1.0f };
+
+	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
 
 		static std::shared_ptr<GameObject> create(std::string name);
 
@@ -63,5 +68,13 @@ namespace VoidEngine::Scene {
 		std::shared_ptr<AObjectComponent> getComponent(const Class* cls);
 		std::shared_ptr<AObjectComponent> getFirstOfType(const Class* cls);
 		std::vector<std::shared_ptr<AObjectComponent>> gatherComponentsOfType(const Class* cls);
+
+		void setPosition(Variant);
+		void setRotation(Variant);
+		void setScale(Variant);
+
+		Variant getPosition() const;
+		Variant getRotation() const;
+		Variant getScale() const;
 	};
 }
