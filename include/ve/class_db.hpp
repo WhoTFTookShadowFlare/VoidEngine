@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -7,9 +8,11 @@
 #include <functional>
 #include <concepts>
 #include <cassert>
+#include "ve/variant.hpp"
 
 namespace VoidEngine {
 	class Object;
+	class Variant;
 	struct Class;
 
 	template<typename T>
@@ -27,12 +30,26 @@ namespace VoidEngine {
 			{ T::create() } -> std::convertible_to<std::shared_ptr<Object>>;
 			// { T::deserialize() } -> std::convertible_to<std::shared_ptr<AObjectComponent>>;
 		};
+	
+	struct PropertyBase {
+	protected:
+		PropertyBase(std::string name) : name(name) {}
+	public:
+		virtual ~PropertyBase() = default;
+
+		const std::string name;
+
+		virtual Variant get(std::shared_ptr<Object>) const = 0;
+		virtual void set(std::shared_ptr<Object>, Variant) const = 0;
+		virtual bool isReadOnly() const = 0;
+	};
 
 	struct Class {
 		const char* name;
 
 		const Class *super;
 		std::vector<const Class*> childTypes;
+		std::vector<const PropertyBase*> properties;
 
 		std::function<std::shared_ptr<Object>()> create;
 
@@ -49,6 +66,14 @@ namespace VoidEngine {
 
 		bool isAbstract() const {
 			return create == nullptr;
+		}
+
+		const PropertyBase* findProperty(std::string name) const {
+			const auto idx = std::find_if(properties.cbegin(), properties.cend(), [&name](const auto prop) {
+				return prop->name == name;
+			});
+			if(idx == properties.cend()) return nullptr;
+			return *idx;
 		}
 	};
 

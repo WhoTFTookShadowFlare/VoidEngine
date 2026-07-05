@@ -6,9 +6,9 @@
 #include <memory>
 #include <expected>
 
-#include "ve/object.hpp"
-
 namespace VoidEngine {
+	class Object;
+
 	enum VariantType : uint8_t {
 		NIL,
 		INT,
