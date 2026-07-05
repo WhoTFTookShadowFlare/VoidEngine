@@ -23,51 +23,33 @@ namespace VoidEngine {
 	Variant::Variant(std::nullptr_t) : VoidEngine::Variant() {}
 
 	Variant::Variant(int32_t value) : type(VariantType::INT) {
-		data = new int32_t(value);
+		data = std::make_shared<int32_t>(value);
 	}
 
 	Variant::Variant(float value) : type(VariantType::FLOAT) {
-		data = new float(value);
+		data = std::make_shared<float>(value);
 	}
 
 	Variant::Variant(bool value) : type(VariantType::BOOL) {
-		data = new bool(value);
+		data = std::make_shared<bool>(value);
 	}
 
 	Variant::Variant(std::string value) : type(VariantType::STRING) {
-		data = new std::string(value);
+		data = std::make_shared<std::string>(value);
 	}
 
 	// Variant::Variant(uint32_t);
 	// Variant::Variant(uint32_t);
 	
 	Variant::Variant(std::shared_ptr<Object> value) : type(VariantType::OBJECT) {
-		data = new std::shared_ptr<Object>(value);
+		data = std::make_shared<std::shared_ptr<Object>>(value);
 	}
 
-	Variant::Variant(glm::vec2 value) : type(VariantType::VEC2) { data = new glm::vec2(value); }
-	Variant::Variant(glm::vec3 value) : type(VariantType::VEC3) { data = new glm::vec3(value); }
-	Variant::Variant(glm::vec4 value) : type(VariantType::VEC4) { data = new glm::vec4(value); }
+	Variant::Variant(glm::vec2 value) : type(VariantType::VEC2) { data = std::make_shared<glm::vec2>(value); }
+	Variant::Variant(glm::vec3 value) : type(VariantType::VEC3) { data = std::make_shared<glm::vec3>(value); }
+	Variant::Variant(glm::vec4 value) : type(VariantType::VEC4) { data = std::make_shared<glm::vec4>(value); }
 
-	Variant::~Variant() {
-		switch(type) {
-		case VariantType::NIL: break;
-		case VariantType::INT: delete (int32_t*) data; break;
-		case VariantType::FLOAT: delete (float*) data; break;
-		case VariantType::BOOL: delete (bool*) data; break;
-		case VariantType::STRING: delete (std::string*) data; break;
-		// case VariantType::ARRAY: delete (bool*) data; break;
-		// case VariantType::MAP: delete (bool*) data; break;
-		case VariantType::OBJECT: delete (std::shared_ptr<Object>*) data; break;
-
-		case VariantType::VEC2: delete (glm::vec2*) data; break;
-		case VariantType::VEC3: delete (glm::vec3*) data; break;
-		case VariantType::VEC4: delete (glm::vec4*) data; break;
-
-		default:
-			std::println("[ERR] Could not determine variant of type id: {}, memory leaked!", (uint8_t) type);
-		}
-	}
+	Variant::~Variant() {	}
 
 	constexpr bool Variant::isType(VariantType type) { return this->type == type; }
 
@@ -86,22 +68,22 @@ namespace VoidEngine {
 
 	std::expected<int32_t, TypeError> Variant::asInt() {
 		if(!isInt()) { return std::unexpected(TypeError(VariantType::INT, type)); }
-		return int32_t(*(int32_t*) data);
+		return int32_t(*(int32_t*) data.get());
 	}
 
 	std::expected<float, TypeError> Variant::asFloat() {
 		if(!isFloat()) { return std::unexpected(TypeError(VariantType::FLOAT, type)); }
-		return float(*(float*) data);
+		return float(*(float*) data.get());
 	}
 
 	std::expected<bool, TypeError> Variant::asBool() {
 		if(!isBool()) { return std::unexpected(TypeError(VariantType::BOOL, type)); }
-		return bool(*(bool*) data);
+		return bool(*(bool*) data.get());
 	}
 
 	std::expected<std::string, TypeError> Variant::asString() {
 		if(!isString()) { return std::unexpected(TypeError(VariantType::STRING, type)); }
-		return std::string(*(std::string*) data);
+		return std::string(*(std::string*) data.get());
 	}
 
 	// std::expected<, TypeError> Variant::asArray() {}
@@ -109,21 +91,21 @@ namespace VoidEngine {
 	
 	std::expected<std::shared_ptr<Object>, TypeError> Variant::asObject() {
 		if(!isObject()) { return std::unexpected(TypeError(VariantType::OBJECT, type)); }
-		return std::shared_ptr<Object>(*(std::shared_ptr<Object>*) data);
+		return std::shared_ptr<Object>(*(std::shared_ptr<Object>*) data.get());
 	}
 
 	std::expected<glm::vec2, TypeError> Variant::asVec2() {
 		if(!isVec2()) { return std::unexpected(TypeError(VariantType::VEC2, type)); }
-		return glm::vec2(*(glm::vec2*) data);
+		return glm::vec2(*(glm::vec2*) data.get());
 	}
 	
 	std::expected<glm::vec3, TypeError> Variant::asVec3() {
 		if(!isVec3()) { return std::unexpected(TypeError(VariantType::VEC3, type)); }
-		return glm::vec3(*(glm::vec3*) data);
+		return glm::vec3(*(glm::vec3*) data.get());
 	}
 	
 	std::expected<glm::vec4, TypeError> Variant::asVec4() {
 		if(!isVec4()) { return std::unexpected(TypeError(VariantType::VEC4, type)); }
-		return glm::vec4(*(glm::vec4*) data);
+		return glm::vec4(*(glm::vec4*) data.get());
 	}
 }

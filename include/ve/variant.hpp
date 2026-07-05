@@ -39,7 +39,7 @@ namespace VoidEngine {
 	class Variant final {
 	private:
 		const VariantType type;
-		void* data;
+		std::shared_ptr<void> data;
 	public:
 		Variant();
 		Variant(std::nullptr_t);

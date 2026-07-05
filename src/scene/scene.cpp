@@ -6,6 +6,10 @@
 #include "ve/scene/game_object.hpp"
 #include "ve/scene/components/camera.hpp"
 #include "ve/io/res_providers/model/a_provider.hpp"
+#include "ve/variant.hpp"
+#include <iostream>
+#include <toml++/impl/forward_declarations.hpp>
+#include <toml++/impl/key.hpp>
 #include <toml++/toml.hpp>
 #include <algorithm>
 #include <filesystem>
@@ -135,6 +139,25 @@ namespace VoidEngine::Scene {
 						}
 						objComponentRefs[obj] = compRefs;
 					}
+
+					std::for_each(
+						GameObject::ClassData.properties.cbegin(), GameObject::ClassData.properties.cend(),
+						[&obj, objTable](const auto prop) {
+							if(prop->isReadOnly()) return;
+							if(!objTable->contains(prop->name)) return;
+							toml::node* node = objTable->get(prop->name);
+							if(!node->is_array()) return;
+
+							toml::array* arr = node->as_array();
+							if(arr->size() < 3) return;
+							Variant value = glm::vec3 {
+								(arr->get(0)->is_floating_point() ? arr->get(0)->as_floating_point()->get() : arr->get(0)->as_integer()->get()),
+								(arr->get(1)->is_floating_point() ? arr->get(1)->as_floating_point()->get() : arr->get(1)->as_integer()->get()),
+								(arr->get(2)->is_floating_point() ? arr->get(2)->as_floating_point()->get() : arr->get(2)->as_integer()->get())
+							};
+							prop->set(obj, value);
+						}
+					);
 				}
 			}
 
