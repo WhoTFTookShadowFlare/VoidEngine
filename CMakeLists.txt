@@ -62,6 +62,8 @@ endif()
 add_subdirectory(extern/openal)
 add_subdirectory(extern/toml++)
 
+add_compile_options(-fno-rtti)
+
 file(GLOB_RECURSE VESource "src/**.cpp")
 add_library(VoidEngine STATIC ${VESource})
 target_include_directories(VoidEngine PUBLIC

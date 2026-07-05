@@ -24,7 +24,7 @@ namespace VoidEngine::Scene {
 	}
 
 	const Class AObjectComponent::ClassData = {
-		   .name = "AObjectComponent",
+		.name = "AObjectComponent",
 	};
 }
 

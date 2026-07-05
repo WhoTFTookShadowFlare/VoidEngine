@@ -3,18 +3,21 @@
 #include "ve/scene/components/mesh.hpp"
 #include "ve/scene/components/sound.hpp"
 #include "ve/scene/components/camera.hpp"
+#include "ve/scene/object_component.hpp"
 
-namespace VoidEngine::Scene {
+namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
 
 	ClassDB::ClassDB() {
-		registerClass<Components::MeshComponent, AObjectComponent>();
+		registerAbstractClass<Scene::AObjectComponent, Object>();
 
-		registerClass<Components::SoundComponent, AObjectComponent>();
+		registerClass<Scene::Components::MeshComponent, Scene::AObjectComponent>();
 
-		registerAbstractClass<Components::ACamera, AObjectComponent>();
-		registerClass<Components::OrthoCamera, Components::ACamera>();
-		registerClass<Components::PerspectiveCamera, Components::ACamera>();
+		registerClass<Scene::Components::SoundComponent, Scene::AObjectComponent>();
+
+		registerAbstractClass<Scene::Components::ACamera, Scene::AObjectComponent>();
+		registerClass<Scene::Components::OrthoCamera, Scene::Components::ACamera>();
+		registerClass<Scene::Components::PerspectiveCamera, Scene::Components::ACamera>();
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {

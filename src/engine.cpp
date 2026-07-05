@@ -17,11 +17,8 @@
 #include <SDL3/SDL_video.h>
 #include <cassert>
 #include <csignal>
-#include <cstdint>
 #include <filesystem>
-#include <format>
 #include <glm/ext/vector_int2.hpp>
-#include <iostream>
 #include <memory>
 #include <SDL3/SDL.h>
 #include <vector>
@@ -86,7 +83,7 @@ namespace VoidEngine {
 		instance->winDefaultClose = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
 
 		Scene::ComponentUpdater::ensureSetup();
-		auto compDB = Scene::ClassDB::getInstance();
+		auto compDB = ClassDB::getInstance();
 	}
 
 	std::shared_ptr<Engine> Engine::getInstance() {

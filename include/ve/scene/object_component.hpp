@@ -1,32 +1,17 @@
 #pragma once
 
-#include <concepts>
 #include <memory>
 #include <vector>
 
 #include "ve/event/event_bus.hpp"
+#include "ve/object.hpp"
+#include "ve/class_db.hpp"
 #include "ve/scene/events.hpp"
 
 namespace VoidEngine::Scene {
-	struct Class;
 	class GameObject;
 
-	template<typename T>
-	concept IsAbstractObjectComponent =
-		std::is_base_of<AObjectComponent, T>::value &&
-		requires(T a) {
-			{ T::ClassData } -> std::convertible_to<Class>;
-		};
-
-	template<typename T>
-	concept IsObjectComponent =
-		IsAbstractObjectComponent<T> &&
-		requires(T a) {
-			{ T::create() } -> std::convertible_to<std::shared_ptr<AObjectComponent>>;
-			// { T::deserialize() } -> std::convertible_to<std::shared_ptr<AObjectComponent>>;
-		};
-
-	class AObjectComponent {
+	class AObjectComponent : public Object {
 		friend class GameObject;
 	private:
 		std::vector<std::weak_ptr<GameObject>> tiedTo;

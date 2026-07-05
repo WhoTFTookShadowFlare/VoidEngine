@@ -5,18 +5,35 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
+#include <concepts>
 #include <cassert>
 
-#include "ve/scene/object_component.hpp"
+namespace VoidEngine {
+	class Object;
+	struct Class;
 
-namespace VoidEngine::Scene {
+	template<typename T>
+	concept IsAbstractClass =
+		std::is_base_of<Object, T>::value &&
+		requires(T a) {
+			{ T::ClassData } -> std::convertible_to<Class>;
+		};
+
+	template<typename T>
+	concept IsClass =
+		IsAbstractClass<T> &&
+		requires(T a) {
+			{ T::create() } -> std::convertible_to<std::shared_ptr<Object>>;
+			// { T::deserialize() } -> std::convertible_to<std::shared_ptr<AObjectComponent>>;
+		};
+
 	struct Class {
 		const char* name;
 
 		const Class *super;
 		std::vector<const Class*> childTypes;
 
-		std::function<std::shared_ptr<AObjectComponent>()> create;
+		std::function<std::shared_ptr<Object>()> create;
 
 		bool operator==(Class RHS) const { return name == RHS.name; }
 
@@ -46,9 +63,9 @@ namespace VoidEngine::Scene {
 
 		const Class* getClassByName(std::string);
 
-		template<IsAbstractObjectComponent component, IsAbstractObjectComponent parent>
+		template<IsAbstractClass clazz, IsAbstractClass parent>
 		void registerAbstractClass() {
-			Class *cls = (Class*) &component::ClassData;
+			Class *cls = (Class*) &clazz::ClassData;
 			cls->super = &parent::ClassData;
 
 			Class *parentCls = (Class*) &parent::ClassData;
@@ -57,11 +74,11 @@ namespace VoidEngine::Scene {
 			componentClasses[cls->name] = cls;
 		}
 
-		template<IsObjectComponent component, IsAbstractObjectComponent parent>
+		template<IsClass clazz, IsAbstractClass parent>
 		void registerClass() {
-			registerAbstractClass<component, parent>();
-			Class *cls = (Class*) &component::ClassData;
-			cls->create = component::create;
+			registerAbstractClass<clazz, parent>();
+			Class *cls = (Class*) &clazz::ClassData;
+			cls->create = clazz::create;
 		}
 	};
 }

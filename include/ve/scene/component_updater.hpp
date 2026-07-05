@@ -1,8 +1,6 @@
 #pragma once
 
 #include "ve/scene/object_component.hpp"
-#include <cstdint>
-#include <iostream>
 #include <memory>
 #include <vector>
 

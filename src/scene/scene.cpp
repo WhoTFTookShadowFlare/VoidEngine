@@ -64,18 +64,21 @@ namespace VoidEngine::Scene {
 
 					for(size_t idx = 0; idx < chunk_components->size(); idx++) {
 						std::string clsName = chunk_components->get(idx)->as_table()->get("type")->as_string()->get();
-						const VoidEngine::Scene::Class* cls = compDB->getClassByName(clsName);
+						const VoidEngine::Class* cls = compDB->getClassByName(clsName);
 						if(cls == nullptr) {
 							std::println("[ERR] Could not find class {}", clsName);
 							continue;
 						}
-
+						if(!cls->instanceOf(&AObjectComponent::ClassData)) {
+							std::println("[ERR] Class \"{}\" is not of type AObjectComponent", clsName);
+							continue;
+						}
 						if(cls->isAbstract()) {
 							std::println("[ERR] Cannot instance abstract class {}", clsName);
 							continue;
 						}
 
-						auto comp = cls->create();
+						auto comp = std::static_pointer_cast<AObjectComponent>(cls->create());
 						comps.push_back(comp);
 						compUpdater->addComponent(comp);
 					}
@@ -109,13 +112,17 @@ namespace VoidEngine::Scene {
 								compRefs.push_back(entry->as_string()->get());
 							} else if(entry->is_table()) {
 								std::string clsName = entry->as_table()->get("type")->as_string()->get();
-								const VoidEngine::Scene::Class* cls = compDB->getClassByName(clsName);
+								const VoidEngine::Class* cls = compDB->getClassByName(clsName);
 								if(cls == nullptr) {
 									std::println("[ERR] Could not find class {}", clsName);
 									continue;
 								}
+								if(!cls->instanceOf(&AObjectComponent::ClassData)) {
+									std::println("[ERR] Class \"{}\" is not of type AObjectComponent", clsName);
+									continue;
+								}
 
-								auto comp = cls->create();
+								auto comp = std::static_pointer_cast<AObjectComponent>(cls->create());
 								compUpdater->addComponent(comp);
 								obj->addComponent(comp);
 							} else {
