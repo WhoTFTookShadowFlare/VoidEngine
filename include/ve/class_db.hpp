@@ -17,6 +17,7 @@ namespace VoidEngine {
 		std::is_base_of<Object, T>::value &&
 		requires(T a) {
 			{ T::ClassData } -> std::convertible_to<Class>;
+			{ a.getClass() } -> std::same_as<const Class*>;
 		};
 
 	template<typename T>

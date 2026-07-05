@@ -7,5 +7,6 @@ namespace VoidEngine {
 	private:
 	public:
 		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
 	};
 }
