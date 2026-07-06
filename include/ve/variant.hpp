@@ -8,6 +8,7 @@
 #include <glm/ext/vector_float4.hpp>
 #include <memory>
 #include <expected>
+#include <string>
 
 namespace VoidEngine {
 	class Object;
