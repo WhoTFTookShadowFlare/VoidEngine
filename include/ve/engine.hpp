@@ -73,5 +73,7 @@ namespace VoidEngine {
 		[[nodiscard]] std::vector<Math::Rect2i> getWorkspaceDeadzones();
 		[[nodiscard]] std::vector<Math::Rect2i> getWorkspaceCaves();
 		[[nodiscard]] std::vector<Math::Rect2i> getWorkspacePlateaus();
+
+		void finalize();
 	};
 }

@@ -40,11 +40,13 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	}
 
 	GLWindow::~GLWindow() {
-		SDL_GL_DestroyContext(context);
+		// SDL_GL_DestroyContext(context);
 	}
 
 	std::shared_ptr<Window> GLWindow::create(Window::CreationOptions& options) {
-		return std::shared_ptr<Window>(new GLWindow(options));
+		auto window = std::shared_ptr<Window>(new GLWindow(options));
+		WindowMap[SDL_GetWindowID(window->window)] = window;
+		return window;
 	}
 
 	void GLWindow::swapBuffers() {

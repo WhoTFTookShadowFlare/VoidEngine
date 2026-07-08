@@ -2,6 +2,8 @@
 
 #include <SDL3/SDL_video.h>
 #include <glm/ext/vector_int2.hpp>
+#include <map>
+#include <memory>
 
 #include "input_events.hpp"
 #include "ve/io/gfx/render_target.hpp"
@@ -17,7 +19,7 @@ namespace VoidEngine {
 }
 
 namespace VoidEngine::IO {
-	class Window : public GFX::IRenderTarget {
+	class Window : public GFX::IRenderTarget, public std::enable_shared_from_this<Window> {
 		friend class VoidEngine::Engine;
 
 		friend class VoidEngine::IO::GFX::OpenGL::GLWindow;
@@ -33,6 +35,7 @@ namespace VoidEngine::IO {
 		};
 	private:
 		bool closing = false;
+		static std::map<SDL_WindowID, std::weak_ptr<Window>> WindowMap;
 	
 	protected:
 		SDL_Window *window = nullptr;

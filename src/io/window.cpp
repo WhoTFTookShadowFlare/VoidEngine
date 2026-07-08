@@ -4,7 +4,10 @@
 #include <print>
 
 namespace VoidEngine::IO {
+	std::map<SDL_WindowID, std::weak_ptr<Window>> Window::WindowMap;
+
 	Window::~Window() {
+		if(WindowMap.contains(SDL_GetWindowID(window))) WindowMap.erase(SDL_GetWindowID(window));
 		SDL_DestroyWindow(window);
 	}
 

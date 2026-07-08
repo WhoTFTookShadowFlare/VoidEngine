@@ -140,7 +140,7 @@ namespace VoidEngine {
 
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
-			/*switch (event.type) {
+			switch (event.type) {
 				case SDL_EVENT_DISPLAY_ORIENTATION:
 				case SDL_EVENT_DISPLAY_REMOVED:
 				case SDL_EVENT_DISPLAY_MOVED:
@@ -242,7 +242,7 @@ namespace VoidEngine {
 					winPtr->onKeyButton(button);
 					input->onKeyButton(button);
 					} break;
-			}*/
+			}
 		}
 	}
 
@@ -377,5 +377,11 @@ namespace VoidEngine {
 		assert(plateaus.size() <= deadzones.size());
 
 		return plateaus;
+	}
+
+	void Engine::finalize() {
+		Events::EQuitEvent evt;
+		onQuit(evt);
+		instance = nullptr;
 	}
 }
