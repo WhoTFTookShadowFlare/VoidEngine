@@ -29,7 +29,7 @@ namespace VoidEngine::Scene::Components {
 			if(uProjection) {
 				matrixPass[0] = std::static_pointer_cast<ACamera>(
 					draw.scene->getCamera()->getFirstOfType(&ACamera::ClassData)
-				)->getProjection(draw.window);
+				)->getProjection(draw.target);
 				program->setUniform(uProjection.value(), matrixPass);
 			}
 			if(uView) {

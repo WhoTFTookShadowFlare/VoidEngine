@@ -1,4 +1,6 @@
 #include "ve/scene/scene.hpp"
+#include "ve/io/gfx/render_target.hpp"
+#include "ve/io/gfx/renderer.hpp"
 #include "ve/io/res_providers/model/file_provider.hpp"
 #include "ve/class_db.hpp"
 #include "ve/scene/component_updater.hpp"
@@ -350,8 +352,9 @@ namespace VoidEngine::Scene {
 		return currentCamera;
 	}
 
-	void Scene::draw(double delta, std::shared_ptr<IO::Window> window) {
-		Events::ESceneDraw draw(delta, window, shared_from_this());
+	void Scene::draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target) {
+		target->bindRenderTarget();
+		Events::ESceneDraw draw(delta, target, shared_from_this());
 		std::for_each(objects.begin(), objects.end(), [&draw](auto& obj) {
 			obj.second->draw(draw);
 		});

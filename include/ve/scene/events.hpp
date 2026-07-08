@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ve/io/gfx/render_target.hpp"
 #include <cinttypes>
 #include <memory>
 
@@ -26,12 +27,12 @@ namespace VoidEngine::Scene::Events {
 	class ESceneDraw final {
 		friend class VoidEngine::Scene::Scene;
 	private:
-		ESceneDraw(double delta, std::shared_ptr<IO::Window> window, std::shared_ptr<Scene> scene)
-			: delta(delta), window(window), scene(scene)
+		ESceneDraw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target, std::shared_ptr<Scene> scene)
+			: delta(delta), target(target), scene(scene)
 		{}
 	public:
 		const double delta;
-		const std::shared_ptr<IO::Window> window;
+		const std::shared_ptr<IO::GFX::IRenderTarget> target;
 		const std::shared_ptr<Scene> scene;
 	};
 
@@ -39,11 +40,11 @@ namespace VoidEngine::Scene::Events {
 		friend class VoidEngine::Scene::GameObject;
 	private:
 		EComponentDraw(ESceneDraw& sceneDraw, std::shared_ptr<GameObject> object)
-			: delta(sceneDraw.delta), window(sceneDraw.window), scene(sceneDraw.scene), object(object)
+			: delta(sceneDraw.delta), target(sceneDraw.target), scene(sceneDraw.scene), object(object)
 		{}
 	public:
 		const double delta;
-		const std::shared_ptr<IO::Window> window;
+		const std::shared_ptr<IO::GFX::IRenderTarget> target;
 		const std::shared_ptr<Scene> scene;
 		const std::shared_ptr<GameObject> object;
 	};

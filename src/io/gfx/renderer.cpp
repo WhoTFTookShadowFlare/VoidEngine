@@ -2,6 +2,7 @@
 #include "ve/io/gfx/opengl/backend.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
+#include "ve/math/rect2.hpp"
 #include <cstdint>
 #include <memory>
 
@@ -38,6 +39,16 @@ namespace VoidEngine::IO::GFX {
 	void Renderer::swapBuffers(std::shared_ptr<Window> window) {
 		if(backend == nullptr) return;
 		backend->swapBuffers(window);
+	}
+
+	void Renderer::setViewport(VoidEngine::Math::Rect2i size) {
+		if(backend == nullptr) return;
+		backend->setViewport(size);
+	}
+
+	void Renderer::setDrawArea(std::optional<VoidEngine::Math::Rect2i> area) {
+		if(backend == nullptr) return;
+		backend->setDrawArea(area);
 	}
 
 	shared_ptr<Window> Renderer::createWindow(Window::CreationOptions& options) {

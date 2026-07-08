@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/ext/matrix_float4x4.hpp>
+#include "ve/io/gfx/render_target.hpp"
 #include "ve/scene/object_component.hpp"
 #include "ve/class_db.hpp"
 #include "ve/variant.hpp"
@@ -21,7 +22,7 @@ namespace VoidEngine::Scene::Components {
 		
 		virtual glm::mat4 getView(std::shared_ptr<GameObject> obj);
 
-		virtual glm::mat4 getProjection(std::shared_ptr<IO::Window> window) = 0;
+		virtual glm::mat4 getProjection(std::shared_ptr<IO::GFX::IRenderTarget> target) = 0;
 
 		Variant getZFar() const;
 		void setZFar(Variant);
@@ -36,7 +37,7 @@ namespace VoidEngine::Scene::Components {
 
 		static std::shared_ptr<PerspectiveCamera> create();
 
-		glm::mat4 getProjection(std::shared_ptr<IO::Window> window) override;
+		glm::mat4 getProjection(std::shared_ptr<IO::GFX::IRenderTarget> target) override;
 
 		Variant getFOV() const;
 		void setFOV(Variant);
@@ -47,7 +48,7 @@ namespace VoidEngine::Scene::Components {
 		static const Class ClassData;
 		static std::shared_ptr<OrthoCamera> create();
 
-		glm::mat4 getProjection(std::shared_ptr<IO::Window> window) override;
+		glm::mat4 getProjection(std::shared_ptr<IO::GFX::IRenderTarget> target) override;
 
 		virtual const Class* getClass() const override { return &ClassData; }
 	};

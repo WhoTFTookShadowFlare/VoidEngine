@@ -4,6 +4,7 @@
 #include "glbinding/gl/enum.h"
 #include "glbinding/gl/functions.h"
 #include "glbinding/glbinding.h"
+#include "ve/io/gfx/renderer.hpp"
 #include "ve/io/window.hpp"
 #include <SDL3/SDL_video.h>
 #include <memory>
@@ -57,5 +58,6 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	void GLWindow::bindRenderTarget() {
 		SDL_GL_MakeCurrent(window, context);
 		gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, 0);
+		Renderer::getInstance()->setViewport({ { 0, 0 }, getSize() });
 	}
 }

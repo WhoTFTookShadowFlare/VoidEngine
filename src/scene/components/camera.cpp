@@ -4,6 +4,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/geometric.hpp"
 #include "ve/class_property.hpp"
+#include "ve/io/gfx/render_target.hpp"
 #include "ve/io/window.hpp"
 #include "ve/scene/game_object.hpp"
 #include "ve/variant.hpp"
@@ -44,8 +45,8 @@ namespace VoidEngine::Scene::Components {
 		zFar = value.asFloat().value();
 	}
 
-	glm::mat4 PerspectiveCamera::getProjection(std::shared_ptr<IO::Window> window) {
-		auto size = window->getSize();
+	glm::mat4 PerspectiveCamera::getProjection(std::shared_ptr<IO::GFX::IRenderTarget> target) {
+		auto size = target->getSize();
 		float aspectRatio = (float) size.x / (float) size.y;
 		return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 200.0f);
 	}
@@ -60,8 +61,8 @@ namespace VoidEngine::Scene::Components {
 		fov = value.asFloat().value();
 	}
 
-	glm::mat4 OrthoCamera::getProjection(std::shared_ptr<IO::Window> window) {
-		glm::ivec2 size = window->getSize();
+	glm::mat4 OrthoCamera::getProjection(std::shared_ptr<IO::GFX::IRenderTarget> target) {
+		glm::ivec2 size = target->getSize();
 		return glm::ortho(-size.x / 2.0f, size.x / 2.0f, -size.y / 2.0f, size.y / 2.0f, 0.0f, 200.0f);
 	}
 

@@ -63,7 +63,7 @@ namespace VoidEngine::IO {
 		bool isClosing() const;
 
 		void setSize(glm::ivec2);
-		glm::ivec2 getSize();
+		glm::ivec2 getSize() override;
 
 		void setPosition(glm::ivec2);
 		glm::ivec2 getPosition();

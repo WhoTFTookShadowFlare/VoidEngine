@@ -1,4 +1,6 @@
 #include "ve/io/gfx/opengl/backend.hpp"
+#include "glbinding/gl/enum.h"
+#include "glbinding/gl/functions.h"
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/opengl/graphics_program.hpp"
 #include "ve/io/gfx/opengl/window.hpp"
@@ -8,6 +10,7 @@
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/io/window.hpp"
+#include "ve/math/rect2.hpp"
 #include <cstdint>
 #include <glbinding/glbinding.h>
 #include <SDL3/SDL_video.h>
@@ -42,6 +45,26 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 	void RendererOpenGL::swapBuffers(std::shared_ptr<Window> window) {
 		window->swapBuffers();
+	}
+
+	void RendererOpenGL::setViewport(VoidEngine::Math::Rect2i viewport) {
+		glViewport(
+			viewport.position.x, viewport.position.y,
+			viewport.size.x, viewport.size.y
+		);
+	}
+
+	void RendererOpenGL::setDrawArea(std::optional<VoidEngine::Math::Rect2i> area) {
+		if(area.has_value()) {
+			glEnable(gl::GLenum::GL_SCISSOR_TEST);
+			auto value = area.value();
+			glScissor(
+				value.position.x, value.position.y,
+				value.size.x, value.size.y
+			);
+		} else {
+			glDisable(gl::GLenum::GL_SCISSOR_TEST);
+		}
 	}
 
 	shared_ptr<Window> RendererOpenGL::createWindow(Window::CreationOptions& options) {
