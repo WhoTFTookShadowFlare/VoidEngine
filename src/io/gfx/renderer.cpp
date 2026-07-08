@@ -1,5 +1,6 @@
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/opengl/backend.hpp"
+#include "ve/io/gfx/render_target.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include <cstdint>
 #include <memory>
@@ -24,17 +25,7 @@ namespace VoidEngine::IO::GFX {
 		return instance;
 	}
 
-	void Renderer::setupWindow(Window *window) {
-		if(backend == nullptr) return;
-		backend->setupWindow(window);
-	}
-
-	void Renderer::destroyWindow(Window *window) {
-		if(backend == nullptr) return;
-		backend->destroyWindow(window);
-	}
-
-	void Renderer::bindRenderTarget(std::shared_ptr<Window> target) {
+	void Renderer::bindRenderTarget(std::shared_ptr<IRenderTarget> target) {
 		if(backend == nullptr) return;
 		backend->bindRenderTarget(target);
 	}
@@ -47,6 +38,11 @@ namespace VoidEngine::IO::GFX {
 	void Renderer::swapBuffers(std::shared_ptr<Window> window) {
 		if(backend == nullptr) return;
 		backend->swapBuffers(window);
+	}
+
+	shared_ptr<Window> Renderer::createWindow(Window::CreationOptions& options) {
+		if(backend == nullptr) return nullptr;
+		return backend->createWindow(options);
 	}
 
 	shared_ptr<Mesh> Renderer::createMesh() {

@@ -74,10 +74,10 @@ namespace VoidEngine {
 		IO::Window::CreationOptions options {
 			.visible = false
 		};
-		instance->mainWindow = IO::Window::create(options);
-
+		
 		instance->audio = IO::SFX::Audio::getInstance();
 		instance->renderer = IO::GFX::Renderer::getInstance();
+		instance->mainWindow = instance->renderer->createWindow(options);
 		instance->input = IO::Input::getInstance();
 
 		instance->winDefaultClose = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
@@ -140,7 +140,7 @@ namespace VoidEngine {
 
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
-			switch (event.type) {
+			/*switch (event.type) {
 				case SDL_EVENT_DISPLAY_ORIENTATION:
 				case SDL_EVENT_DISPLAY_REMOVED:
 				case SDL_EVENT_DISPLAY_MOVED:
@@ -242,7 +242,7 @@ namespace VoidEngine {
 					winPtr->onKeyButton(button);
 					input->onKeyButton(button);
 					} break;
-			}
+			}*/
 		}
 	}
 

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "ve/io/gfx/mesh.hpp"
+#include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/renderer_backend.hpp"
 #include "ve/io/gfx/shader.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/io/gfx/texture.hpp"
+#include "ve/io/window.hpp"
 #include <cstdint>
 #include <glm/ext/vector_float4.hpp>
 #include <memory>
@@ -25,9 +27,11 @@ namespace VoidEngine::IO::GFX {
 		~Renderer();
 		static std::shared_ptr<Renderer> getInstance();
 
-		void bindRenderTarget(shared_ptr<Window>);
+		void bindRenderTarget(shared_ptr<IRenderTarget>);
 		void clear(glm::vec4 color = { 0.1, 0.1, 0.1, 1.0 });
 		void swapBuffers(shared_ptr<Window>);
+
+		shared_ptr<Window> createWindow(Window::CreationOptions&);
 
 		shared_ptr<Mesh> createMesh();
 

@@ -1,41 +1,11 @@
 #include "ve/io/window.hpp"
-#include "ve/io/gfx/renderer.hpp"
 #include <SDL3/SDL_video.h>
 #include <glm/ext/vector_int2.hpp>
-#include <memory>
 #include <print>
 
 namespace VoidEngine::IO {
-	std::map<SDL_WindowID, std::weak_ptr<Window>> Window::WindowMap;
-
-	Window::Window(CreationOptions& options) {
-		// TODO: Extract SDL_WINDOW_OPENGL
-		SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_TRANSPARENT;
-
-		if(options.resizable) flags |= SDL_WINDOW_RESIZABLE;
-		if(options.borderless) flags |= SDL_WINDOW_BORDERLESS;
-		if(options.alwaysOnTop) flags |= SDL_WINDOW_ALWAYS_ON_TOP;
-		if(options.utility) flags |= SDL_WINDOW_UTILITY;
-		if(!options.visible) flags |= SDL_WINDOW_HIDDEN;
-
-		window = SDL_CreateWindow(options.title.c_str(), options.size.x, options.size.y, flags);
-		if(window == nullptr) throw std::runtime_error(SDL_GetError());
-		auto renderer = GFX::Renderer::getInstance();
-		renderer->setupWindow(this);
-	}
-
 	Window::~Window() {
-		//WindowMap[SDL_GetWindowID(window)] = std::weak_ptr<Window>();
-		//WindowMap.erase(SDL_GetWindowID(window));
-		auto renderer = GFX::Renderer::getInstance();
-		renderer->destroyWindow(this);
 		SDL_DestroyWindow(window);
-	}
-
-	std::shared_ptr<Window> Window::create(CreationOptions& options) {
-		auto window = std::shared_ptr<Window>(new Window(options));
-		WindowMap[SDL_GetWindowID(window->window)] = window;
-		return window;
 	}
 
 	void Window::setClosing(bool value) {
@@ -117,5 +87,9 @@ namespace VoidEngine::IO {
 	
 	bool Window::isVisible() {
 		return SDL_GetWindowFlags(window) | SDL_WINDOW_HIDDEN;
+	}
+
+	void bindRenderTarget() {
+
 	}
 }

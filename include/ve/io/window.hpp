@@ -2,23 +2,25 @@
 
 #include <SDL3/SDL_video.h>
 #include <glm/ext/vector_int2.hpp>
-#include <memory>
-#include <map>
 
 #include "input_events.hpp"
-#include "ve/io/gfx/opengl/backend.hpp"
+#include "ve/io/gfx/render_target.hpp"
 #include "ve/event/event_bus.hpp"
 #include "ve/io/window_events.hpp"
 #include "ve/io/input_events.hpp"
 
 namespace VoidEngine {
 	class Engine;
+	namespace IO::GFX::OpenGL {
+		class GLWindow;
+	}
 }
 
 namespace VoidEngine::IO {
-	class Window final {
+	class Window : public GFX::IRenderTarget {
 		friend class VoidEngine::Engine;
-		friend class GFX::OpenGL::RendererOpenGL;
+
+		friend class VoidEngine::IO::GFX::OpenGL::GLWindow;
 	public:
 		struct CreationOptions {
 			glm::ivec2 size = { 800, 600 };
@@ -30,15 +32,13 @@ namespace VoidEngine::IO {
 			bool visible = true;
 		};
 	private:
-		static std::map<SDL_WindowID, std::weak_ptr<Window>> WindowMap;
+		bool closing = false;
+	
+	protected:
 		SDL_Window *window = nullptr;
 	
-		bool closing = false;
-
-		Window(CreationOptions&);
 	public:
-		~Window();
-		static std::shared_ptr<Window> create(CreationOptions&);
+		virtual ~Window();
 
 		Event::EventBus<Events::EWindowCloseRequested> onCloseRequested;
 		Event::EventBus<Events::EWindowSizeChanged> onSizeChanged;
@@ -52,6 +52,8 @@ namespace VoidEngine::IO {
 		Event::EventBus<Events::EMouseMotion> onMouseMotion;
 		Event::EventBus<Events::EMouseButton> onMouseButton;
 		Event::EventBus<Events::EKeyButton> onKeyButton;
+
+		virtual void swapBuffers() = 0;
 
 		void setClosing(bool value);
 		void close();
