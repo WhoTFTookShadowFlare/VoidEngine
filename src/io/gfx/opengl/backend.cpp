@@ -1,4 +1,5 @@
 #include "ve/io/gfx/opengl/backend.hpp"
+#include "glbinding/gl/bitfield.h"
 #include "glbinding/gl/enum.h"
 #include "glbinding/gl/functions.h"
 #include "ve/io/gfx/mesh.hpp"
@@ -18,21 +19,6 @@
 
 namespace VoidEngine::IO::GFX::OpenGL {
 	using namespace gl;
-	// void RendererOpenGL::setupWindow(Window *window) {
-		
-
-	// 	// SDL_GLContext context = SDL_GL_CreateContext(window->window);
-	// 	// SDL_GL_MakeCurrent(window->window, context);
-	// 	// glbinding::initialize(SDL_GL_GetProcAddress);
-	// 	// SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, true);
-
-	// 	// contextMap[window] = context;
-	// }
-
-	// void RendererOpenGL::destroyWindow(Window *window) {
-	// 	// SDL_GL_DestroyContext(contextMap[window]);
-	// 	// contextMap.erase(window);
-	// }
 
 	void RendererOpenGL::bindRenderTarget(std::shared_ptr<IRenderTarget> target) {
 		target->bindRenderTarget();
@@ -40,7 +26,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 	void RendererOpenGL::clear(glm::vec4 color) {
 		glClearColor(color.x, color.y, color.z, color.w);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void RendererOpenGL::swapBuffers(std::shared_ptr<Window> window) {
@@ -65,6 +51,10 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		} else {
 			glDisable(gl::GLenum::GL_SCISSOR_TEST);
 		}
+	}
+
+	void RendererOpenGL::useDepth(bool value) {
+		(value ? glEnable : glDisable)(GL_DEPTH_TEST);
 	}
 
 	shared_ptr<Window> RendererOpenGL::createWindow(Window::CreationOptions& options) {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "glm/ext/vector_int2.hpp"
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/shader.hpp"
@@ -28,6 +27,8 @@ namespace VoidEngine::IO {
 
 			virtual void setViewport(VoidEngine::Math::Rect2i) = 0;
 			virtual void setDrawArea(std::optional<VoidEngine::Math::Rect2i>) = 0;
+
+			virtual void useDepth(bool) = 0;
 
 			virtual shared_ptr<Window> createWindow(Window::CreationOptions&) = 0;
 

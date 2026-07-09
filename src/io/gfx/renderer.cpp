@@ -51,6 +51,11 @@ namespace VoidEngine::IO::GFX {
 		backend->setDrawArea(area);
 	}
 
+	void Renderer::useDepth(bool value) {
+		if(backend == nullptr) return;
+		backend->useDepth(value);
+	}
+
 	shared_ptr<Window> Renderer::createWindow(Window::CreationOptions& options) {
 		if(backend == nullptr) return nullptr;
 		return backend->createWindow(options);

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "glm/ext/vector_int2.hpp"
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/renderer_backend.hpp"
@@ -36,6 +35,8 @@ namespace VoidEngine::IO::GFX {
 
 		void setViewport(VoidEngine::Math::Rect2i);
 		void setDrawArea(std::optional<VoidEngine::Math::Rect2i>);
+
+		void useDepth(bool);
 
 		shared_ptr<Window> createWindow(Window::CreationOptions&);
 

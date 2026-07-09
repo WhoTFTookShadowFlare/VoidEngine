@@ -23,6 +23,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		void setViewport(VoidEngine::Math::Rect2i);
 		void setDrawArea(std::optional<VoidEngine::Math::Rect2i>);
 
+		void useDepth(bool);
+
 		shared_ptr<Window> createWindow(Window::CreationOptions&);
 
 		shared_ptr<Mesh> createMesh();

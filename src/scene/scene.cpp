@@ -9,7 +9,6 @@
 #include "ve/scene/components/camera.hpp"
 #include "ve/io/res_providers/model/a_provider.hpp"
 #include "ve/variant.hpp"
-#include <iostream>
 #include <toml++/impl/forward_declarations.hpp>
 #include <toml++/impl/key.hpp>
 #include <toml++/toml.hpp>
@@ -354,9 +353,12 @@ namespace VoidEngine::Scene {
 
 	void Scene::draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target) {
 		target->bindRenderTarget();
+		IO::GFX::Renderer::getInstance()->useDepth(true);
 		Events::ESceneDraw draw(delta, target, shared_from_this());
 		std::for_each(objects.begin(), objects.end(), [&draw](auto& obj) {
 			obj.second->draw(draw);
 		});
+		target->bindRenderTarget();
+		IO::GFX::Renderer::getInstance()->useDepth(false);
 	}
 }
