@@ -78,8 +78,18 @@ namespace VoidEngine::IO::GFX::OpenGL {
 
 	void GLGraphicsProgram::draw(shared_ptr<Mesh> mesh) {
 		auto material = mesh->getMaterial();
+		if(material == nullptr) {
+			glUseProgram(program);
+			forwardDraw(mesh);
+			glUseProgram(0);
+			return;
+		}
+
 		auto optUniformAlbedoTexture = queryUniform("material.albedo");
-		if(optUniformAlbedoTexture.has_value()) setUniform(optUniformAlbedoTexture.value(), material->getAlbedoTexture());
+		if(optUniformAlbedoTexture.has_value()) {
+			setUniform(optUniformAlbedoTexture.value(), material->getAlbedoTexture());
+			material->getAlbedoTexture()->bindTexture();
+		}
 
 		glUseProgram(program);
 		forwardDraw(mesh);
