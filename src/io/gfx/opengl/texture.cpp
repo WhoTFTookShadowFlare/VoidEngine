@@ -10,6 +10,20 @@
 namespace VoidEngine::IO::GFX::OpenGL {
 	using namespace gl;
 
+	void GLTexture::uploadTexture() {
+		auto provider =  getTextureProvider();
+		if(provider == nullptr) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+			return;
+		}
+
+		glm::ivec2 size = provider->getSize();
+		std::vector<uint8_t> data = provider->getData();
+		bindTexture();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
+		glGenerateTextureMipmap(texture);
+	}
+
 	GLTexture::GLTexture(uint8_t slot) : Texture(slot) {
 		glGenTextures(1, &texture);
 	}
@@ -23,12 +37,11 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 
-	void GLTexture::setTextureProvider(VoidEngine::IO::ResourceProviders::ATextureProvider& textureData) {
-		glm::ivec2 size = textureData.getSize();
-		std::vector<uint8_t> data = textureData.getData();
-		bindTexture();
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
-		glGenerateTextureMipmap(texture);
+	void GLTexture::setTextureProvider(std::shared_ptr<ResourceProviders::ATextureProvider> textureData) {
+		if(textureProvider) textureProvider->onTextureChange -= weak_from_this();
+		textureProvider = textureData;
+		if(textureProvider) textureProvider->onTextureChange += weak_from_this();
+		uploadTexture();
 	}
 
 	void GLTexture::setFiltered(bool value) {
@@ -42,5 +55,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	bool GLTexture::isFiltered() {
 		return filtered;
 	}
-}
 
+	void GLTexture::onEvent(ResourceProviders::ETextureChanged& evt) {
+		uploadTexture();
+	}
+}

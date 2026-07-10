@@ -1,5 +1,7 @@
 #include "ve/io/gfx/mesh.hpp"
+#include "ve/io/gfx/material.hpp"
 #include "ve/io/res_providers/mesh/a_provider.hpp"
+#include <memory>
 
 namespace VoidEngine::IO::GFX {
 	void Mesh::setMeshProvider(std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> provider) {
@@ -17,6 +19,14 @@ namespace VoidEngine::IO::GFX {
 
 	std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> Mesh::getMeshProvider() {
 		return provider;
+	}
+
+	void Mesh::setMaterial(std::shared_ptr<Material> value) {
+		material = value;
+	}
+
+	std::shared_ptr<Material> Mesh::getMaterial() {
+		return material;
 	}
 
 	void Mesh::onEvent(VoidEngine::IO::ResourceProviders::EMeshProviderChanged& evt) {

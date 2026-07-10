@@ -1,0 +1,30 @@
+#include "ve/io/gfx/material.hpp"
+#include "ve/io/gfx/renderer.hpp"
+#include "ve/io/res_providers/texture/a_provider.hpp"
+#include <memory>
+
+namespace VoidEngine::IO::GFX {
+	const Class Material::ClassData = { .name = "Material" };
+
+	Material::Material() {
+		auto renderer = Renderer::getInstance();
+		albedo = renderer->createTexture(0);
+	}
+
+	std::shared_ptr<Material> Material::create() {
+		auto self = std::shared_ptr<Material>(new Material);
+		return self;
+	}
+
+	void Material::setAlbedo(std::shared_ptr<ResourceProviders::ATextureProvider> value) {
+		albedo->setTextureProvider(value);
+	}
+
+	std::shared_ptr<ResourceProviders::ATextureProvider> Material::getAlbedo() {
+		return albedo->getTextureProvider();
+	}
+
+	std::shared_ptr<Texture> Material::getAlbedoTexture() {
+		return albedo;
+	}
+}

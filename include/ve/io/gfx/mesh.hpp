@@ -1,10 +1,9 @@
 #pragma once
 
+#include "ve/io/gfx/material.hpp"
 #include "ve/io/res_providers/mesh/a_provider.hpp"
 #include "ve/event/event_listener.hpp"
-#include "ve/io/gfx/vertex.hpp"
-#include <cstdint>
-#include <vector>
+#include <memory>
 
 namespace VoidEngine::IO::GFX {
 	class GraphicsProgram;
@@ -14,6 +13,7 @@ namespace VoidEngine::IO::GFX {
 		friend class GraphicsProgram;
 
 		std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> provider = nullptr;
+		std::shared_ptr<Material> material = nullptr;
 		
 		virtual void draw() = 0;
 	protected:
@@ -23,6 +23,9 @@ namespace VoidEngine::IO::GFX {
 
 		void setMeshProvider(std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider>);
 		std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> getMeshProvider();
+
+		void setMaterial(std::shared_ptr<Material>);
+		std::shared_ptr<Material> getMaterial();
 
 		void onEvent(VoidEngine::IO::ResourceProviders::EMeshProviderChanged& evt);
 	};

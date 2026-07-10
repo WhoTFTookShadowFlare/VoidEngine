@@ -2,10 +2,14 @@
 
 #include "ve/io/res_providers/texture/a_provider.hpp"
 #include <cstdint>
+#include <memory>
 
 namespace VoidEngine::IO::GFX {
 	class Texture {
+	private:
 		uint8_t slot;
+	protected:
+		std::shared_ptr<ResourceProviders::ATextureProvider> textureProvider;
 	public:
 		Texture(uint8_t slot) : slot(slot) {}
 		virtual ~Texture() {}
@@ -16,7 +20,8 @@ namespace VoidEngine::IO::GFX {
 		virtual bool isFiltered() = 0;
 
 		virtual void bindTexture() = 0;
-		virtual void setTextureProvider(VoidEngine::IO::ResourceProviders::ATextureProvider&) = 0;
+		virtual void setTextureProvider(std::shared_ptr<ResourceProviders::ATextureProvider>) = 0;
+		std::shared_ptr<ResourceProviders::ATextureProvider> getTextureProvider();
 	};
 }
 
