@@ -51,7 +51,8 @@ namespace VoidEngine {
 
 	Variant::~Variant() {	}
 
-	constexpr bool Variant::isType(VariantType type) { return this->type == type; }
+	bool Variant::isType(VariantType type) const { return this->type == type; }
+	VariantType Variant::getType() const { return type; }
 
 	bool Variant::isNil() const { return type == VariantType::NIL; }
 	bool Variant::isInt() const { return type == VariantType::INT; }

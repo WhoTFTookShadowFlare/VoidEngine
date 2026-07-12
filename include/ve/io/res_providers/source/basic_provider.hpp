@@ -6,9 +6,11 @@
 namespace VoidEngine::IO::ResourceProviders {
 	class BasicSourceProvider : public ASourceProvider {
 		std::string shaderSourceCode = "";
+		std::string language = "";
 	public:
-		BasicSourceProvider(std::string shaderSourceCode) : shaderSourceCode(shaderSourceCode) {}
+		BasicSourceProvider(std::string shaderSourceCode, std::string language) : shaderSourceCode(shaderSourceCode), language(language) {}
 
 		std::string getShaderSource() { return shaderSourceCode; }
+		std::string getLanguage() { return language; }
 	};
 }

@@ -100,3 +100,5 @@ add_custom_command(TARGET VoidEngine POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different
 	$<TARGET_FILE:glbinding::glbinding-aux> ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
 )
+
+add_subdirectory(components)

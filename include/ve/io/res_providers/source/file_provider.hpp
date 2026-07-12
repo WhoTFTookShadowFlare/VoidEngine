@@ -9,8 +9,11 @@
 namespace VoidEngine::IO::ResourceProviders {
 	class FileSourceProvider : public ASourceProvider {
 		std::string shaderSourceCode = "";
+		std::string language = "";
 	public:
-		FileSourceProvider(std::filesystem::path& filePath) {
+		FileSourceProvider(std::filesystem::path& filePath, std::string language)
+			: language(language)
+		{
 			if (!(std::filesystem::exists(filePath) && !std::filesystem::is_directory(filePath))) {
 				throw std::runtime_error(std::format("File {} is either a directory or does not exist", filePath.string()));
 			}
@@ -22,5 +25,6 @@ namespace VoidEngine::IO::ResourceProviders {
 		}
 
 		std::string getShaderSource() { return shaderSourceCode; }
+		std::string getLanguage() { return language; }
 	};
 }

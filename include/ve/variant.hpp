@@ -58,7 +58,8 @@ namespace VoidEngine {
 
 		~Variant();
 
-		constexpr bool isType(VariantType type);
+		bool isType(VariantType type) const;
+		VariantType getType() const;
 
 		bool isNil() const;
 		bool isInt() const;
