@@ -9,6 +9,7 @@
 #include <memory>
 #include <expected>
 #include <string>
+#include <vector>
 
 namespace VoidEngine {
 	class Object;
@@ -48,7 +49,7 @@ namespace VoidEngine {
 		Variant(float);
 		Variant(bool);
 		Variant(std::string);
-		// Variant(uint32_t);
+		Variant(std::vector<Variant>);
 		// Variant(uint32_t);
 		Variant(std::shared_ptr<Object>);
 
@@ -78,7 +79,7 @@ namespace VoidEngine {
 		std::expected<float, TypeError> asFloat();
 		std::expected<bool, TypeError> asBool();
 		std::expected<std::string, TypeError> asString();
-		// std::expected<, TypeError> asArray();
+		std::expected<std::vector<Variant>*, TypeError> asArray();
 		// std::expected<, TypeError> asMap();
 		std::expected<std::shared_ptr<Object>, TypeError> asObject();
 

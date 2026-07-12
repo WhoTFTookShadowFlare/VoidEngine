@@ -7,6 +7,7 @@
 #include "ve/object.hpp"
 #include "ve/script/a_script_engine.hpp"
 #include "ve/variant.hpp"
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <print>
@@ -97,6 +98,18 @@ namespace VoidEngine::Scripts::Luau {
 			}; break;
 			case VoidEngine::VariantType::STRING: {
 				lua_pushstring(vmState, value.asString().value().c_str());
+			}; break;
+			case VoidEngine::VariantType::ARRAY: {
+				auto arr = value.asArray().value();
+				lua_createtable(vmState, arr->size(), 0);
+				for(auto idx = 0; idx < arr->size(); idx++) {
+					lua_pushinteger(vmState, idx + 1);
+					objectFromVariant((*arr)[idx]);
+					lua_settable(vmState, -3);
+				}
+			}; break;
+			case VoidEngine::VariantType::MAP: {
+				lua_createtable(vmState, 0, 5);
 			}; break;
 			case VoidEngine::VariantType::OBJECT: {
 				ObjectHolder* ptr = static_cast<ObjectHolder*>(lua_newuserdatadtor(vmState, sizeof(ObjectHolder), [](void* ptr) {

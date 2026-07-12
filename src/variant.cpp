@@ -7,6 +7,7 @@
 #include <memory>
 #include <print>
 #include <string>
+#include <vector>
 
 namespace VoidEngine {
 	TypeError::TypeError(VariantType expected, VariantType got) : expected(expected), got(got)
@@ -38,7 +39,10 @@ namespace VoidEngine {
 		data = std::make_shared<std::string>(value);
 	}
 
-	// Variant::Variant(uint32_t);
+	Variant::Variant(std::vector<Variant> value) : type(VariantType::ARRAY) {
+		data = std::make_shared<std::vector<Variant>>(value);
+	}
+
 	// Variant::Variant(uint32_t);
 	
 	Variant::Variant(std::shared_ptr<Object> value) : type(VariantType::OBJECT) {
@@ -87,7 +91,11 @@ namespace VoidEngine {
 		return std::string(*(std::string*) data.get());
 	}
 
-	// std::expected<, TypeError> Variant::asArray() {}
+	std::expected<std::vector<Variant>*, TypeError> Variant::asArray() {
+		if(!isArray()) { return std::unexpected(TypeError(VariantType::ARRAY, type)); }
+		return (std::vector<Variant>*) data.get();
+	}
+
 	// std::expected<, TypeError> Variant::asMap() {}
 	
 	std::expected<std::shared_ptr<Object>, TypeError> Variant::asObject() {
