@@ -9,8 +9,11 @@
 #include "ve/variant.hpp"
 #include <algorithm>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <print>
+#include <string>
+#include <vector>
 
 namespace VoidEngine::Scripts::Luau {
 	std::shared_ptr<LuauScriptEngine> LuauScriptEngine::instance = nullptr;
@@ -74,8 +77,48 @@ namespace VoidEngine::Scripts::Luau {
 			case LUA_TBOOLEAN: return luaL_checkboolean(vmState, idx);
 			case LUA_TNUMBER: return (float) luaL_checknumber(vmState, idx);
 			case LUA_TINTEGER: return luaL_checkinteger(vmState, idx);
-			case LUA_TOBJECT: return static_cast<ObjectHolder*>(lua_touserdata(vmState, idx))->obj;
+			// case LUA_TOBJECT: return static_cast<ObjectHolder*>(lua_touserdata(vmState, idx))->obj;
+			case LUA_TUSERDATA: return static_cast<ObjectHolder*>(lua_touserdata(vmState, idx))->obj;
 			case LUA_TSTRING: return luaL_checkstring(vmState, idx);
+			case LUA_TTABLE: {
+				bool isArray = true;
+				lua_pushnil(vmState);
+				while(lua_next(vmState, idx) != 0) {
+					if(lua_type(vmState, -1) != LUA_TNUMBER) {
+						isArray = false;
+						lua_pop(vmState, 2);
+						break;
+					}
+					lua_pop(vmState, 1);
+				}
+
+
+				lua_pushnil(vmState);
+				if(isArray) {
+					std::vector<Variant> arr;
+					while(lua_next(vmState, idx) != 0) {
+						int32_t* nextIdx = new int32_t(-1);
+						arr.push_back(objectToVariant(nextIdx));
+						delete nextIdx;
+						lua_pop(vmState, 1);
+					}
+					lua_pop(vmState, 1);
+
+					return arr;
+				} else {
+					std::map<std::string, Variant> map;
+					while(lua_next(vmState, idx) != 0) {
+						const char* key = lua_tostring(vmState, -2);
+						int32_t* nextIdx = new int32_t(-1);
+						map.insert({ key, objectToVariant(nextIdx) });
+						delete nextIdx;
+						lua_pop(vmState, 1);
+					}
+					lua_pop(vmState, 1);
+
+					return map;
+				}
+			}; break;
 		}
 
 		std::println("Lua type {} is not supported yet", type);
@@ -109,7 +152,13 @@ namespace VoidEngine::Scripts::Luau {
 				}
 			}; break;
 			case VoidEngine::VariantType::MAP: {
-				lua_createtable(vmState, 0, 5);
+				auto map = value.asMap().value();
+				lua_createtable(vmState, 0, map->size());
+				std::for_each(map->begin(), map->end(), [&](auto& entry) {
+					lua_pushstring(vmState, entry.first.c_str());
+					objectFromVariant(entry.second);
+					lua_settable(vmState, -3);
+				});
 			}; break;
 			case VoidEngine::VariantType::OBJECT: {
 				ObjectHolder* ptr = static_cast<ObjectHolder*>(lua_newuserdatadtor(vmState, sizeof(ObjectHolder), [](void* ptr) {

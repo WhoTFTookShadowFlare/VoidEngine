@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <map>
 #include <memory>
 #include <print>
 #include <string>
@@ -43,7 +44,9 @@ namespace VoidEngine {
 		data = std::make_shared<std::vector<Variant>>(value);
 	}
 
-	// Variant::Variant(uint32_t);
+	Variant::Variant(std::map<std::string, Variant> value) : type(VariantType::MAP) {
+		data = std::make_shared<std::map<std::string, Variant>>(value);
+	}
 	
 	Variant::Variant(std::shared_ptr<Object> value) : type(VariantType::OBJECT) {
 		data = std::make_shared<std::shared_ptr<Object>>(value);
@@ -71,49 +74,52 @@ namespace VoidEngine {
 	bool Variant::isVec3() const { return type == VariantType::VEC3; }
 	bool Variant::isVec4() const { return type == VariantType::VEC4; }
 
-	std::expected<int32_t, TypeError> Variant::asInt() {
+	std::expected<int32_t, TypeError> Variant::asInt() const {
 		if(!isInt()) { return std::unexpected(TypeError(VariantType::INT, type)); }
 		return int32_t(*(int32_t*) data.get());
 	}
 
-	std::expected<float, TypeError> Variant::asFloat() {
+	std::expected<float, TypeError> Variant::asFloat() const {
 		if(!isFloat()) { return std::unexpected(TypeError(VariantType::FLOAT, type)); }
 		return float(*(float*) data.get());
 	}
 
-	std::expected<bool, TypeError> Variant::asBool() {
+	std::expected<bool, TypeError> Variant::asBool() const {
 		if(!isBool()) { return std::unexpected(TypeError(VariantType::BOOL, type)); }
 		return bool(*(bool*) data.get());
 	}
 
-	std::expected<std::string, TypeError> Variant::asString() {
+	std::expected<std::string, TypeError> Variant::asString() const {
 		if(!isString()) { return std::unexpected(TypeError(VariantType::STRING, type)); }
 		return std::string(*(std::string*) data.get());
 	}
 
-	std::expected<std::vector<Variant>*, TypeError> Variant::asArray() {
+	std::expected<std::vector<Variant>*, TypeError> Variant::asArray() const {
 		if(!isArray()) { return std::unexpected(TypeError(VariantType::ARRAY, type)); }
 		return (std::vector<Variant>*) data.get();
 	}
 
-	// std::expected<, TypeError> Variant::asMap() {}
+	std::expected<std::map<std::string, Variant>*, TypeError> Variant::asMap() const {
+		if(!isMap()) { return std::unexpected(TypeError(VariantType::MAP, type)); }
+		return (std::map<std::string, Variant>*) data.get();
+	}
 	
-	std::expected<std::shared_ptr<Object>, TypeError> Variant::asObject() {
+	std::expected<std::shared_ptr<Object>, TypeError> Variant::asObject() const {
 		if(!isObject()) { return std::unexpected(TypeError(VariantType::OBJECT, type)); }
 		return std::shared_ptr<Object>(*(std::shared_ptr<Object>*) data.get());
 	}
 
-	std::expected<glm::vec2, TypeError> Variant::asVec2() {
+	std::expected<glm::vec2, TypeError> Variant::asVec2() const {
 		if(!isVec2()) { return std::unexpected(TypeError(VariantType::VEC2, type)); }
 		return glm::vec2(*(glm::vec2*) data.get());
 	}
 	
-	std::expected<glm::vec3, TypeError> Variant::asVec3() {
+	std::expected<glm::vec3, TypeError> Variant::asVec3() const {
 		if(!isVec3()) { return std::unexpected(TypeError(VariantType::VEC3, type)); }
 		return glm::vec3(*(glm::vec3*) data.get());
 	}
 	
-	std::expected<glm::vec4, TypeError> Variant::asVec4() {
+	std::expected<glm::vec4, TypeError> Variant::asVec4() const {
 		if(!isVec4()) { return std::unexpected(TypeError(VariantType::VEC4, type)); }
 		return glm::vec4(*(glm::vec4*) data.get());
 	}

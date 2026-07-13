@@ -6,6 +6,7 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
+#include <map>
 #include <memory>
 #include <expected>
 #include <string>
@@ -50,7 +51,7 @@ namespace VoidEngine {
 		Variant(bool);
 		Variant(std::string);
 		Variant(std::vector<Variant>);
-		// Variant(uint32_t);
+		Variant(std::map<std::string, Variant>);
 		Variant(std::shared_ptr<Object>);
 
 		Variant(glm::vec2);
@@ -75,16 +76,16 @@ namespace VoidEngine {
 		bool isVec3() const;
 		bool isVec4() const;
 
-		std::expected<int32_t, TypeError> asInt();
-		std::expected<float, TypeError> asFloat();
-		std::expected<bool, TypeError> asBool();
-		std::expected<std::string, TypeError> asString();
-		std::expected<std::vector<Variant>*, TypeError> asArray();
-		// std::expected<, TypeError> asMap();
-		std::expected<std::shared_ptr<Object>, TypeError> asObject();
+		std::expected<int32_t, TypeError> asInt() const;
+		std::expected<float, TypeError> asFloat() const;
+		std::expected<bool, TypeError> asBool() const;
+		std::expected<std::string, TypeError> asString() const;
+		std::expected<std::vector<Variant>*, TypeError> asArray() const;
+		std::expected<std::map<std::string, Variant>*, TypeError> asMap() const;
+		std::expected<std::shared_ptr<Object>, TypeError> asObject() const;
 
-		std::expected<glm::vec2, TypeError> asVec2();
-		std::expected<glm::vec3, TypeError> asVec3();
-		std::expected<glm::vec4, TypeError> asVec4();
+		std::expected<glm::vec2, TypeError> asVec2() const;
+		std::expected<glm::vec3, TypeError> asVec3() const;
+		std::expected<glm::vec4, TypeError> asVec4() const;
 	};
 }
