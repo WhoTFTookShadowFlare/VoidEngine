@@ -4,6 +4,7 @@
 #include <glm/ext/vector_int2.hpp>
 #include <map>
 #include <memory>
+#include <string>
 
 #include "input_events.hpp"
 #include "ve/io/gfx/render_target.hpp"
