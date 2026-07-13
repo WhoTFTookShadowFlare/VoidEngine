@@ -27,11 +27,13 @@ namespace VoidEngine::Scripts::Luau {
 	static int ObjectToString(lua_State* L);
 	static int ObjectGet(lua_State* L);
 	static int ObjectSet(lua_State* L);
+	static int ObjectCall(lua_State* L);
 
 	static const luaL_Reg objectMeth[] = {
 		{ "__tostring", ObjectToString },
 		{ "__index", ObjectGet },
 		{ "__newindex", ObjectSet },
+		{ "__namecall", ObjectCall },
 		{ nullptr, nullptr }
 	};
 
@@ -244,6 +246,30 @@ namespace VoidEngine::Scripts::Luau {
 		delete idx;
 
 		property->set(obj->obj, value);
+		return 0;
+	}
+
+	static int ObjectCall(lua_State* L) {
+		ObjectHolder* obj = static_cast<ObjectHolder*>(lua_touserdata(L, 1));
+		const char* key = lua_namecallatom(L, nullptr);
+		if(key == nullptr) return 0;
+
+		std::println("CALL TO: {}", key);
+		auto meth = obj->obj->getClass()->findMethod(key);
+
+		auto engine = LuauScriptEngine::getInstance();
+		int32_t* stackIndex = new int32_t(1);
+		std::vector<Variant> args;
+		for(uint32_t arg = 1; arg < lua_gettop(L); arg++) {
+			*stackIndex = arg + 1;
+
+			std::println("luau arg type: {}", lua_type(L, *stackIndex));
+
+			args.push_back(engine->objectToVariant(stackIndex));
+		}
+		delete stackIndex;
+		meth->call(obj->obj, args);
+
 		return 0;
 	}
 }

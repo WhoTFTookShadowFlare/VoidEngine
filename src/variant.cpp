@@ -40,6 +40,10 @@ namespace VoidEngine {
 		data = std::make_shared<std::string>(value);
 	}
 
+	Variant::Variant(const char* value) : type(VariantType::STRING) {
+		data = std::make_shared<std::string>(value);
+	}
+
 	Variant::Variant(std::vector<Variant> value) : type(VariantType::ARRAY) {
 		data = std::make_shared<std::vector<Variant>>(value);
 	}

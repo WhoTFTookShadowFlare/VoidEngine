@@ -50,6 +50,7 @@ namespace VoidEngine {
 		Variant(float);
 		Variant(bool);
 		Variant(std::string);
+		Variant(const char*);
 		Variant(std::vector<Variant>);
 		Variant(std::map<std::string, Variant>);
 		Variant(std::shared_ptr<Object>);

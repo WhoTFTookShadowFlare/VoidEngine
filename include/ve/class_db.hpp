@@ -44,12 +44,23 @@ namespace VoidEngine {
 		virtual bool isReadOnly() const = 0;
 	};
 
+	struct MethodBase {
+	protected:
+		MethodBase(std::string name) : name(name) {}
+	public:
+		virtual ~MethodBase() = default;
+
+		const std::string name;
+		virtual Variant call(std::shared_ptr<Object> obj, std::vector<Variant> args) const = 0;
+	};
+
 	struct Class {
 		const char* name;
 
 		const Class *super;
 		std::vector<const Class*> childTypes;
 		std::vector<const PropertyBase*> properties;
+		std::vector<const MethodBase*> methods;
 
 		std::function<std::shared_ptr<Object>()> create;
 
@@ -73,6 +84,14 @@ namespace VoidEngine {
 				return prop->name == name;
 			});
 			if(idx == properties.cend()) return nullptr;
+			return *idx;
+		}
+
+		const MethodBase* findMethod(std::string name) const {
+			const auto idx = std::find_if(methods.cbegin(), methods.cend(), [&name](const auto meth) {
+				return meth->name == name;
+			});
+			if(idx == methods.cend()) return nullptr;
 			return *idx;
 		}
 	};
