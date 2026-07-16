@@ -14,8 +14,13 @@
 
 namespace VoidEngine {
 	class Engine;
+#ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
 	namespace IO::GFX::OpenGL {
 		class GLWindow;
+	}
+#endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
+	namespace IO::GFX::Dummy {
+		class DummyWindow;
 	}
 }
 
@@ -23,7 +28,10 @@ namespace VoidEngine::IO {
 	class Window : public GFX::IRenderTarget, public std::enable_shared_from_this<Window> {
 		friend class VoidEngine::Engine;
 
+#ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
 		friend class VoidEngine::IO::GFX::OpenGL::GLWindow;
+#endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
+		friend class VoidEngine::IO::GFX::Dummy::DummyWindow;
 	public:
 		struct CreationOptions {
 			glm::ivec2 size = { 800, 600 };
@@ -36,9 +44,9 @@ namespace VoidEngine::IO {
 		};
 	private:
 		bool closing = false;
-		static std::map<SDL_WindowID, std::weak_ptr<Window>> WindowMap;
-	
+		
 	protected:
+		static std::map<SDL_WindowID, std::weak_ptr<Window>> WindowMap;
 		SDL_Window *window = nullptr;
 	
 	public:

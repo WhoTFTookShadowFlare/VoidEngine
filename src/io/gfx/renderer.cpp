@@ -1,24 +1,32 @@
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/render_target.hpp"
+#include "ve/io/gfx/renderer_backend.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/math/rect2.hpp"
 #include <cstdint>
+#include <functional>
 #include <memory>
+#include <print>
+#include <vector>
+
+#include "ve/io/gfx/dummy/backend_dummy.hpp"
 
 #ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
 #include "backend_opengl.hpp"
 #endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
 
-
 namespace VoidEngine::IO::GFX {
 	using std::shared_ptr;
 	shared_ptr<Renderer> Renderer::instance = nullptr;
 
-	Renderer::Renderer() {
+	std::vector<std::function<ARendererBackend*()>> backendLoaders = {
 #ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
-		backend = new OpenGL::RendererOpenGL;
+		[]() { return new OpenGL::RendererOpenGL; },
 #endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
-	}
+		[]() { return new Dummy::DummyBackend; }
+	};
+
+	Renderer::Renderer() {	}
 
 	Renderer::~Renderer() {
 		if(backend == nullptr) return;
@@ -28,6 +36,13 @@ namespace VoidEngine::IO::GFX {
 	shared_ptr<Renderer> Renderer::getInstance() {
 		if(instance == nullptr) {
 			instance = std::shared_ptr<Renderer>(new Renderer);
+			for(const auto& loadFn : backendLoaders) {
+				instance->backend = loadFn();
+				if(instance->backend != nullptr) break;
+			}
+			if(instance->backend == nullptr) {
+				std::println("[FATAL] Failed to load a renderer backend!");
+			}
 		}
 		return instance;
 	}
@@ -87,5 +102,3 @@ namespace VoidEngine::IO::GFX {
 		return backend->createTexture(slot);
 	}
 }
-
-
