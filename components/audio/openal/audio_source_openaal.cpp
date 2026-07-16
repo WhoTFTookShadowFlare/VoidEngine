@@ -1,4 +1,4 @@
-#include "ve/io/sfx/openal/audio_source.hpp"
+#include "audio_source_openal.hpp"
 
 #include <AL/al.h>
 

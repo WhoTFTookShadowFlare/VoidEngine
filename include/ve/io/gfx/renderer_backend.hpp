@@ -19,8 +19,6 @@ namespace VoidEngine::IO {
 		class ARendererBackend {
 		public:
 			virtual ~ARendererBackend() {}
-			// virtual void setupWindow(Window*) = 0;
-			// virtual void destroyWindow(Window*) = 0;
 			virtual void bindRenderTarget(shared_ptr<IRenderTarget>) = 0;
 			virtual void clear(glm::vec4 color) = 0;
 			virtual void swapBuffers(shared_ptr<Window>) = 0;

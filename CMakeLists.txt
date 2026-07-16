@@ -26,9 +26,6 @@ endif()
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/stb)
 	message(FATAL_ERROR "Missing submodule stb")
 endif()
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/openal/CMakeLists.txt)
-	message(FATAL_ERROR "Missing submodule openal")
-endif()
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/toml++/CMakeLists.txt)
 	message(FATAL_ERROR "Missing submodule toml++")
 endif()
@@ -52,7 +49,6 @@ else()
 	find_package(assimp REQUIRED)
 endif()
 
-add_subdirectory(extern/openal)
 add_subdirectory(extern/toml++)
 
 file(GLOB_RECURSE VESource "src/**.cpp")
@@ -73,7 +69,6 @@ target_include_directories(VoidEngine PRIVATE
 )
 target_link_libraries(VoidEngine PRIVATE
 	SDL3::SDL3
-	OpenAL::OpenAL
 )
 target_include_directories(VoidEngine PUBLIC
 	extern/SDL3/include

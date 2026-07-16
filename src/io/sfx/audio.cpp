@@ -1,12 +1,16 @@
 #include "ve/io/sfx/audio.hpp"
 
-#include "ve/io/sfx/openal/backend.hpp"
+#ifdef COMPONENT_AUDIO_OPENAL_ENABLED
+#include "backend_openal.hpp"
+#endif // COMPONENT_AUDIO_OPENAL_ENABLED
 
 namespace VoidEngine::IO::SFX {
 	std::shared_ptr<Audio> Audio::instance = nullptr;
 
 	Audio::Audio() {
+#ifdef COMPONENT_AUDIO_OPENAL_ENABLED
 		backend = new OpenAL::OpenALBackend;
+#endif // COMPONENT_AUDIO_OPENAL_ENABLED
 	}
 
 	Audio::~Audio() {

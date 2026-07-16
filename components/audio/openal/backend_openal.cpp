@@ -1,9 +1,9 @@
-#include "ve/io/sfx/openal/backend.hpp"
+#include "backend_openal.hpp"
 
 #include <AL/alc.h>
 #include <AL/al.h>
 
-#include "ve/io/sfx/openal/audio_source.hpp"
+#include "audio_source_openal.hpp"
 
 #include <stdexcept>
 

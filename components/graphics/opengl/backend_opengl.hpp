@@ -6,16 +6,15 @@
 #include "ve/math/rect2.hpp"
 #include <SDL3/SDL_video.h>
 #include <cstdint>
-#include <map>
 #include <memory>
 
 namespace VoidEngine::IO::GFX::OpenGL {
 	using std::shared_ptr;
 	class RendererOpenGL : public ARendererBackend {
-		std::map<Window*, SDL_GLContext> contextMap;
 	public:
-		// void setupWindow(Window*);
-		// void destroyWindow(Window*);
+		RendererOpenGL() {}
+		~RendererOpenGL() {}
+
 		void bindRenderTarget(shared_ptr<IRenderTarget>);
 		void clear(glm::vec4 color);
 		void swapBuffers(shared_ptr<Window>);

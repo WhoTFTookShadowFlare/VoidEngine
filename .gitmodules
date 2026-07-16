@@ -14,7 +14,7 @@
 	path = extern/assimp
 	url = https://github.com/assimp/assimp
 [submodule "extern/openal"]
-	path = extern/openal
+	path = components/audio/openal/openal
 	url = https://github.com/kcat/openal-soft
 [submodule "extern/toml++"]
 	path = extern/toml++

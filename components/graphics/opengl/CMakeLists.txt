@@ -2,8 +2,8 @@ set(OPTION_BUILD_TOOLS OFF)
 set(OPTION_BUILD_EXAMPLES OFF)
 add_subdirectory(components/graphics/opengl/glbinding)
 
-file(GLOB openglScriptSrc "components/graphics/opengl/*.cpp")
-target_sources(VoidEngine PRIVATE ${openglScriptSrc})
+file(GLOB openglGraphicsSrc "components/graphics/opengl/*.cpp")
+target_sources(VoidEngine PRIVATE ${openglGraphicsSrc})
 target_include_directories(VoidEngine PRIVATE components/graphics/opengl)
 target_compile_definitions(VoidEngine PUBLIC COMPONENT_GRAPHICS_OPENGL_ENABLED)
 
