@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <print>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -80,19 +81,35 @@ namespace VoidEngine {
 		}
 
 		const PropertyBase* findProperty(std::string name) const {
-			const auto idx = std::find_if(properties.cbegin(), properties.cend(), [&name](const auto prop) {
-				return prop->name == name;
-			});
-			if(idx == properties.cend()) return nullptr;
-			return *idx;
+			const Class* cls = this;
+			while(cls != nullptr) {
+
+				const auto idx = std::find_if(cls->properties.cbegin(), cls->properties.cend(), [&name](const auto prop) {
+					return prop->name == name;
+				});
+				if(idx == properties.cend()) {
+					cls = cls->super;
+					continue;
+				}
+				return *idx;
+			}
+			return nullptr;
 		}
 
 		const MethodBase* findMethod(std::string name) const {
-			const auto idx = std::find_if(methods.cbegin(), methods.cend(), [&name](const auto meth) {
-				return meth->name == name;
-			});
-			if(idx == methods.cend()) return nullptr;
-			return *idx;
+			const Class* cls = this;
+			while(cls != nullptr) {
+
+				const auto idx = std::find_if(cls->methods.cbegin(), cls->methods.cend(), [&name](const auto meth) {
+					return meth->name == name;
+				});
+				if(idx == methods.cend()) {
+					cls = cls->super;
+					continue;
+				}
+				return *idx;
+			}
+			return nullptr;
 		}
 	};
 

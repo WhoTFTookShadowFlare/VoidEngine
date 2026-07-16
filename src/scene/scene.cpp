@@ -262,10 +262,10 @@ namespace VoidEngine::Scene {
 				int idx = 0;
 				try {
 					idx = std::stoi(targetIdx);
-				} catch(std::invalid_argument ex) {
+				} catch(std::invalid_argument& ex) {
 					std::println("{}", ex.what());
 					return;
-				} catch(std::out_of_range ex) {
+				} catch(std::out_of_range& ex) {
 					std::println("{}", ex.what());
 					return;
 				}

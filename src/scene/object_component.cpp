@@ -1,9 +1,13 @@
 #include "ve/scene/object_component.hpp"
 #include <algorithm>
 #include <memory>
+#include <print>
 #include <vector>
 
 #include "ve/class_db.hpp"
+#include "ve/class_methods.hpp"
+#include "ve/scene/game_object.hpp"
+#include "ve/variant.hpp"
 
 namespace VoidEngine::Scene {
 	void AObjectComponent::cleanTiedTo() {
@@ -23,8 +27,21 @@ namespace VoidEngine::Scene {
 		return retVal;
 	}
 
+	Variant AObjectComponent::scr_getObjectsUsing(std::vector<Variant> args) {
+		if(args.size() != 0) std::println("[WARN] Expected 0 args for getObjectsUsing");
+		auto objs = getObjectsUsing();
+		std::vector<Variant> objVars;
+		std::for_each(objs.begin(), objs.end(), [&](std::shared_ptr<GameObject>& obj) {
+			objVars.push_back(Variant(obj));
+		});
+		return objVars;
+	}
+
 	const Class AObjectComponent::ClassData = {
 		.name = "AObjectComponent",
+		.methods = {
+			new Method("getObjectsUsing", &AObjectComponent::scr_getObjectsUsing)
+		}
 	};
 }
 

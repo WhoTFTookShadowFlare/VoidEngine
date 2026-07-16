@@ -12,6 +12,7 @@ namespace VoidEngine::IO::SFX {
 	class AudioBackend {
 	private:
 	public:
+		virtual ~AudioBackend() {}
 		virtual std::vector<AudioDevice> getDevices() = 0;
 
 		virtual std::shared_ptr<AudioSource> createSource() = 0;

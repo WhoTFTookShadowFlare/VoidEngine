@@ -62,18 +62,19 @@ endif()
 add_subdirectory(extern/openal)
 add_subdirectory(extern/toml++)
 
-if(MSVC)
-	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	add_compile_options(/GR-)
-else()
-	add_compile_options(-fno-rtti)
-endif()
-
 file(GLOB_RECURSE VESource "src/**.cpp")
 add_library(VoidEngine STATIC ${VESource})
 target_include_directories(VoidEngine PUBLIC
 	include
 )
+
+if(MSVC)
+	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	add_compile_options(/GR-)
+else()
+	add_compile_options(-fno-rtti)
+	target_compile_options(VoidEngine PUBLIC -Wall -Werror)
+endif()
 
 target_include_directories(VoidEngine PRIVATE
 	extern/stb

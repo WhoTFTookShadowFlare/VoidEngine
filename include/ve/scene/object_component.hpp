@@ -7,6 +7,7 @@
 #include "ve/object.hpp"
 #include "ve/class_db.hpp"
 #include "ve/scene/events.hpp"
+#include "ve/variant.hpp"
 
 namespace VoidEngine::Scene {
 	class GameObject;
@@ -17,6 +18,7 @@ namespace VoidEngine::Scene {
 		std::vector<std::weak_ptr<GameObject>> tiedTo;
 
 		void cleanTiedTo();
+		Variant scr_getObjectsUsing(std::vector<Variant>);
 
 	public:
 		static const Class ClassData;

@@ -147,7 +147,7 @@ namespace VoidEngine::Scripts::Luau {
 			case VoidEngine::VariantType::ARRAY: {
 				auto arr = value.asArray().value();
 				lua_createtable(vmState, arr->size(), 0);
-				for(auto idx = 0; idx < arr->size(); idx++) {
+				for(size_t idx = 0; idx < arr->size(); idx++) {
 					lua_pushinteger(vmState, idx + 1);
 					objectFromVariant((*arr)[idx]);
 					lua_settable(vmState, -3);
@@ -254,13 +254,13 @@ namespace VoidEngine::Scripts::Luau {
 		const char* key = lua_namecallatom(L, nullptr);
 		if(key == nullptr) return 0;
 
-		std::println("CALL TO: {}", key);
 		auto meth = obj->obj->getClass()->findMethod(key);
+		if(meth == nullptr) return 0;
 
 		auto engine = LuauScriptEngine::getInstance();
 		int32_t* stackIndex = new int32_t(1);
 		std::vector<Variant> args;
-		for(uint32_t arg = 1; arg < lua_gettop(L); arg++) {
+		for(int32_t arg = 1; arg < lua_gettop(L); arg++) {
 			*stackIndex = arg + 1;
 
 			std::println("luau arg type: {}", lua_type(L, *stackIndex));
@@ -268,8 +268,10 @@ namespace VoidEngine::Scripts::Luau {
 			args.push_back(engine->objectToVariant(stackIndex));
 		}
 		delete stackIndex;
-		meth->call(obj->obj, args);
 
-		return 0;
+		Variant retVal = meth->call(obj->obj, args);
+		if(retVal.isNil()) return 0;
+		engine->objectFromVariant(retVal);
+		return 1;
 	}
 }

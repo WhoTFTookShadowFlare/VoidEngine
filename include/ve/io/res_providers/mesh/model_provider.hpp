@@ -29,7 +29,7 @@ namespace VoidEngine::IO::ResourceProviders {
 			for(size_t idx = 0; idx < vertices.size(); idx++)
 				vertices[idx].UV = { mesh->mTextureCoords[0][idx].x, mesh->mTextureCoords[0][idx].y };
 
-			if(mesh->mColors != nullptr) for (size_t idx = 0; idx < vertices.size(); idx++)
+			for (size_t idx = 0; idx < vertices.size(); idx++)
 				vertices[idx].color = { 1, 1, 1, 1 };
 
 			indices = std::vector<uint32_t>(3 * mesh->mNumFaces);
