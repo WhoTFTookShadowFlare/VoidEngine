@@ -1,4 +1,4 @@
-#include "ve/io/gfx/opengl/mesh.hpp"
+#include "mesh_opengl.hpp"
 #include "ve/io/gfx/vertex.hpp"
 #include <cstddef>
 #include <cstdint>

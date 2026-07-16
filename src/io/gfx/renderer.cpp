@@ -1,17 +1,23 @@
 #include "ve/io/gfx/renderer.hpp"
-#include "ve/io/gfx/opengl/backend.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/math/rect2.hpp"
 #include <cstdint>
 #include <memory>
 
+#ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
+#include "backend_opengl.hpp"
+#endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
+
+
 namespace VoidEngine::IO::GFX {
 	using std::shared_ptr;
 	shared_ptr<Renderer> Renderer::instance = nullptr;
 
 	Renderer::Renderer() {
+#ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
 		backend = new OpenGL::RendererOpenGL;
+#endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
 	}
 
 	Renderer::~Renderer() {

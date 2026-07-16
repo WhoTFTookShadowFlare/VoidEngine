@@ -20,9 +20,6 @@ endif()
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/SDL3/CMakeLists.txt)
 	message(FATAL_ERROR "Missing submodule SDL3")
 endif()
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/glbinding/CMakeLists.txt)
-	message(FATAL_ERROR "Missing submodule glbinding")
-endif()
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/glm/CMakeLists.txt)
 	message(FATAL_ERROR "Missing submodule glm")
 endif()
@@ -46,10 +43,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/lib>)
 
 add_subdirectory(extern/SDL3)
 
-set(OPTION_BUILD_TOOLS OFF)
-set(OPTION_BUILD_EXAMPLES OFF)
-add_subdirectory(extern/glbinding)
-
 if(WIN32)
 	if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extern/assimp)
 		message(FATAL_ERROR "Missing submodule assimp")
@@ -72,8 +65,7 @@ if(MSVC)
 	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 	add_compile_options(/GR-)
 else()
-	add_compile_options(-fno-rtti)
-	target_compile_options(VoidEngine PUBLIC -Wall -Werror)
+	target_compile_options(VoidEngine PUBLIC -fno-rtti -Wall -Werror)
 endif()
 
 target_include_directories(VoidEngine PRIVATE
@@ -81,7 +73,6 @@ target_include_directories(VoidEngine PRIVATE
 )
 target_link_libraries(VoidEngine PRIVATE
 	SDL3::SDL3
-	glbinding::glbinding glbinding::glbinding-aux
 	OpenAL::OpenAL
 )
 target_include_directories(VoidEngine PUBLIC
@@ -97,14 +88,4 @@ target_include_directories(VoidEngine PUBLIC
 	extern/glm
 )
 
-add_custom_command(TARGET VoidEngine POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-	$<TARGET_FILE:glbinding::glbinding> ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-)
-
-add_custom_command(TARGET VoidEngine POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-	$<TARGET_FILE:glbinding::glbinding-aux> ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-)
-
-add_subdirectory(components)
+include(components/CMakeLists.txt)

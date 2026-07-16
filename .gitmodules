@@ -1,5 +1,5 @@
 [submodule "extern/glbinding"]
-	path = extern/glbinding
+	path = components/graphics/opengl/glbinding
 	url = https://github.com/cginternals/glbinding
 [submodule "extern/SDL3"]
 	path = extern/SDL3

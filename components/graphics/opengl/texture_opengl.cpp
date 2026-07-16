@@ -1,4 +1,4 @@
-#include "ve/io/gfx/opengl/texture.hpp"
+#include "texture_opengl.hpp"
 #include "ve/io/gfx/texture.hpp"
 #include "ve/io/res_providers/texture/a_provider.hpp"
 #include <cstdint>

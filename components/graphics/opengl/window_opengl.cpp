@@ -1,4 +1,4 @@
-#include "ve/io/gfx/opengl/window.hpp"
+#include "window_opengl.hpp"
 #include "SDL3/SDL_error.h"
 #include "SDL3/SDL_video.h"
 #include "glbinding/gl/enum.h"

@@ -1,4 +1,4 @@
-#include "ve/io/gfx/opengl/render_target.hpp"
+#include "render_target_opengl.hpp"
 
 #include <glbinding/gl40/gl.h>
 

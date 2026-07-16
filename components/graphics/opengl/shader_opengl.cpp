@@ -1,4 +1,4 @@
-#include "ve/io/gfx/opengl/shader.hpp"
+#include "shader_opengl.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include <cstdint>
 #include <glbinding/gl/boolean.h>
