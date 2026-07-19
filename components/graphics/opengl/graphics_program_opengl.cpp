@@ -2,6 +2,7 @@
 #include "ve/io/gfx/mesh.hpp"
 #include "shader_opengl.hpp"
 #include "ve/io/gfx/program_uniform.hpp"
+#include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/shader.hpp"
 #include <algorithm>
 #include <cstdint>
@@ -89,6 +90,11 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		if(optUniformAlbedoTexture.has_value()) {
 			setUniform(optUniformAlbedoTexture.value(), material->getAlbedoTexture());
 			material->getAlbedoTexture()->bindTexture();
+		}
+
+		auto optUniformCameraPosition = queryUniform("cameraPosition");
+		if(optUniformCameraPosition.has_value()) {
+			setUniform(optUniformCameraPosition.value(), Renderer::getInstance()->getCameraPosition());
 		}
 
 		glUseProgram(program);

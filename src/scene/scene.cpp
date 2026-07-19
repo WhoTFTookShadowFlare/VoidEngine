@@ -352,13 +352,15 @@ namespace VoidEngine::Scene {
 	}
 
 	void Scene::draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target) {
-		target->bindRenderTarget();
-		IO::GFX::Renderer::getInstance()->useDepth(true);
+		auto renderer = IO::GFX::Renderer::getInstance();
+		renderer->bindRenderTarget(target);
+		renderer->useDepth(true);
+		if(currentCamera != nullptr) renderer->setCameraPosition(currentCamera->getPosition().asVec3().value());
 		Events::ESceneDraw draw(delta, target, shared_from_this());
 		std::for_each(objects.begin(), objects.end(), [&draw](auto& obj) {
 			obj.second->draw(draw);
 		});
-		target->bindRenderTarget();
+		renderer->bindRenderTarget(target);
 		IO::GFX::Renderer::getInstance()->useDepth(false);
 	}
 }
