@@ -62,7 +62,7 @@ namespace VoidEngine::Scene {
 		return compList;
 	}
 
-	glm::mat4 GameObject::getModelMatrix() {
+	glm::mat4 GameObject::getModelMatrix() const {
 		glm::mat4 matrix(1.0f);
 
 		matrix = glm::translate(matrix, position);

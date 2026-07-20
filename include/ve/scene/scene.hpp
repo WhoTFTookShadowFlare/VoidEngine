@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ve/io/gfx/render_frame.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/object.hpp"
 #include "ve/scene/game_object.hpp"
@@ -39,6 +40,6 @@ namespace VoidEngine::Scene {
 		void setCamera(std::shared_ptr<GameObject>);
 		std::shared_ptr<GameObject> getCamera();
 
-		void draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target);
+		std::shared_ptr<IO::GFX::RenderFrame> draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target);
 	};
 }

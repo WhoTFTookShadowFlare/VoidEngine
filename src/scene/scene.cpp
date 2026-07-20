@@ -1,4 +1,5 @@
 #include "ve/scene/scene.hpp"
+#include "ve/io/gfx/render_frame.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/res_providers/model/file_provider.hpp"
@@ -351,16 +352,24 @@ namespace VoidEngine::Scene {
 		return currentCamera;
 	}
 
-	void Scene::draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target) {
+	std::shared_ptr<IO::GFX::RenderFrame> Scene::draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target) {
+		auto frame = IO::GFX::RenderFrame::create();
+		frame->setTarget(target);
 		auto renderer = IO::GFX::Renderer::getInstance();
-		renderer->bindRenderTarget(target);
-		renderer->useDepth(true);
-		if(currentCamera != nullptr) renderer->setCameraPosition(currentCamera->getPosition().asVec3().value());
-		Events::ESceneDraw draw(delta, target, shared_from_this());
+		// renderer->bindRenderTarget(target);
+		// renderer->useDepth(true);
+		if(currentCamera != nullptr) {
+			auto camComp = std::static_pointer_cast<Components::ACamera>(currentCamera->getFirstOfType(&Components::ACamera::ClassData));
+			frame->setView(camComp->getView(currentCamera));
+			frame->setProjection(camComp->getProjection(target));
+		}
+		Events::ESceneDraw draw(delta, frame, shared_from_this());
 		std::for_each(objects.begin(), objects.end(), [&draw](auto& obj) {
 			obj.second->draw(draw);
 		});
-		renderer->bindRenderTarget(target);
-		IO::GFX::Renderer::getInstance()->useDepth(false);
+		// renderer->bindRenderTarget(target);
+		// IO::GFX::Renderer::getInstance()->useDepth(false);
+
+		return frame;
 	}
 }

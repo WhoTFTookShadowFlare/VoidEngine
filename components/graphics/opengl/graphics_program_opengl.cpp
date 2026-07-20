@@ -86,15 +86,35 @@ namespace VoidEngine::IO::GFX::OpenGL {
 			return;
 		}
 
-		auto optUniformAlbedoTexture = queryUniform("material.albedo");
-		if(optUniformAlbedoTexture.has_value()) {
-			setUniform(optUniformAlbedoTexture.value(), material->getAlbedoTexture());
+		auto optUniform = queryUniform("material.albedo");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getAlbedoTexture());
 			material->getAlbedoTexture()->bindTexture();
 		}
 
-		auto optUniformCameraPosition = queryUniform("cameraPosition");
-		if(optUniformCameraPosition.has_value()) {
-			setUniform(optUniformCameraPosition.value(), Renderer::getInstance()->getCameraPosition());
+		optUniform = queryUniform("material.ambient");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getAmbient());
+		}
+
+		optUniform = queryUniform("material.diffuse");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getDiffuse());
+		}
+
+		optUniform = queryUniform("material.specular");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getSpecular());
+		}
+
+		optUniform = queryUniform("material.shininess");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getShininess());
+		}
+
+		optUniform = queryUniform("cameraPosition");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), Renderer::getInstance()->getCameraPosition());
 		}
 
 		glUseProgram(program);

@@ -27,4 +27,36 @@ namespace VoidEngine::IO::GFX {
 	std::shared_ptr<Texture> Material::getAlbedoTexture() {
 		return albedo;
 	}
+
+	void Material::setAmbient(glm::vec3 value) {
+		ambient = value;
+	}
+
+	glm::vec3 Material::getAmbient() {
+		return ambient;
+	}
+
+	void Material::setDiffuse(glm::vec3 value) {
+		diffuse = value;
+	}
+
+	glm::vec3 Material::getDiffuse() {
+		return diffuse;
+	}
+
+	void Material::setSpecular(glm::vec3 value) {
+		specular = value;
+	}
+
+	glm::vec3 Material::getSpecular() {
+		return specular;
+	}
+
+	void Material::setShininess(float value) {
+		shininess = value;
+	}
+
+	float Material::getShininess() {
+		return shininess;
+	}
 }

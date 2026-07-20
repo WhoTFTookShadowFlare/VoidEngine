@@ -11,8 +11,6 @@ namespace VoidEngine::IO {
 }
 
 namespace VoidEngine::Scene::Components {
-	class TransformComponent;
-
 	class ACamera : public AObjectComponent {
 	private:
 		float zFar = 200.0f;
