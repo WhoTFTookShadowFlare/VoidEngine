@@ -352,9 +352,18 @@ namespace VoidEngine::Scene {
 		return currentCamera;
 	}
 
+	IO::GFX::DirectionalLight Scene::getDirectionalLight() {
+		return light;
+	}
+
+	void Scene::setDirectionalLight(IO::GFX::DirectionalLight value) {
+		light = value;
+	}
+
 	std::shared_ptr<IO::GFX::RenderFrame> Scene::draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target) {
 		auto frame = IO::GFX::RenderFrame::create();
 		frame->setTarget(target);
+		frame->setDirectionalLight(light);
 		auto renderer = IO::GFX::Renderer::getInstance();
 		// renderer->bindRenderTarget(target);
 		// renderer->useDepth(true);

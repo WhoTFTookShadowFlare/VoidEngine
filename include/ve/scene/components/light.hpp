@@ -7,30 +7,40 @@
 #include <memory>
 
 namespace VoidEngine::Scene::Components {
-	class LightComponent final : public AObjectComponent,
-		public Event::IEventListener<Events::EComponentDraw>
+	class LightComponent : public AObjectComponent
 	{
 	private:
-		glm::vec3 ambient = { 1.0f, 1.0f, 1.0f };
 		glm::vec3 diffuse = { 1.0f, 1.0f, 1.0f };
 		glm::vec3 specular = { 1.0f, 1.0f, 1.0f };
 
+	protected:
 		LightComponent();
+	
 	public:
 		static const Class ClassData;
 		virtual const Class* getClass() const { return &ClassData; }
-
-		static std::shared_ptr<LightComponent> create();
-
-		void onEvent(Events::EComponentDraw&);
-		
-		glm::vec3 getAmbient();
-		void setAmbient(glm::vec3);
 
 		glm::vec3 getDiffuse();
 		void setDiffuse(glm::vec3);
 
 		glm::vec3 getSpecular();
 		void setSpecular(glm::vec3);
+	};
+
+	class PointLightComponent final : public LightComponent,
+		public Event::IEventListener<Events::EComponentDraw>
+	{
+	private:
+		float constant = 1.0f;
+		float linear = 0.09f;
+		float quadratic = 0.032f;
+
+	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
+
+		static std::shared_ptr<PointLightComponent> create();
+
+		void onEvent(Events::EComponentDraw&);
 	};
 }

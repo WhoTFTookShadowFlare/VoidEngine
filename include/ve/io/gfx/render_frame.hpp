@@ -25,7 +25,16 @@ namespace VoidEngine::IO::GFX {
 	private:
 		std::vector<std::shared_ptr<RenderFrame>> dependancies = {};
 
-		std::vector<Light> lights = {};
+		DirectionalLight directionalLight = {
+			{ 
+				{ 1.0f, 1.0f, 1.0f },
+				{ 1.0f, 1.0f, 1.0f }
+			},
+			{ 0.1f, -1.0f, -0.1f }
+		};
+		
+		std::vector<PointLight> pointLights = {};
+
 		std::vector<FrameDrawEntry> draws = {};
 
 		glm::mat4 projection = glm::mat4(1.0f);
@@ -48,7 +57,10 @@ namespace VoidEngine::IO::GFX {
 
 		void addDependency(std::shared_ptr<RenderFrame>);
 
-		void addLight(Light);
+		void setDirectionalLight(DirectionalLight);
+		DirectionalLight getDirectionalLight();
+
+		void addLight(PointLight);
 		void addDraw(std::shared_ptr<Mesh>, std::shared_ptr<GraphicsProgram>, glm::mat4 modelMatrix);
 
 		void render() const;

@@ -86,25 +86,16 @@ namespace VoidEngine::IO::GFX::OpenGL {
 			return;
 		}
 
-		auto optUniform = queryUniform("material.albedo");
+		auto optUniform = queryUniform("material.diffuse");
 		if(optUniform.has_value()) {
-			setUniform(optUniform.value(), material->getAlbedoTexture());
-			material->getAlbedoTexture()->bindTexture();
-		}
-
-		optUniform = queryUniform("material.ambient");
-		if(optUniform.has_value()) {
-			setUniform(optUniform.value(), material->getAmbient());
-		}
-
-		optUniform = queryUniform("material.diffuse");
-		if(optUniform.has_value()) {
-			setUniform(optUniform.value(), material->getDiffuse());
+			setUniform(optUniform.value(), material->getDiffuseTexture());
+			material->getDiffuseTexture()->bindTexture();
 		}
 
 		optUniform = queryUniform("material.specular");
 		if(optUniform.has_value()) {
-			setUniform(optUniform.value(), material->getSpecular());
+			setUniform(optUniform.value(), material->getSpecularTexture());
+			material->getSpecularTexture()->bindTexture();
 		}
 
 		optUniform = queryUniform("material.shininess");

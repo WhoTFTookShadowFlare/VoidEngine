@@ -1,5 +1,6 @@
 #include "ve/io/gfx/render_frame.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "ve/io/gfx/light.hpp"
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/graphics_program.hpp"
 #include <algorithm>
@@ -56,8 +57,16 @@ namespace VoidEngine::IO::GFX {
 		dependancies.push_back(frame);
 	}
 
-	void RenderFrame::addLight(Light light) {
-		lights.push_back(light);
+	void RenderFrame::setDirectionalLight(DirectionalLight value) {
+		directionalLight = value;
+	}
+
+	DirectionalLight RenderFrame::getDirectionalLight() {
+		return directionalLight;
+	}
+
+	void RenderFrame::addLight(PointLight light) {
+		pointLights.push_back(light);
 	}
 
 	void RenderFrame::addDraw(std::shared_ptr<Mesh> mesh, std::shared_ptr<GraphicsProgram> program, glm::mat4 modelMatrix) {
@@ -84,19 +93,36 @@ namespace VoidEngine::IO::GFX {
 			optMatrix = program->queryUniform("uProjection");
 			if(optMatrix.has_value()) program->setUniform(optMatrix.value(), projection);
 
+			auto optLight = program->queryUniform("directionalLight.direction");
+			if(optLight.has_value()) {
+				program->setUniform(optLight.value(), directionalLight.direction);
+
+				optLight = program->queryUniform("directionalLight.light.diffuse");
+				program->setUniform(optLight.value(), directionalLight.diffuse);
+
+				optLight = program->queryUniform("directionalLight.light.specular");
+				program->setUniform(optLight.value(), directionalLight.specular);
+			}
+
 			{
-				auto optLight = program->queryUniform("light.position");
+				optLight = program->queryUniform("pointLight.position");
 				if(!optLight.has_value()) {} //break;
-				program->setUniform(optLight.value(), lights[0].position);
+				program->setUniform(optLight.value(), pointLights[0].position);
 
-				optLight = program->queryUniform("light.ambient");
-				program->setUniform(optLight.value(), lights[0].ambient);
+				optLight = program->queryUniform("pointLight.light.diffuse");
+				program->setUniform(optLight.value(), pointLights[0].diffuse);
 
-				optLight = program->queryUniform("light.diffuse");
-				program->setUniform(optLight.value(), lights[0].diffuse);
+				optLight = program->queryUniform("pointLight.light.specular");
+				program->setUniform(optLight.value(), pointLights[0].specular);
+				
+				optLight = program->queryUniform("pointLight.constant");
+				program->setUniform(optLight.value(), pointLights[0].constant);
 
-				optLight = program->queryUniform("light.specular");
-				program->setUniform(optLight.value(), lights[0].specular);
+				optLight = program->queryUniform("pointLight.linear");
+				program->setUniform(optLight.value(), pointLights[0].linear);
+
+				optLight = program->queryUniform("pointLight.quadratic");
+				program->setUniform(optLight.value(), pointLights[0].quadratic);
 			}
 
 			program->draw(draw.getMesh());
