@@ -18,4 +18,16 @@ namespace VoidEngine::IO::GFX {
 		float linear;
 		float quadratic;
 	};
+
+	struct SpotLight final : public Light {
+		glm::vec3 position;
+		glm::vec3 direction;
+
+		float constant;
+		float linear;
+		float quadratic;
+
+		float cutoffAngle;
+		float outerCutoffAngle;
+	};
 }

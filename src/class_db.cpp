@@ -19,6 +19,7 @@ namespace VoidEngine {
 
 		registerAbstractClass<Scene::Components::LightComponent, Scene::AObjectComponent>();
 		registerClass<Scene::Components::PointLightComponent, Scene::Components::LightComponent>();
+		registerClass<Scene::Components::SpotLightComponent, Scene::Components::LightComponent>();
 		registerClass<Scene::Components::MeshComponent, Scene::AObjectComponent>();
 
 		registerClass<Scene::Components::SoundComponent, Scene::AObjectComponent>();

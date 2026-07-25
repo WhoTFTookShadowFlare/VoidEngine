@@ -43,4 +43,23 @@ namespace VoidEngine::Scene::Components {
 
 		void onEvent(Events::EComponentDraw&);
 	};
+
+	class SpotLightComponent final : public LightComponent,
+		public Event::IEventListener<Events::EComponentDraw>
+	{
+	private:
+		float constant = 1.0f;
+		float linear = 0.09f;
+		float quadratic = 0.032f;
+
+		float cutoffAngle = 12.5f;
+		float outerCutoffAngle = 17.5f;
+	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
+
+		static std::shared_ptr<SpotLightComponent> create();
+
+		void onEvent(Events::EComponentDraw&);
+	};
 }

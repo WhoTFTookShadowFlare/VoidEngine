@@ -34,6 +34,7 @@ namespace VoidEngine::IO::GFX {
 		};
 		
 		std::vector<PointLight> pointLights = {};
+		std::vector<SpotLight> spotLights = {};
 
 		std::vector<FrameDrawEntry> draws = {};
 
@@ -60,7 +61,8 @@ namespace VoidEngine::IO::GFX {
 		void setDirectionalLight(DirectionalLight);
 		DirectionalLight getDirectionalLight();
 
-		void addLight(PointLight);
+		void addPointLight(PointLight);
+		void addSpotLight(SpotLight);
 		void addDraw(std::shared_ptr<Mesh>, std::shared_ptr<GraphicsProgram>, glm::mat4 modelMatrix);
 
 		void render() const;

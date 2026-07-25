@@ -1,5 +1,6 @@
 #include "ve/io/gfx/render_frame.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "glm/trigonometric.hpp"
 #include "ve/io/gfx/light.hpp"
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/graphics_program.hpp"
@@ -65,8 +66,12 @@ namespace VoidEngine::IO::GFX {
 		return directionalLight;
 	}
 
-	void RenderFrame::addLight(PointLight light) {
+	void RenderFrame::addPointLight(PointLight light) {
 		pointLights.push_back(light);
+	}
+
+	void RenderFrame::addSpotLight(SpotLight light) {
+		spotLights.push_back(light);
 	}
 
 	void RenderFrame::addDraw(std::shared_ptr<Mesh> mesh, std::shared_ptr<GraphicsProgram> program, glm::mat4 modelMatrix) {
@@ -104,7 +109,7 @@ namespace VoidEngine::IO::GFX {
 				program->setUniform(optLight.value(), directionalLight.specular);
 			}
 
-			{
+			if(false) {
 				optLight = program->queryUniform("pointLight.position");
 				if(!optLight.has_value()) {} //break;
 				program->setUniform(optLight.value(), pointLights[0].position);
@@ -123,6 +128,36 @@ namespace VoidEngine::IO::GFX {
 
 				optLight = program->queryUniform("pointLight.quadratic");
 				program->setUniform(optLight.value(), pointLights[0].quadratic);
+			}
+
+			{
+				optLight = program->queryUniform("spotLight.position");
+				if(!optLight.has_value()) {} //break;
+				program->setUniform(optLight.value(), spotLights[0].position);
+
+				optLight = program->queryUniform("spotLight.direction");
+				program->setUniform(optLight.value(), spotLights[0].direction);
+
+				optLight = program->queryUniform("spotLight.cutoffAngle");
+				program->setUniform(optLight.value(), glm::cos(glm::radians(spotLights[0].cutoffAngle)));
+
+				optLight = program->queryUniform("spotLight.outerCutoffAngle");
+				program->setUniform(optLight.value(), glm::cos(glm::radians(spotLights[0].outerCutoffAngle)));
+
+				optLight = program->queryUniform("spotLight.light.diffuse");
+				program->setUniform(optLight.value(), spotLights[0].diffuse);
+
+				optLight = program->queryUniform("spotLight.light.specular");
+				program->setUniform(optLight.value(), spotLights[0].specular);
+				
+				optLight = program->queryUniform("spotLight.constant");
+				program->setUniform(optLight.value(), spotLights[0].constant);
+
+				optLight = program->queryUniform("spotLight.linear");
+				program->setUniform(optLight.value(), spotLights[0].linear);
+
+				optLight = program->queryUniform("spotLight.quadratic");
+				program->setUniform(optLight.value(), spotLights[0].quadratic);
 			}
 
 			program->draw(draw.getMesh());
