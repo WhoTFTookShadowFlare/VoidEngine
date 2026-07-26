@@ -45,6 +45,9 @@ namespace VoidEngine::IO::GFX {
 
 		RenderFrame();
 	public:
+		const int32_t MAX_POINT_LIGHTS = 4;
+		const int32_t MAX_SPOT_LIGHTS = 4;
+
 		static std::shared_ptr<RenderFrame> create();
 
 		std::shared_ptr<IRenderTarget> getTarget();

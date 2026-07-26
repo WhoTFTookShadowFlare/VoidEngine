@@ -1,4 +1,5 @@
 #include "ve/io/gfx/render_frame.hpp"
+#include "glm/common.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/trigonometric.hpp"
 #include "ve/io/gfx/light.hpp"
@@ -109,55 +110,57 @@ namespace VoidEngine::IO::GFX {
 				program->setUniform(optLight.value(), directionalLight.specular);
 			}
 
-			if(false) {
-				optLight = program->queryUniform("pointLight.position");
-				if(!optLight.has_value()) {} //break;
-				program->setUniform(optLight.value(), pointLights[0].position);
+			optLight = program->queryUniform("pointLightCount");
+			program->setUniform(optLight.value(), (int32_t) pointLights.size());
+			for(size_t idx = 0; idx < glm::min((size_t) MAX_POINT_LIGHTS, pointLights.size()); idx++) {
+				auto optLight = program->queryUniform(std::format("pointLight[{}].position", idx));
+				program->setUniform(optLight.value(), pointLights[idx].position);
 
-				optLight = program->queryUniform("pointLight.light.diffuse");
-				program->setUniform(optLight.value(), pointLights[0].diffuse);
+				optLight = program->queryUniform(std::format("pointLight[{}].light.diffuse", idx));
+				program->setUniform(optLight.value(), pointLights[idx].diffuse);
 
-				optLight = program->queryUniform("pointLight.light.specular");
-				program->setUniform(optLight.value(), pointLights[0].specular);
+				optLight = program->queryUniform(std::format("pointLight[{}].light.specular", idx));
+				program->setUniform(optLight.value(), pointLights[idx].specular);
 				
-				optLight = program->queryUniform("pointLight.constant");
-				program->setUniform(optLight.value(), pointLights[0].constant);
+				optLight = program->queryUniform(std::format("pointLight[{}].constant", idx));
+				program->setUniform(optLight.value(), pointLights[idx].constant);
 
-				optLight = program->queryUniform("pointLight.linear");
-				program->setUniform(optLight.value(), pointLights[0].linear);
+				optLight = program->queryUniform(std::format("pointLight[{}].linear", idx));
+				program->setUniform(optLight.value(), pointLights[idx].linear);
 
-				optLight = program->queryUniform("pointLight.quadratic");
-				program->setUniform(optLight.value(), pointLights[0].quadratic);
+				optLight = program->queryUniform(std::format("pointLight[{}].quadratic", idx));
+				program->setUniform(optLight.value(), pointLights[idx].quadratic);
 			}
 
-			{
-				optLight = program->queryUniform("spotLight.position");
-				if(!optLight.has_value()) {} //break;
-				program->setUniform(optLight.value(), spotLights[0].position);
+			optLight = program->queryUniform("spotLightCount");
+			program->setUniform(optLight.value(), (int32_t) spotLights.size());
+			for(size_t idx = 0; idx < glm::min((size_t) MAX_SPOT_LIGHTS, spotLights.size()); idx++) {
+				auto optLight = program->queryUniform(std::format("spotLight[{}].position", idx));
+				program->setUniform(optLight.value(), spotLights[idx].position);
 
-				optLight = program->queryUniform("spotLight.direction");
-				program->setUniform(optLight.value(), spotLights[0].direction);
+				optLight = program->queryUniform(std::format("spotLight[{}].direction", idx));
+				program->setUniform(optLight.value(), spotLights[idx].direction);
 
-				optLight = program->queryUniform("spotLight.cutoffAngle");
-				program->setUniform(optLight.value(), glm::cos(glm::radians(spotLights[0].cutoffAngle)));
+				optLight = program->queryUniform(std::format("spotLight[{}].cutoffAngle", idx));
+				program->setUniform(optLight.value(), glm::cos(glm::radians(spotLights[idx].cutoffAngle)));
 
-				optLight = program->queryUniform("spotLight.outerCutoffAngle");
-				program->setUniform(optLight.value(), glm::cos(glm::radians(spotLights[0].outerCutoffAngle)));
+				optLight = program->queryUniform(std::format("spotLight[{}].outerCutoffAngle", idx));
+				program->setUniform(optLight.value(), glm::cos(glm::radians(spotLights[idx].outerCutoffAngle)));
 
-				optLight = program->queryUniform("spotLight.light.diffuse");
-				program->setUniform(optLight.value(), spotLights[0].diffuse);
+				optLight = program->queryUniform(std::format("spotLight[{}].light.diffuse", idx));
+				program->setUniform(optLight.value(), spotLights[idx].diffuse);
 
-				optLight = program->queryUniform("spotLight.light.specular");
-				program->setUniform(optLight.value(), spotLights[0].specular);
+				optLight = program->queryUniform(std::format("spotLight[{}].light.specular", idx));
+				program->setUniform(optLight.value(), spotLights[idx].specular);
 				
-				optLight = program->queryUniform("spotLight.constant");
-				program->setUniform(optLight.value(), spotLights[0].constant);
+				optLight = program->queryUniform(std::format("spotLight[{}].constant", idx));
+				program->setUniform(optLight.value(), spotLights[idx].constant);
 
-				optLight = program->queryUniform("spotLight.linear");
-				program->setUniform(optLight.value(), spotLights[0].linear);
+				optLight = program->queryUniform(std::format("spotLight[{}].linear", idx));
+				program->setUniform(optLight.value(), spotLights[idx].linear);
 
-				optLight = program->queryUniform("spotLight.quadratic");
-				program->setUniform(optLight.value(), spotLights[0].quadratic);
+				optLight = program->queryUniform(std::format("spotLight[{}].quadratic", idx));
+				program->setUniform(optLight.value(), spotLights[idx].quadratic);
 			}
 
 			program->draw(draw.getMesh());
