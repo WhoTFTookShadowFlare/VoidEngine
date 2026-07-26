@@ -77,6 +77,14 @@ namespace VoidEngine::IO::GFX {
 		backend->useDepth(value);
 	}
 
+	void Renderer::setCameraPosition(glm::vec3 value) {
+		cameraPosition = value;
+	}
+
+	glm::vec3 Renderer::getCameraPosition() {
+		return cameraPosition;
+	}
+
 	shared_ptr<Window> Renderer::createWindow(Window::CreationOptions& options) {
 		if(backend == nullptr) return nullptr;
 		return backend->createWindow(options);

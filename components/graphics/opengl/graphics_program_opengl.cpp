@@ -2,6 +2,7 @@
 #include "ve/io/gfx/mesh.hpp"
 #include "shader_opengl.hpp"
 #include "ve/io/gfx/program_uniform.hpp"
+#include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/shader.hpp"
 #include <algorithm>
 #include <cstdint>
@@ -85,10 +86,26 @@ namespace VoidEngine::IO::GFX::OpenGL {
 			return;
 		}
 
-		auto optUniformAlbedoTexture = queryUniform("material.albedo");
-		if(optUniformAlbedoTexture.has_value()) {
-			setUniform(optUniformAlbedoTexture.value(), material->getAlbedoTexture());
-			material->getAlbedoTexture()->bindTexture();
+		auto optUniform = queryUniform("material.diffuse");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getDiffuseTexture());
+			material->getDiffuseTexture()->bindTexture();
+		}
+
+		optUniform = queryUniform("material.specular");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getSpecularTexture());
+			material->getSpecularTexture()->bindTexture();
+		}
+
+		optUniform = queryUniform("material.shininess");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), material->getShininess());
+		}
+
+		optUniform = queryUniform("cameraPosition");
+		if(optUniform.has_value()) {
+			setUniform(optUniform.value(), Renderer::getInstance()->getCameraPosition());
 		}
 
 		glUseProgram(program);

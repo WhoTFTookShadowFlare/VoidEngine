@@ -41,7 +41,7 @@ namespace VoidEngine::Scene {
 
 		std::string getName() const;
 
-		glm::mat4 getModelMatrix();
+		glm::mat4 getModelMatrix() const;
 
 		std::vector<std::shared_ptr<GameObject>> getChildren();
 		std::vector<std::shared_ptr<AObjectComponent>> getComponents();

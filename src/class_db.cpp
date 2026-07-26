@@ -1,6 +1,7 @@
 #include "ve/class_db.hpp"
 
 #include "ve/object.hpp"
+#include "ve/scene/components/light.hpp"
 #include "ve/scene/components/mesh.hpp"
 #include "ve/scene/components/sound.hpp"
 #include "ve/scene/components/camera.hpp"
@@ -16,6 +17,9 @@ namespace VoidEngine {
 
 		registerAbstractClass<Scene::AObjectComponent, Object>();
 
+		registerAbstractClass<Scene::Components::LightComponent, Scene::AObjectComponent>();
+		registerClass<Scene::Components::PointLightComponent, Scene::Components::LightComponent>();
+		registerClass<Scene::Components::SpotLightComponent, Scene::Components::LightComponent>();
 		registerClass<Scene::Components::MeshComponent, Scene::AObjectComponent>();
 
 		registerClass<Scene::Components::SoundComponent, Scene::AObjectComponent>();

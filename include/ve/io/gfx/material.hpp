@@ -9,7 +9,8 @@
 namespace VoidEngine::IO::GFX {
 	class Material final : public Object {
 	private:
-		std::shared_ptr<Texture> albedo;
+		std::shared_ptr<Texture> diffuse, specular;
+		float shininess = 32.0f;
 
 		Material();
 	public:
@@ -21,6 +22,17 @@ namespace VoidEngine::IO::GFX {
 		void setAlbedo(std::shared_ptr<ResourceProviders::ATextureProvider>);
 		std::shared_ptr<ResourceProviders::ATextureProvider> getAlbedo();
 
+		void setDiffuse(std::shared_ptr<ResourceProviders::ATextureProvider>);
+		std::shared_ptr<ResourceProviders::ATextureProvider> getDiffuse();
+
+		void setSpecular(std::shared_ptr<ResourceProviders::ATextureProvider>);
+		std::shared_ptr<ResourceProviders::ATextureProvider> getSpecular();
+
+		void setShininess(float);
+		float getShininess();
+
 		std::shared_ptr<Texture> getAlbedoTexture();
+		std::shared_ptr<Texture> getDiffuseTexture();
+		std::shared_ptr<Texture> getSpecularTexture();
 	};
 }

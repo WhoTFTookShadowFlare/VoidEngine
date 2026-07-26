@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glm/ext/vector_float3.hpp"
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/gfx/renderer_backend.hpp"
@@ -19,6 +20,8 @@ namespace VoidEngine::IO::GFX {
 		friend class ::VoidEngine::IO::Window;
 		static shared_ptr<Renderer> instance;
 		ARendererBackend *backend = nullptr;
+
+		glm::vec3 cameraPosition;
 	
 		void setupWindow(Window*);
 		void destroyWindow(Window*);
@@ -37,6 +40,9 @@ namespace VoidEngine::IO::GFX {
 		void setDrawArea(std::optional<VoidEngine::Math::Rect2i>);
 
 		void useDepth(bool);
+
+		void setCameraPosition(glm::vec3);
+		glm::vec3 getCameraPosition();
 
 		shared_ptr<Window> createWindow(Window::CreationOptions&);
 

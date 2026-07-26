@@ -1,5 +1,6 @@
 #include "ve/io/gfx/material.hpp"
 #include "ve/io/gfx/renderer.hpp"
+#include "ve/io/gfx/texture.hpp"
 #include "ve/io/res_providers/texture/a_provider.hpp"
 #include <memory>
 
@@ -8,7 +9,8 @@ namespace VoidEngine::IO::GFX {
 
 	Material::Material() {
 		auto renderer = Renderer::getInstance();
-		albedo = renderer->createTexture(0);
+		diffuse = renderer->createTexture(0);
+		specular = renderer->createTexture(1);
 	}
 
 	std::shared_ptr<Material> Material::create() {
@@ -16,15 +18,35 @@ namespace VoidEngine::IO::GFX {
 		return self;
 	}
 
-	void Material::setAlbedo(std::shared_ptr<ResourceProviders::ATextureProvider> value) {
-		albedo->setTextureProvider(value);
+	void Material::setDiffuse(std::shared_ptr<ResourceProviders::ATextureProvider> value) {
+		diffuse->setTextureProvider(value);
 	}
 
-	std::shared_ptr<ResourceProviders::ATextureProvider> Material::getAlbedo() {
-		return albedo->getTextureProvider();
+	std::shared_ptr<ResourceProviders::ATextureProvider> Material::getDiffuse() {
+		return diffuse->getTextureProvider();
 	}
 
-	std::shared_ptr<Texture> Material::getAlbedoTexture() {
-		return albedo;
+	std::shared_ptr<Texture> Material::getDiffuseTexture() {
+		return diffuse;
+	}
+
+	void Material::setSpecular(std::shared_ptr<ResourceProviders::ATextureProvider> value) {
+		specular->setTextureProvider(value);
+	}
+
+	std::shared_ptr<ResourceProviders::ATextureProvider> Material::getSpecular() {
+		return specular->getTextureProvider();
+	}
+
+	std::shared_ptr<Texture> Material::getSpecularTexture() {
+		return specular;
+	}
+
+	void Material::setShininess(float value) {
+		shininess = value;
+	}
+
+	float Material::getShininess() {
+		return shininess;
 	}
 }
