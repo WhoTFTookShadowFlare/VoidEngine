@@ -9,6 +9,7 @@
 #include "ve/math/rect2.hpp"
 #include "ve/class_db.hpp"
 #include "ve/scene/component_updater.hpp"
+#include "ve/script/script_engines.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_rect.h>
@@ -97,6 +98,11 @@ namespace VoidEngine {
 
 	std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> Engine::getDefaultWindowCloseEvent() const {
 		return winDefaultClose;
+	}
+
+	void Engine::setupScriptEngines() {
+		ClassDB::getInstance()->freezeClassList();
+		Scripts::ScriptEngines::getInstance();
 	}
 
 	double Engine::getDelta() const {

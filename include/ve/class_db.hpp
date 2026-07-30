@@ -3,12 +3,14 @@
 #include <algorithm>
 #include <memory>
 #include <print>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <functional>
 #include <concepts>
 #include <cassert>
+#include "ve/engine.hpp"
 #include "ve/variant.hpp"
 
 namespace VoidEngine {
@@ -114,10 +116,14 @@ namespace VoidEngine {
 	};
 
 	class ClassDB {
+		friend class Engine;
 	private:
 		static std::shared_ptr<ClassDB> instance;
 
 		std::unordered_map<std::string, const Class*> componentClasses;
+		bool classListFrozen = false;
+
+		void freezeClassList();
 
 		ClassDB();
 	public:
@@ -127,6 +133,7 @@ namespace VoidEngine {
 
 		template<IsAbstractClass clazz, IsAbstractClass parent>
 		void registerAbstractClass() {
+			if(classListFrozen) throw std::runtime_error("Cannot add classes once the class list is frozen");
 			Class *cls = (Class*) &clazz::ClassData;
 			cls->super = &parent::ClassData;
 

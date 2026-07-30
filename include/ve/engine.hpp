@@ -58,6 +58,8 @@ namespace VoidEngine {
 
 		[[nodiscard]] std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> getDefaultWindowCloseEvent() const;
 
+		void setupScriptEngines();
+
 		[[nodiscard]] double getDelta() const;
 
 		void pollEvents();

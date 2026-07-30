@@ -4,6 +4,7 @@
 #include <memory>
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/script/a_script_engine.hpp"
+#include "ve/script/a_script_module.hpp"
 
 namespace VoidEngine::Scripts {
 	class ScriptEngines final {
@@ -17,5 +18,6 @@ namespace VoidEngine::Scripts {
 		~ScriptEngines();
 
 		std::shared_ptr<Script> compileScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>);
+		std::shared_ptr<AScriptModule> compileModuleScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>);
 	};
 }

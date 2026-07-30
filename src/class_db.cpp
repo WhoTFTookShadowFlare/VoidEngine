@@ -11,6 +11,10 @@
 namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
 
+	void ClassDB::freezeClassList() {
+		classListFrozen = true;
+	}
+
 	ClassDB::ClassDB() {
 		registerClass<Scene::Scene, Object>();
 		// registerClass<Scene::GameObject, Object>();

@@ -3,7 +3,9 @@
 #include "lualib.h"
 #include "luacode.h"
 #include "luau_script.hpp"
+#include "luau_script_module.hpp"
 #include "ve/class_db.hpp"
+#include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/object.hpp"
 #include "ve/script/a_script_engine.hpp"
 #include "ve/variant.hpp"
@@ -42,14 +44,16 @@ namespace VoidEngine::Scripts::Luau {
 		{ nullptr, nullptr }
 	};
 
-	LuauScriptEngine::LuauScriptEngine() {
-		vmState = luaL_newstate();
-		luaL_openlibs(vmState);
-
+	void LuauScriptEngine::setupNativeTypes() {
 		luaL_register(vmState, "Object", objectLib);
 		lua_pop(vmState, 1);
 		
 		luaL_sandbox(vmState);
+	}
+
+	LuauScriptEngine::LuauScriptEngine() {
+		vmState = luaL_newstate();
+		luaL_openlibs(vmState);
 	}
 
 	LuauScriptEngine::~LuauScriptEngine() {
@@ -68,6 +72,14 @@ namespace VoidEngine::Scripts::Luau {
 		ByteCode retVal;
 		retVal.code = luau_compile(src.c_str(), src.length(), nullptr, &retVal.size);
 		return LuauScript::create(retVal);
+	}
+
+	std::shared_ptr<AScriptModule> LuauScriptEngine::compileModuleScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider> srcProvider) {
+		if(srcProvider == nullptr) return nullptr;
+		auto src = srcProvider->getShaderSource();
+		ByteCode retVal;
+		retVal.code = luau_compile(src.c_str(), src.length(), nullptr, &retVal.size);
+		return LuauScriptModule::create(retVal);
 	}
 
 	Variant LuauScriptEngine::objectToVariant(void* index) {
