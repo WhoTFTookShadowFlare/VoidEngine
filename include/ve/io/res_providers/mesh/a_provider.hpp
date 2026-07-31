@@ -1,12 +1,18 @@
 #pragma once
 
+#include "ve/class_db.hpp"
+#include "ve/event/event.hpp"
 #include "ve/event/event_bus.hpp"
 #include "ve/io/gfx/vertex.hpp"
 #include <cstdint>
 #include <vector>
 
 namespace VoidEngine::IO::ResourceProviders {
-	class EMeshProviderChanged final {};
+	class EMeshProviderChanged final : public Event::AEvent {
+	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
+	};
 
 	class AMeshProvider {
 	public:

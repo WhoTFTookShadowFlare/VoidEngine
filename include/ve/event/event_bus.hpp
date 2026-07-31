@@ -6,7 +6,7 @@
 #include "ve/event/event_listener.hpp"
 
 namespace VoidEngine::Event {
-	template<typename E>
+	template<IsEvent E>
 	class EventBus {
 		std::vector<std::weak_ptr<IEventListener<E>>> eventListeners;
 	public:
