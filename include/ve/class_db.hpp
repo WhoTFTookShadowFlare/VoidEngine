@@ -3,14 +3,12 @@
 #include <algorithm>
 #include <memory>
 #include <print>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <functional>
 #include <concepts>
 #include <cassert>
-// #include "ve/engine.hpp"
 #include "ve/variant.hpp"
 
 namespace VoidEngine {
@@ -57,13 +55,33 @@ namespace VoidEngine {
 		virtual Variant call(std::shared_ptr<Object> obj, std::vector<Variant> args) const = 0;
 	};
 
+	struct ConstructorBase {
+	protected:
+		ConstructorBase() {}
+	public:
+		virtual ~ConstructorBase() = default;
+
+		virtual std::shared_ptr<Object> create() const = 0;
+	};
+
+	struct NativeConstructor final : public ConstructorBase {
+	private:
+		const std::function<std::shared_ptr<Object>()> fn;
+	public:
+		NativeConstructor(std::function<std::shared_ptr<Object>()> fn) 
+			: fn(fn)
+		{}
+
+		std::shared_ptr<Object> create() const override { return fn(); }
+	};
+
 	struct Class {
 		const char* name;
 
 		const Class *super;
 		std::vector<const PropertyBase*> properties;
 		std::vector<const MethodBase*> methods;
-		std::function<std::shared_ptr<Object>()> create;
+		const ConstructorBase* constructor = nullptr;
 
 		const char* getName() const { return name; }
 		const Class* getSuper() const { return super; }
@@ -82,7 +100,7 @@ namespace VoidEngine {
 		}
 
 		bool isAbstract() const {
-			return create == nullptr;
+			return constructor == nullptr;
 		}
 
 		const PropertyBase* findProperty(std::string name) const {
@@ -144,7 +162,7 @@ namespace VoidEngine {
 				Class* eCls = (Class*) cls;
 				eCls->super = parent;
 			}
-			
+
 			componentClasses[cls->name] = cls;
 		}
 	};

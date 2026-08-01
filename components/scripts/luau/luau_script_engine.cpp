@@ -11,6 +11,7 @@
 #include "ve/variant.hpp"
 #include <algorithm>
 #include <cstdint>
+#include <exception>
 #include <map>
 #include <memory>
 #include <print>
@@ -34,12 +35,14 @@ namespace VoidEngine::Scripts::Luau {
 	static int ObjectGet(lua_State* L);
 	static int ObjectSet(lua_State* L);
 	static int ObjectCall(lua_State* L);
+	static int ObjectEq(lua_State* L);
 
 	static const luaL_Reg objectMeth[] = {
 		{ "__tostring", ObjectToString },
 		{ "__index", ObjectGet },
 		{ "__newindex", ObjectSet },
 		{ "__namecall", ObjectCall },
+		{ "__eq", ObjectEq },
 		{ nullptr, nullptr }
 	};
 
@@ -51,18 +54,19 @@ namespace VoidEngine::Scripts::Luau {
 	static int ClassNew(lua_State* L);
 	static int GetClass(lua_State* L);
 	static int RegisterClass(lua_State* L);
-	static int RegisterAbstractClass(lua_State* L);
 
 	static int ClassToString(lua_State* L);
 	static int ClassGet(lua_State* L);
 	static int ClassSet(lua_State* L);
 	static int ClassCall(lua_State* L);
+	static int ClassEq(lua_State* L);
 
 	static const luaL_Reg classMeth[] = {
 		{ "__tostring", ClassToString },
 		{ "__index", ClassGet },
 		{ "__newindex", ClassSet },
 		{ "__namecall", ClassCall },
+		{ "__eq", ClassEq },
 		{ nullptr, nullptr }
 	};
 
@@ -70,7 +74,6 @@ namespace VoidEngine::Scripts::Luau {
 		{ "new", ClassNew },
 		{ "get", GetClass },
 		{ "registerclass", RegisterClass },
-		{ "registerabstractclass", RegisterAbstractClass },
 		{ nullptr, nullptr }
 	};
 
@@ -255,7 +258,7 @@ namespace VoidEngine::Scripts::Luau {
 		}
 		lua_setmetatable(L, -2);
 
-		new(&ptr->obj) std::shared_ptr<Object>(cls->create());
+		new(&ptr->obj) std::shared_ptr<Object>(cls->constructor->create());
 
 		return 1;
 	}
@@ -325,6 +328,23 @@ namespace VoidEngine::Scripts::Luau {
 		return 1;
 	}
 
+	static int ObjectEq(lua_State* L) {
+		if(!lua_istable(L, 2)) {
+			lua_pushboolean(L, false);
+			return 1;
+		}
+
+		try {
+			ObjectHolder* LHS = static_cast<ObjectHolder*>(luaL_checkudata(L, 1, "Object"));
+			ObjectHolder* RHS = static_cast<ObjectHolder*>(luaL_checkudata(L, 2, "Object"));
+			lua_pushboolean(L, LHS->obj == RHS->obj);
+			return 1;
+		} catch(std::exception& ex) {	}
+
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
 	static int ClassNew(lua_State* L) {
 		if(!lua_isstring(L, 1)) {
 			std::println("[ERR] [LUAU] Class.new takes only a string for class name");
@@ -379,17 +399,11 @@ namespace VoidEngine::Scripts::Luau {
 	}
 
 	static int RegisterClass(lua_State* L) {
-		
-		
-		return 0;
-	}
-
-	static int RegisterAbstractClass(lua_State* L) {
 		ClassHolder* cls = (ClassHolder*) luaL_checkudata(L, 1, "Class");
 		ClassHolder* parent = (ClassHolder*) luaL_checkudata(L, 2, "Class");
 
-		std::println("[DEBUG] [LUAU] Registered class {} (child of {})", cls->cls->name, parent->cls->name);
-		
+		ClassDB::getInstance()->registerClass(cls->cls, parent->cls);
+
 		return 0;
 	}
 
@@ -409,5 +423,22 @@ namespace VoidEngine::Scripts::Luau {
 	
 	static int ClassCall(lua_State* L) {
 		return 0;
+	}
+
+	static int ClassEq(lua_State* L) {
+		if(!lua_istable(L, 2)) {
+			lua_pushboolean(L, false);
+			return 1;
+		}
+
+		try {
+			ClassHolder* LHS = static_cast<ClassHolder*>(luaL_checkudata(L, 1, "Class"));
+			ClassHolder* RHS = static_cast<ClassHolder*>(luaL_checkudata(L, 2, "Class"));
+			lua_pushboolean(L, LHS->cls == RHS->cls);
+			return 1;
+		} catch(std::exception& ex) {	}
+
+		lua_pushboolean(L, false);
+		return 1;
 	}
 }

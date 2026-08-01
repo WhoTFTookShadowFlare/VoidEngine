@@ -5,7 +5,7 @@
 namespace VoidEngine::Scene::Components {
 	const Class SoundComponent::ClassData = {
 		.name = "SoundComponent",
-		.create = SoundComponent::create
+		.constructor = new NativeConstructor(SoundComponent::create)
 	};
 
 	SoundComponent::SoundComponent() {}

@@ -15,12 +15,12 @@ namespace VoidEngine::Scene::Components {
 
 	const Class PointLightComponent::ClassData = {
 		.name = "PointLightComponent",
-		.create = PointLightComponent::create
+		.constructor = new NativeConstructor(PointLightComponent::create)
 	};
 
 	const Class SpotLightComponent::ClassData = {
 		.name = "SpotLightComponent",
-		.create = SpotLightComponent::create
+		.constructor = new NativeConstructor(SpotLightComponent::create)
 	};
 
 	LightComponent::LightComponent() {}

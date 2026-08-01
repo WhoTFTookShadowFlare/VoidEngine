@@ -82,11 +82,11 @@ namespace VoidEngine::Scene::Components {
 		.properties = {
 			new Property<PerspectiveCamera>("fov", &PerspectiveCamera::getFOV, &PerspectiveCamera::setFOV)
 		},
-		.create = PerspectiveCamera::create
+		.constructor = new NativeConstructor(PerspectiveCamera::create)
 	};
 
 	const Class OrthoCamera::ClassData = {
 		.name = "OrthoCamera",
-		.create = OrthoCamera::create
+		.constructor = new NativeConstructor(OrthoCamera::create)
 	};
 }

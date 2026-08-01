@@ -24,7 +24,7 @@
 namespace VoidEngine::Scene {
 	const Class Scene::ClassData = {
 		.name = "Scene",
-		.create = Scene::create
+		.constructor = new NativeConstructor(Scene::create)
 	};
 
 	std::shared_ptr<Scene> Scene::create() {
@@ -89,7 +89,7 @@ namespace VoidEngine::Scene {
 							continue;
 						}
 
-						auto comp = std::static_pointer_cast<AObjectComponent>(cls->create());
+						auto comp = std::static_pointer_cast<AObjectComponent>(cls->constructor->create());
 						comps.push_back(comp);
 						compUpdater->addComponent(comp);
 					}
@@ -133,7 +133,7 @@ namespace VoidEngine::Scene {
 									continue;
 								}
 
-								auto comp = std::static_pointer_cast<AObjectComponent>(cls->create());
+								auto comp = std::static_pointer_cast<AObjectComponent>(cls->constructor->create());
 								compUpdater->addComponent(comp);
 								obj->addComponent(comp);
 							} else {

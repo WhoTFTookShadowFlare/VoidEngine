@@ -44,7 +44,7 @@ namespace VoidEngine::Scene::Components {
 
 	const Class MeshComponent::ClassData = {
 		.name = "MeshComponent",
-		.create = MeshComponent::create
+		.constructor = new NativeConstructor(MeshComponent::create)
 	};
 }
 
