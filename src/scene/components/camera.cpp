@@ -81,10 +81,12 @@ namespace VoidEngine::Scene::Components {
 		.name = "PerspectiveCamera",
 		.properties = {
 			new Property<PerspectiveCamera>("fov", &PerspectiveCamera::getFOV, &PerspectiveCamera::setFOV)
-		}
+		},
+		.create = PerspectiveCamera::create
 	};
 
 	const Class OrthoCamera::ClassData = {
-		.name = "OrthoCamera"
+		.name = "OrthoCamera",
+		.create = OrthoCamera::create
 	};
 }

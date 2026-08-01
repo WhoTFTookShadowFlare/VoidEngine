@@ -14,11 +14,13 @@ namespace VoidEngine::Scene::Components {
 	};
 
 	const Class PointLightComponent::ClassData = {
-		.name = "PointLightComponent"
+		.name = "PointLightComponent",
+		.create = PointLightComponent::create
 	};
 
 	const Class SpotLightComponent::ClassData = {
-		.name = "SpotLightComponent"
+		.name = "SpotLightComponent",
+		.create = SpotLightComponent::create
 	};
 
 	LightComponent::LightComponent() {}

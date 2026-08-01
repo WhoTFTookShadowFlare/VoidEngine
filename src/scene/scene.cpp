@@ -23,7 +23,8 @@
 
 namespace VoidEngine::Scene {
 	const Class Scene::ClassData = {
-		.name = "Scene"
+		.name = "Scene",
+		.create = Scene::create
 	};
 
 	std::shared_ptr<Scene> Scene::create() {

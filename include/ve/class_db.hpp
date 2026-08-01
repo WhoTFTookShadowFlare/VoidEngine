@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <print>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -60,13 +61,16 @@ namespace VoidEngine {
 		const char* name;
 
 		const Class *super;
-		std::vector<const Class*> childTypes;
 		std::vector<const PropertyBase*> properties;
 		std::vector<const MethodBase*> methods;
-
 		std::function<std::shared_ptr<Object>()> create;
 
-		bool operator==(Class RHS) const { return name == RHS.name; }
+		const char* getName() const { return name; }
+		const Class* getSuper() const { return super; }
+		const std::vector<const PropertyBase*>& getProperties() const { return properties; }
+		const std::vector<const MethodBase*>& getMethods() const { return methods; }
+
+		bool operator==(Class* RHS) const { return name == RHS->name; }
 
 		bool instanceOf(const Class* cls) const {
 			const Class *check = this;
@@ -130,23 +134,18 @@ namespace VoidEngine {
 
 		const Class* getClassByName(std::string);
 
-		template<IsAbstractClass clazz, IsAbstractClass parent>
-		void registerAbstractClass() {
-			if(classListFrozen) throw std::runtime_error("Cannot add classes once the class list is frozen");
-			Class *cls = (Class*) &clazz::ClassData;
-			cls->super = &parent::ClassData;
+		void registerClass(const Class* cls, const Class* parent) {
+			if(componentClasses[cls->name] != nullptr) {
+				std::println("[ERR] Duplicate class name {}", cls->name);
+				return;
+			}
 
-			Class *parentCls = (Class*) &parent::ClassData;
-			parentCls->childTypes.emplace_back(cls);
-
+			{
+				Class* eCls = (Class*) cls;
+				eCls->super = parent;
+			}
+			
 			componentClasses[cls->name] = cls;
-		}
-
-		template<IsClass clazz, IsAbstractClass parent>
-		void registerClass() {
-			registerAbstractClass<clazz, parent>();
-			Class *cls = (Class*) &clazz::ClassData;
-			cls->create = clazz::create;
 		}
 	};
 }

@@ -21,49 +21,49 @@ namespace VoidEngine {
 	}
 
 	ClassDB::ClassDB() {
-		registerAbstractClass<Event::AEvent, Object>();
+		registerClass(&Event::AEvent::ClassData, &Object::ClassData);
 
-		registerAbstractClass<Event::AEvent, IO::ResourceProviders::EMeshProviderChanged>();
-		registerAbstractClass<Event::AEvent, IO::ResourceProviders::ETextureChanged>();
+		registerClass(&IO::ResourceProviders::EMeshProviderChanged::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::ResourceProviders::ETextureChanged::ClassData, &Event::AEvent::ClassData);
 
-		registerAbstractClass<Events::EQuitEvent, Event::AEvent>();
-		registerAbstractClass<Events::EScreenLayoutChangedEvent, Event::AEvent>();
+		registerClass(&Events::EQuitEvent::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Events::EScreenLayoutChangedEvent::ClassData, &Event::AEvent::ClassData);
 
-		registerAbstractClass<IO::Events::BasicWindowEvent, Event::AEvent>();
-		registerAbstractClass<IO::Events::EWindowMinimized, Event::AEvent>();
-		registerAbstractClass<IO::Events::EWindowRestored, Event::AEvent>();
-		registerAbstractClass<IO::Events::EWindowMaximized, Event::AEvent>();
-		registerAbstractClass<IO::Events::EWindowCloseRequested, Event::AEvent>();
-		registerAbstractClass<IO::Events::EWindowSizeChanged, Event::AEvent>();
-		registerAbstractClass<IO::Events::EWindowRepositioned, Event::AEvent>();
-		registerAbstractClass<IO::Events::EMouseEnter, Event::AEvent>();
-		registerAbstractClass<IO::Events::EWindowFocus, Event::AEvent>();
+		registerClass(&IO::Events::BasicWindowEvent::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EWindowMinimized::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EWindowRestored::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EWindowMaximized::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EWindowCloseRequested::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EWindowSizeChanged::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EWindowRepositioned::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EMouseEnter::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::EWindowFocus::ClassData, &Event::AEvent::ClassData);
 
-		registerAbstractClass<Scene::Events::EComponentUpdate, Event::AEvent>();
-		registerAbstractClass<Scene::Events::ESceneDraw, Event::AEvent>();
-		registerAbstractClass<Scene::Events::EComponentDraw, Event::AEvent>();
-		registerAbstractClass<Scene::Events::EAddedToScene, Event::AEvent>();
-		registerAbstractClass<Scene::Events::ERemovedFromScene, Event::AEvent>();
-		registerAbstractClass<Scene::Events::EComponentAddedToObject, Event::AEvent>();
-		registerAbstractClass<Scene::Events::EComponentRemovedFromObject, Event::AEvent>();
-		registerAbstractClass<Scene::Events::EChildAdded, Event::AEvent>();
-		registerAbstractClass<Scene::Events::EChildRemoved, Event::AEvent>();
+		registerClass(&Scene::Events::EComponentUpdate::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::ESceneDraw::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::EComponentDraw::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::EAddedToScene::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::ERemovedFromScene::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::EComponentAddedToObject::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::EComponentRemovedFromObject::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::EChildAdded::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::EChildRemoved::ClassData, &Event::AEvent::ClassData);
 
-		registerClass<Scene::Scene, Object>();
-		// registerClass<Scene::GameObject, Object>();
+		registerClass(&Scene::Scene::ClassData, &Object::ClassData);
+		registerClass(&Scene::GameObject::ClassData, &Object::ClassData);
 
-		registerAbstractClass<Scene::AObjectComponent, Object>();
+		registerClass(&Scene::AObjectComponent::ClassData, &Object::ClassData);
 
-		registerAbstractClass<Scene::Components::LightComponent, Scene::AObjectComponent>();
-		registerClass<Scene::Components::PointLightComponent, Scene::Components::LightComponent>();
-		registerClass<Scene::Components::SpotLightComponent, Scene::Components::LightComponent>();
-		registerClass<Scene::Components::MeshComponent, Scene::AObjectComponent>();
+		registerClass(&Scene::Components::LightComponent::ClassData, &Scene::AObjectComponent::ClassData);
+		registerClass(&Scene::Components::PointLightComponent::ClassData, &Scene::Components::LightComponent::ClassData);
+		registerClass(&Scene::Components::SpotLightComponent::ClassData, &Scene::Components::LightComponent::ClassData);
+		registerClass(&Scene::Components::MeshComponent::ClassData, &Scene::AObjectComponent::ClassData);
 
-		registerClass<Scene::Components::SoundComponent, Scene::AObjectComponent>();
+		registerClass(&Scene::Components::SoundComponent::ClassData, &Scene::AObjectComponent::ClassData);
 
-		registerAbstractClass<Scene::Components::ACamera, Scene::AObjectComponent>();
-		registerClass<Scene::Components::OrthoCamera, Scene::Components::ACamera>();
-		registerClass<Scene::Components::PerspectiveCamera, Scene::Components::ACamera>();
+		registerClass(&Scene::Components::ACamera::ClassData, &Scene::AObjectComponent::ClassData);
+		registerClass(&Scene::Components::OrthoCamera::ClassData, &Scene::Components::ACamera::ClassData);
+		registerClass(&Scene::Components::PerspectiveCamera::ClassData, &Scene::Components::ACamera::ClassData);
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {

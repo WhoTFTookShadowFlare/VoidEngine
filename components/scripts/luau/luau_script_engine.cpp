@@ -24,6 +24,10 @@ namespace VoidEngine::Scripts::Luau {
 		std::shared_ptr<Object> obj;
 	};
 
+	struct ClassHolder {
+		const Class* cls;
+	};
+
 	static int ObjectNew(lua_State* L);
 
 	static int ObjectToString(lua_State* L);
@@ -44,8 +48,37 @@ namespace VoidEngine::Scripts::Luau {
 		{ nullptr, nullptr }
 	};
 
+	static int ClassNew(lua_State* L);
+	static int GetClass(lua_State* L);
+	static int RegisterClass(lua_State* L);
+	static int RegisterAbstractClass(lua_State* L);
+
+	static int ClassToString(lua_State* L);
+	static int ClassGet(lua_State* L);
+	static int ClassSet(lua_State* L);
+	static int ClassCall(lua_State* L);
+
+	static const luaL_Reg classMeth[] = {
+		{ "__tostring", ClassToString },
+		{ "__index", ClassGet },
+		{ "__newindex", ClassSet },
+		{ "__namecall", ClassCall },
+		{ nullptr, nullptr }
+	};
+
+	static const luaL_Reg classLib[] = {
+		{ "new", ClassNew },
+		{ "get", GetClass },
+		{ "registerclass", RegisterClass },
+		{ "registerabstractclass", RegisterAbstractClass },
+		{ nullptr, nullptr }
+	};
+
 	void LuauScriptEngine::setupNativeTypes() {
 		luaL_register(vmState, "Object", objectLib);
+		lua_pop(vmState, 1);
+
+		luaL_register(vmState, "Class", classLib);
 		lua_pop(vmState, 1);
 		
 		luaL_sandbox(vmState);
@@ -198,6 +231,11 @@ namespace VoidEngine::Scripts::Luau {
 	}
 
 	static int ObjectNew(lua_State* L) {
+		if(!lua_isstring(L, 1)) {
+			std::println("[ERR] [LUAU] Object.new takes only a string for class type");
+			return 0;
+		}
+
 		const char* type = luaL_checkstring(L, 1);
 		if(type == nullptr) return 0;
 
@@ -285,5 +323,91 @@ namespace VoidEngine::Scripts::Luau {
 		if(retVal.isNil()) return 0;
 		engine->objectFromVariant(retVal);
 		return 1;
+	}
+
+	static int ClassNew(lua_State* L) {
+		if(!lua_isstring(L, 1)) {
+			std::println("[ERR] [LUAU] Class.new takes only a string for class name");
+			return 0;
+		}
+
+		const char* name = luaL_checkstring(L, 1);
+		if(name == nullptr) return 0;
+
+		ClassHolder* ptr = static_cast<ClassHolder*>(lua_newuserdatadtor(L, sizeof(ClassHolder), [](void* data) {
+			ClassHolder* cls = static_cast<ClassHolder*>(data);
+			if(ClassDB::getInstance()->getClassByName(cls->cls->name) != cls->cls) {
+				std::println("[ERR] Class {} was instanced but not registered!", cls->cls->name);
+			}
+		}));
+
+		if(luaL_newmetatable(L, "Class")) {
+			luaL_register(L, nullptr, classMeth);
+			lua_pushliteral(L, "Class");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		Class* cls = new Class;
+		cls->name = name;
+		ptr->cls = cls;
+
+		return 1;
+	}
+
+	static int GetClass(lua_State* L) {
+		if(!lua_isstring(L, 1)) {
+			std::println("[ERR] [LUAU] Class.get takes only a string for class name");
+			return 0;
+		}
+
+		const char* name = luaL_checkstring(L, 1);
+		if(name == nullptr) return 0;
+
+		const Class* cls = ClassDB::getInstance()->getClassByName(name);
+		ClassHolder* ptr = static_cast<ClassHolder*>(lua_newuserdata(L, sizeof(ClassHolder)));
+		ptr->cls = cls;
+
+		if(luaL_newmetatable(L, "Class")) {
+			luaL_register(L, nullptr, classMeth);
+			lua_pushliteral(L, "Class");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		return 1;
+	}
+
+	static int RegisterClass(lua_State* L) {
+		
+		
+		return 0;
+	}
+
+	static int RegisterAbstractClass(lua_State* L) {
+		ClassHolder* cls = (ClassHolder*) luaL_checkudata(L, 1, "Class");
+		ClassHolder* parent = (ClassHolder*) luaL_checkudata(L, 2, "Class");
+
+		std::println("[DEBUG] [LUAU] Registered class {} (child of {})", cls->cls->name, parent->cls->name);
+		
+		return 0;
+	}
+
+	static int ClassToString(lua_State* L) {
+		ClassHolder* cls = static_cast<ClassHolder*>(lua_touserdata(L, 1));
+		lua_pushstring(L, cls->cls->name);
+		return 1;
+	}
+	
+	static int ClassGet(lua_State* L) {
+		return 0;
+	}
+	
+	static int ClassSet(lua_State* L) {
+		return 0;
+	}
+	
+	static int ClassCall(lua_State* L) {
+		return 0;
 	}
 }

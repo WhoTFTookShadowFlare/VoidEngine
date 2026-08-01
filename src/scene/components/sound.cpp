@@ -3,7 +3,10 @@
 #include "ve/io/sfx/audio.hpp"
 
 namespace VoidEngine::Scene::Components {
-	const Class SoundComponent::ClassData = { .name = "SoundComponent" };
+	const Class SoundComponent::ClassData = {
+		.name = "SoundComponent",
+		.create = SoundComponent::create
+	};
 
 	SoundComponent::SoundComponent() {}
 
