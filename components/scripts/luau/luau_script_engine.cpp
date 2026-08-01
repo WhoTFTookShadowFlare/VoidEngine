@@ -25,10 +25,6 @@ namespace VoidEngine::Scripts::Luau {
 		std::shared_ptr<Object> obj;
 	};
 
-	struct ClassHolder {
-		const Class* cls;
-	};
-
 	static int ObjectNew(lua_State* L);
 
 	static int ObjectToString(lua_State* L);
@@ -51,6 +47,10 @@ namespace VoidEngine::Scripts::Luau {
 		{ nullptr, nullptr }
 	};
 
+	struct ClassHolder {
+		const Class* cls;
+	};
+
 	static int ClassNew(lua_State* L);
 	static int GetClass(lua_State* L);
 	static int RegisterClass(lua_State* L);
@@ -60,6 +60,12 @@ namespace VoidEngine::Scripts::Luau {
 	static int ClassSet(lua_State* L);
 	static int ClassCall(lua_State* L);
 	static int ClassEq(lua_State* L);
+
+	static int ClassFindProperty(lua_State* L);
+	static int ClassFindMethod(lua_State* L);
+	static int ClassIsAbstract(lua_State* L);
+	static int ClassInstanceOf(lua_State* L);
+	static int ClassCreate(lua_State* L);
 
 	static const luaL_Reg classMeth[] = {
 		{ "__tostring", ClassToString },
@@ -76,6 +82,52 @@ namespace VoidEngine::Scripts::Luau {
 		{ "registerclass", RegisterClass },
 		{ nullptr, nullptr }
 	};
+
+	struct PropertyHolder {
+		const PropertyBase* prop;
+	};
+
+	static int PropertyToString(lua_State* L);
+	static int PropertyIndex(lua_State* L);
+	static int PropertyCall(lua_State* L);
+	static int PropertyEq(lua_State* L);
+
+	static int PropertyGet(lua_State* L);
+	static int PropertySet(lua_State* L);
+	static int PropertyIsReadOnly(lua_State* L);
+
+	static const luaL_Reg propertyMeth[] = {
+		{ "__tostring", PropertyToString },
+		{ "__index", PropertyIndex },
+		{ "__namecall", PropertyCall },
+		{ "__eq", PropertyEq },
+		{ nullptr, nullptr }
+	};
+
+	// static const luaL_Reg propertyLib[] = {
+		// { nullptr, nullptr }
+	// };
+
+	struct MethodHolder {
+		const MethodBase* meth;
+	};
+
+	static int MethodToString(lua_State* L);
+	static int MethodIndex(lua_State* L);
+	static int MethodCall(lua_State* L);
+	static int MethodEq(lua_State* L);
+
+	static const luaL_Reg methodMeth[] = {
+		{ "__tostring", MethodToString },
+		{ "__index", MethodIndex },
+		{ "__namecall", MethodCall },
+		{ "__eq", MethodEq },
+		{ nullptr, nullptr }
+	};
+
+	// static const luaL_Reg methodLib[] = {
+		// { nullptr, nullptr }
+	// };
 
 	void LuauScriptEngine::setupNativeTypes() {
 		luaL_register(vmState, "Object", objectLib);
@@ -357,7 +409,8 @@ namespace VoidEngine::Scripts::Luau {
 		ClassHolder* ptr = static_cast<ClassHolder*>(lua_newuserdatadtor(L, sizeof(ClassHolder), [](void* data) {
 			ClassHolder* cls = static_cast<ClassHolder*>(data);
 			if(ClassDB::getInstance()->getClassByName(cls->cls->name) != cls->cls) {
-				std::println("[ERR] Class {} was instanced but not registered!", cls->cls->name);
+				std::println("[WARN] Class {} was instanced but not registered!", cls->cls->name);
+				delete cls->cls;
 			}
 		}));
 
@@ -422,6 +475,17 @@ namespace VoidEngine::Scripts::Luau {
 	}
 	
 	static int ClassCall(lua_State* L) {
+		std::string fnName = lua_namecallatom(L, nullptr);
+
+		// addproperty
+		// addmethod
+		if(fnName == "findproperty") return ClassFindProperty(L);
+		if(fnName == "findmethod") return ClassFindMethod(L);
+
+		// setconstructor
+		if(fnName == "isabstract") return ClassIsAbstract(L);
+		if(fnName == "instanceof") return ClassInstanceOf(L);
+		if(fnName == "create") return ClassCreate(L);
 		return 0;
 	}
 
@@ -439,6 +503,216 @@ namespace VoidEngine::Scripts::Luau {
 		} catch(std::exception& ex) {	}
 
 		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	static int ClassFindProperty(lua_State* L) {
+		ClassHolder* cls = (ClassHolder*) lua_touserdata(L, 1);
+		if(!lua_isstring(L, 2)) {
+			std::println("[ERR] [LUAU] Class:findproperty(name) name must be a string");
+			return 0;
+		}
+
+		std::string name = luaL_checkstring(L, 2);
+
+		const PropertyBase* prop = cls->cls->findProperty(name);
+		if(prop == nullptr) {
+			lua_pushnil(L);
+			return 1;
+		}
+
+		PropertyHolder* propHolder = static_cast<PropertyHolder*>(lua_newuserdata(L, sizeof(PropertyHolder)));
+		if(luaL_newmetatable(L, "Property")) {
+			luaL_register(L, nullptr, propertyMeth);
+			lua_pushliteral(L, "Property");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		propHolder->prop = prop;
+		return 1;
+	}
+
+	static int ClassFindMethod(lua_State* L) {
+		ClassHolder* cls = (ClassHolder*) lua_touserdata(L, 1);
+		if(!lua_isstring(L, 2)) {
+			std::println("[ERR] [LUAU] Class:findproperty(name) name must be a string");
+			return 0;
+		}
+
+		std::string name = luaL_checkstring(L, 2);
+
+		const MethodBase* meth = cls->cls->findMethod(name);
+		if(meth == nullptr) {
+			lua_pushnil(L);
+			return 1;
+		}
+
+		MethodHolder* methHolder = static_cast<MethodHolder*>(lua_newuserdata(L, sizeof(MethodHolder)));
+		if(luaL_newmetatable(L, "Method")) {
+			luaL_register(L, nullptr, methodMeth);
+			lua_pushliteral(L, "Method");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		methHolder->meth = meth;
+		return 1;
+	}
+
+	static int ClassIsAbstract(lua_State* L) {
+		ClassHolder* cls = (ClassHolder*) lua_touserdata(L, 1);
+		lua_pushboolean(L, cls->cls->isAbstract());
+		return 1;
+	}
+
+	static int ClassInstanceOf(lua_State* L) {
+		if(!lua_isuserdata(L, 2)) {
+			std::println("[ERR] [LUAU] Expected type 'Class', got {}", lua_typename(L, lua_type(L, 2)));
+			lua_pushboolean(L, false);
+			return 1;
+		}
+
+		ClassHolder* cls = (ClassHolder*) lua_touserdata(L, 1);
+		ClassHolder* parent = (ClassHolder*) luaL_checkudata(L, 2, "Class");
+
+		lua_pushboolean(L, cls->cls->instanceOf(parent->cls));
+		return 1;
+	}
+
+	static int ClassCreate(lua_State* L) {
+		ClassHolder* clsHolder = (ClassHolder*) lua_touserdata(L, 1);
+		const Class* cls = clsHolder->cls;
+
+		if(cls == nullptr) return 0;
+		if(cls->isAbstract()) return 0;
+		
+		ObjectHolder* ptr = static_cast<ObjectHolder*>(lua_newuserdatadtor(L, sizeof(ObjectHolder), [](void* ptr) {
+			ObjectHolder* self = static_cast<ObjectHolder*>(ptr);
+			self->obj.~shared_ptr<Object>();
+		}));
+
+		if(luaL_newmetatable(L, "Object")) {
+			luaL_register(L, nullptr, objectMeth);
+			lua_pushliteral(L, "Object");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		new(&ptr->obj) std::shared_ptr<Object>(cls->constructor->create());
+
+		return 1;
+	}
+
+	static int PropertyToString(lua_State* L) {
+		PropertyHolder* prop = (PropertyHolder*) lua_touserdata(L, 1);
+		lua_pushstring(L, prop->prop->name.c_str());
+		return 1;
+	}
+
+	static int PropertyIndex(lua_State* L) {
+		PropertyHolder* prop = static_cast<PropertyHolder*>(lua_touserdata(L, 1));
+		std::string name = luaL_checkstring(L, 2);
+		if(name == "name") {
+			lua_pushstring(L, prop->prop->name.c_str());
+			return 1;
+		}
+
+		return 0;
+	}
+	
+	static int PropertyCall(lua_State* L) {
+		std::string fnName = lua_namecallatom(L, nullptr);
+
+		if(fnName == "get") return PropertyGet(L);
+		if(fnName == "set") return PropertySet(L);
+		if(fnName == "isreadonly") return PropertyIsReadOnly(L);
+
+		std::println("[ERR] [LUAU] No function named \"{}\" on Property", fnName);
+		return 0;
+	}
+	
+	static int PropertyEq(lua_State* L) {
+		PropertyHolder* LHS = static_cast<PropertyHolder*>(luaL_checkudata(L, 1, "Property"));
+		PropertyHolder* RHS = static_cast<PropertyHolder*>(luaL_checkudata(L, 2, "Property"));
+
+		lua_pushboolean(L, LHS->prop == RHS->prop);
+		return 1;
+	}
+
+	static int PropertyGet(lua_State* L) {
+		PropertyHolder* prop = static_cast<PropertyHolder*>(lua_touserdata(L, 1));
+		ObjectHolder* obj = static_cast<ObjectHolder*>(luaL_checkudata(L, 2, "Object"));
+
+		Variant retVal = prop->prop->get(obj->obj);
+		LuauScriptEngine::getInstance()->objectFromVariant(retVal);
+		return 1;
+	}
+
+	static int PropertySet(lua_State* L) {
+		PropertyHolder* prop = static_cast<PropertyHolder*>(lua_touserdata(L, 1));
+		ObjectHolder* obj = static_cast<ObjectHolder*>(luaL_checkudata(L, 2, "Object"));
+
+		uint32_t* val = new uint32_t(3);
+		Variant value = LuauScriptEngine::getInstance()->objectToVariant(val);
+		delete val;
+
+		prop->prop->set(obj->obj, value);
+		return 0;
+	}
+	
+	static int PropertyIsReadOnly(lua_State* L) {
+		PropertyHolder* prop = static_cast<PropertyHolder*>(lua_touserdata(L, 1));
+		lua_pushboolean(L, prop->prop->isReadOnly());
+		return 1;
+	}
+
+	static int MethodToString(lua_State* L) {
+		MethodHolder* meth = static_cast<MethodHolder*>(lua_touserdata(L, 1));
+		lua_pushstring(L, meth->meth->name.c_str());
+		return 1;
+	}
+
+	static int MethodIndex(lua_State* L) {
+		MethodHolder* meth = static_cast<MethodHolder*>(lua_touserdata(L, 1));
+		std::string name = luaL_checkstring(L, 2);
+
+		if(name == "name") {
+			lua_pushstring(L, meth->meth->name.c_str());
+			return 1;
+		}
+
+		return 0;
+	}
+	
+	static int MethodCall(lua_State* L) {
+		std::string name = lua_namecallatom(L, nullptr);
+		
+		if(name == "call") {
+			MethodHolder* meth = static_cast<MethodHolder*>(lua_touserdata(L, 1));
+			ObjectHolder* obj = static_cast<ObjectHolder*>(luaL_checkudata(L, 2, "Object"));
+
+			std::vector<Variant> args;
+			auto engine = LuauScriptEngine::getInstance();
+			uint32_t* target = new uint32_t(3);
+			for(int idx = 3; idx < lua_gettop(L); idx++) {
+				*target = idx;
+				args.push_back(engine->objectToVariant(target));
+			}
+			delete target;
+
+			engine->objectFromVariant(meth->meth->call(obj->obj, args));
+			return 1;
+		}
+
+		return 0;
+	}
+	
+	static int MethodEq(lua_State* L) {
+		MethodHolder* LHS = static_cast<MethodHolder*>(luaL_checkudata(L, 1, "Method"));
+		MethodHolder* RHS = static_cast<MethodHolder*>(luaL_checkudata(L, 2, "Method"));
+
+		lua_pushboolean(L, LHS->meth == RHS->meth);
 		return 1;
 	}
 }
