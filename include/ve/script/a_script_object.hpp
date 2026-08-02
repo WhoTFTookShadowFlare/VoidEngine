@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ve/variant.hpp"
+#include "ve/object.hpp"
 #include <memory>
 #include <string>
 #include <vector>
@@ -8,10 +9,13 @@
 namespace VoidEngine::Scripts {
 	class AScriptEngine;
 
-	class AScriptObject {
+	class AScriptObject : public Object {
 	private:
 	protected:
 	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const override { return &ClassData; }
+
 		virtual ~AScriptObject() {}
 		virtual std::shared_ptr<AScriptEngine> getScriptEngine() = 0;
 

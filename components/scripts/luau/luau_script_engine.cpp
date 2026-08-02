@@ -2,6 +2,8 @@
 #include "lua.h"
 #include "lualib.h"
 #include "luacode.h"
+#include "luau_function.hpp"
+#include "luau_property.hpp"
 #include "luau_script.hpp"
 #include "luau_script_module.hpp"
 #include "ve/class_db.hpp"
@@ -61,6 +63,8 @@ namespace VoidEngine::Scripts::Luau {
 	static int ClassCall(lua_State* L);
 	static int ClassEq(lua_State* L);
 
+	static int ClassAddMethod(lua_State* L);
+	static int ClassAddProperty(lua_State* L);
 	static int ClassFindProperty(lua_State* L);
 	static int ClassFindMethod(lua_State* L);
 	static int ClassIsAbstract(lua_State* L);
@@ -87,6 +91,8 @@ namespace VoidEngine::Scripts::Luau {
 		const PropertyBase* prop;
 	};
 
+	static int PropertyNew(lua_State* L);
+
 	static int PropertyToString(lua_State* L);
 	static int PropertyIndex(lua_State* L);
 	static int PropertyCall(lua_State* L);
@@ -104,13 +110,16 @@ namespace VoidEngine::Scripts::Luau {
 		{ nullptr, nullptr }
 	};
 
-	// static const luaL_Reg propertyLib[] = {
-		// { nullptr, nullptr }
-	// };
+	static const luaL_Reg propertyLib[] = {
+		{ "new", PropertyNew },
+		{ nullptr, nullptr }
+	};
 
 	struct MethodHolder {
 		const MethodBase* meth;
 	};
+
+	static int MethodNew(lua_State* L);
 
 	static int MethodToString(lua_State* L);
 	static int MethodIndex(lua_State* L);
@@ -125,15 +134,22 @@ namespace VoidEngine::Scripts::Luau {
 		{ nullptr, nullptr }
 	};
 
-	// static const luaL_Reg methodLib[] = {
-		// { nullptr, nullptr }
-	// };
+	static const luaL_Reg methodLib[] = {
+		{ "new", MethodNew },
+		{ nullptr, nullptr }
+	};
 
 	void LuauScriptEngine::setupNativeTypes() {
 		luaL_register(vmState, "Object", objectLib);
 		lua_pop(vmState, 1);
 
 		luaL_register(vmState, "Class", classLib);
+		lua_pop(vmState, 1);
+
+		luaL_register(vmState, "Method", methodLib);
+		lua_pop(vmState, 1);
+
+		luaL_register(vmState, "Property", propertyLib);
 		lua_pop(vmState, 1);
 		
 		luaL_sandbox(vmState);
@@ -477,8 +493,8 @@ namespace VoidEngine::Scripts::Luau {
 	static int ClassCall(lua_State* L) {
 		std::string fnName = lua_namecallatom(L, nullptr);
 
-		// addproperty
-		// addmethod
+		if(fnName == "addproperty") return ClassAddProperty(L);
+		if(fnName == "addmethod") return ClassAddMethod(L);
 		if(fnName == "findproperty") return ClassFindProperty(L);
 		if(fnName == "findmethod") return ClassFindMethod(L);
 
@@ -504,6 +520,24 @@ namespace VoidEngine::Scripts::Luau {
 
 		lua_pushboolean(L, false);
 		return 1;
+	}
+
+	static int ClassAddMethod(lua_State* L) {
+		ClassHolder* clsHolder = static_cast<ClassHolder*>(luaL_checkudata(L, 1, "Class"));
+		const MethodBase* meth = static_cast<MethodBase*>(luaL_checkudata(L, 2, "Method"));
+
+		Class* cls = const_cast<Class*>(clsHolder->cls);
+		cls->methods.push_back(meth);
+		return 0;
+	}
+
+	static int ClassAddProperty(lua_State* L) {
+		ClassHolder* clsHolder = static_cast<ClassHolder*>(luaL_checkudata(L, 1, "Class"));
+		const PropertyBase* prop = static_cast<PropertyBase*>(luaL_checkudata(L, 2, "Property"));
+
+		Class* cls = const_cast<Class*>(clsHolder->cls);
+		cls->properties.push_back(prop);
+		return 0;
 	}
 
 	static int ClassFindProperty(lua_State* L) {
@@ -604,6 +638,33 @@ namespace VoidEngine::Scripts::Luau {
 		return 1;
 	}
 
+	static int PropertyNew(lua_State* L) {
+		if(!lua_isstring(L, 1)) {
+			std::println("[ERR] [LUAU] Property.new arg 0 must be a string");
+			return 0;
+		}
+
+		if(!lua_isboolean(L, 2)) {
+			std::println("[ERR] [LUAU] Property.new arg 1 must be a boolean");
+			return 0;
+		}
+
+		const char* name = luaL_checkstring(L, 1);
+		if(name == nullptr) return 0;
+
+		LuauProperty* ptr = static_cast<LuauProperty*>(lua_newuserdata(L, sizeof(LuauProperty)));
+		new (ptr) LuauProperty(name, luaL_checkboolean(L, 2));
+
+		if(luaL_newmetatable(L, "Property")) {
+			luaL_register(L, nullptr, propertyMeth);
+			lua_pushliteral(L, "Property");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		return 1;
+	}
+
 	static int PropertyToString(lua_State* L) {
 		PropertyHolder* prop = (PropertyHolder*) lua_touserdata(L, 1);
 		lua_pushstring(L, prop->prop->name.c_str());
@@ -664,6 +725,33 @@ namespace VoidEngine::Scripts::Luau {
 	static int PropertyIsReadOnly(lua_State* L) {
 		PropertyHolder* prop = static_cast<PropertyHolder*>(lua_touserdata(L, 1));
 		lua_pushboolean(L, prop->prop->isReadOnly());
+		return 1;
+	}
+
+	static int MethodNew(lua_State* L) {
+		if(!lua_isstring(L, 1)) {
+			std::println("[ERR] [LUAU] Method.new arg 0 must be a string");
+			return 0;
+		}
+
+		if(!lua_isfunction(L, 2)) {
+			std::println("[ERR] [LUAU] Method.new arg 1 must be a function");
+			return 0;
+		}
+
+		const char* name = luaL_checkstring(L, 1);
+		if(name == nullptr) return 0;
+
+		LuauMethod* ptr = static_cast<LuauMethod*>(lua_newuserdata(L, sizeof(LuauMethod)));
+		new (ptr) LuauMethod(name, L, 2);
+
+		if(luaL_newmetatable(L, "Method")) {
+			luaL_register(L, nullptr, methodMeth);
+			lua_pushliteral(L, "Method");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
 		return 1;
 	}
 

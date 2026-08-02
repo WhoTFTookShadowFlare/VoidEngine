@@ -11,6 +11,9 @@ namespace VoidEngine::Scripts::Luau {
 	private:
 		LuauScriptObject();
 	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const override { return &ClassData; }
+
 		~LuauScriptObject();
 		std::shared_ptr<AScriptEngine> getScriptEngine() override;
 		Variant call(std::string fnName, std::vector<Variant> args) override;

@@ -9,7 +9,6 @@
 #include <functional>
 #include <concepts>
 #include <cassert>
-#include "ve/variant.hpp"
 
 namespace VoidEngine {
 	class Object;

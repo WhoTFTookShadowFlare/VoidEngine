@@ -11,6 +11,10 @@
 #include <vector>
 
 namespace VoidEngine::Scripts::Luau {
+	const Class LuauScriptObject::ClassData = {
+		.name = "LuauScriptObject"
+	};
+
 	LuauScriptObject::LuauScriptObject() {
 		auto L = LuauScriptEngine::getInstance()->vmState;
 		assert(lua_gettop(L) > 0);

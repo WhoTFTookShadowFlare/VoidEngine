@@ -2,6 +2,7 @@
 
 #include "ve/class_db.hpp"
 #include "ve/object.hpp"
+#include "ve/variant.hpp"
 #include <memory>
 
 namespace VoidEngine {
