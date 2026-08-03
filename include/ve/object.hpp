@@ -2,6 +2,8 @@
 
 #include "ve/class_db.hpp"
 
+// TODO: Add macro for common class data
+
 namespace VoidEngine {
 	class Object {
 	private:

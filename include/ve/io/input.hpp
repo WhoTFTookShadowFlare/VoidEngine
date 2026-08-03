@@ -14,8 +14,8 @@ namespace VoidEngine::IO {
 	public:
 		static std::shared_ptr<Input> getInstance();
 
-		Event::EventBus<Events::EMouseMotion> onMouseMotion;
-		Event::EventBus<Events::EMouseButton> onMouseButton;
-		Event::EventBus<Events::EKeyButton> onKeyButton;
+		Event::EventBusLegacy<Events::EMouseMotion> onMouseMotion;
+		Event::EventBusLegacy<Events::EMouseButton> onMouseButton;
+		Event::EventBusLegacy<Events::EKeyButton> onKeyButton;
 	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ve/event/event.hpp"
+#include <print>
 #include <type_traits>
 
 namespace VoidEngine::Event {
@@ -11,6 +12,10 @@ namespace VoidEngine::Event {
 	template <IsEvent E>
 	class IEventListener {
 	public:
+		IEventListener() {
+			std::println("[WARN] IEventListener<T> is deprecated");
+		}
+		
 		virtual void onEvent(E& event) = 0;
 	};
 }

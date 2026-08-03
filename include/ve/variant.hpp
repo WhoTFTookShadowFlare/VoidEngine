@@ -14,6 +14,9 @@
 
 namespace VoidEngine {
 	class Object;
+	namespace Event {
+		class EventBus;
+	}
 
 	enum VariantType : uint8_t {
 		NIL,
@@ -24,6 +27,7 @@ namespace VoidEngine {
 		ARRAY,
 		MAP,
 		OBJECT,
+		EVENT_BUS,
 
 		VEC2,
 		VEC3,
@@ -54,6 +58,7 @@ namespace VoidEngine {
 		Variant(std::vector<Variant>);
 		Variant(std::map<std::string, Variant>);
 		Variant(std::shared_ptr<Object>);
+		Variant(Event::EventBus*);
 
 		Variant(glm::vec2);
 		Variant(glm::vec3);
@@ -72,6 +77,7 @@ namespace VoidEngine {
 		bool isArray() const;
 		bool isMap() const;
 		bool isObject() const;
+		bool isEventBus() const;
 
 		bool isVec2() const;
 		bool isVec3() const;
@@ -84,6 +90,7 @@ namespace VoidEngine {
 		std::expected<std::vector<Variant>*, TypeError> asArray() const;
 		std::expected<std::map<std::string, Variant>*, TypeError> asMap() const;
 		std::expected<std::shared_ptr<Object>, TypeError> asObject() const;
+		std::expected<Event::EventBus*, TypeError> asEventBus() const;
 
 		std::expected<glm::vec2, TypeError> asVec2() const;
 		std::expected<glm::vec3, TypeError> asVec3() const;

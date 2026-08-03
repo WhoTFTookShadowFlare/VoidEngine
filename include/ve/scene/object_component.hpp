@@ -24,11 +24,11 @@ namespace VoidEngine::Scene {
 		static const Class ClassData;
 		virtual ~AObjectComponent() {}
 
-		Event::EventBus<Events::EComponentAddedToObject> onComponentAdded;
-		Event::EventBus<Events::EComponentRemovedFromObject> onComponentRemoved;
+		Event::EventBusLegacy<Events::EComponentAddedToObject> onComponentAdded;
+		Event::EventBusLegacy<Events::EComponentRemovedFromObject> onComponentRemoved;
 
-		Event::EventBus<Events::EComponentUpdate> onUpdate;
-		Event::EventBus<Events::EComponentDraw> onDraw;
+		Event::EventBusLegacy<Events::EComponentUpdate> onUpdate;
+		Event::EventBusLegacy<Events::EComponentDraw> onDraw;
 
 		std::vector<std::shared_ptr<GameObject>> getObjectsUsing();
 

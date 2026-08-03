@@ -1,24 +1,43 @@
 #include "ve/event/event_bus.hpp"
+#include "ve/class_db.hpp"
+#include "ve/event/event.hpp"
+#include <algorithm>
+#include <memory>
 
 namespace VoidEngine::Event {
-	// void EventBus::operator() (std::shared_ptr<AEvent>& event) {
-	// 	std::for_each(eventListeners.begin(), eventListeners.end(), [&](auto& listener) {
-	// 		if (auto pListener = listener.lock())
-	// 			pListener->onEvent(event);
-	// 	});
-	// }
+	EventBus::EventBus(const Class* eventClass) {
+		// TODO: Ensure that the provided class is of type AEvent
+		this->eventClass = eventClass;
+	}
+	
+	void EventBus::addHandler(std::shared_ptr<EventHandler>& handler) {
+		handlers.push_back(handler);
+	}
 
-	// void EventBus::operator+= (std::weak_ptr<Object> listener) {
-	// 	eventListeners.push_back(listener);
-	// }
+	void EventBus::removeHandler(std::shared_ptr<EventHandler>& handler) {
+		handlers.resize(std::distance(
+			handlers.begin(),
+			std::remove_if(handlers.begin(), handlers.end(), [](const auto& iter) {
+				return iter->isValid();
+			})
+		));
+	}
 
-	// void EventBus::operator-= (std::weak_ptr<Object> listener) {
-	// 	eventListeners.resize(std::distance(
-	// 		eventListeners.begin(),
-	// 		std::remove_if(eventListeners.begin(), eventListeners.end(), [&listener](const auto& iter) {
-	// 			if(iter.expired()) return true;
-	// 			return listener.lock() == iter.lock();
-	// 		})
-	// 	));
-	// }
+	bool EventBus::hasHandler(std::shared_ptr<EventHandler>& handler) const {
+		const auto idx = std::find_if(handlers.cbegin(), handlers.cend(), [&handler](const auto& iter) {
+			return *iter == *handler;
+		});
+		return idx != handlers.cend();
+	}
+
+	void EventBus::fireEvent(std::shared_ptr<AEvent> event) const {
+		if(!event->getClass()->instanceOf(eventClass)) {
+			std::println("[ERR] Provided event ({}) is not of type {}", event->getClass()->getName(), eventClass->getName());
+			return;
+		}
+		
+		std::for_each(handlers.cbegin(), handlers.cend(), [&](const auto& handler) {
+			handler->handle(event);
+		});
+	}
 }

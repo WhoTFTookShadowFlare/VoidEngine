@@ -1,12 +1,12 @@
 #include "ve/variant.hpp"
 #include "glm/ext/vector_float2.hpp"
+#include "ve/event/event_bus.hpp"
 #include "ve/object.hpp"
 #include <cstdint>
 #include <expected>
 #include <format>
 #include <map>
 #include <memory>
-#include <print>
 #include <string>
 #include <vector>
 
@@ -56,6 +56,10 @@ namespace VoidEngine {
 		data = std::make_shared<std::shared_ptr<Object>>(value);
 	}
 
+	Variant::Variant(Event::EventBus* value) : type(VariantType::EVENT_BUS) {
+		data = std::shared_ptr<Event::EventBus>(value, [](void*) {});
+	}
+
 	Variant::Variant(glm::vec2 value) : type(VariantType::VEC2) { data = std::make_shared<glm::vec2>(value); }
 	Variant::Variant(glm::vec3 value) : type(VariantType::VEC3) { data = std::make_shared<glm::vec3>(value); }
 	Variant::Variant(glm::vec4 value) : type(VariantType::VEC4) { data = std::make_shared<glm::vec4>(value); }
@@ -73,6 +77,7 @@ namespace VoidEngine {
 	bool Variant::isArray() const { return type == VariantType::ARRAY; }
 	bool Variant::isMap() const { return type == VariantType::MAP; }
 	bool Variant::isObject() const { return type == VariantType::OBJECT; }
+	bool Variant::isEventBus() const { return type == VariantType::EVENT_BUS; }
 
 	bool Variant::isVec2() const { return type == VariantType::VEC2; }
 	bool Variant::isVec3() const { return type == VariantType::VEC3; }
@@ -111,6 +116,11 @@ namespace VoidEngine {
 	std::expected<std::shared_ptr<Object>, TypeError> Variant::asObject() const {
 		if(!isObject()) { return std::unexpected(TypeError(VariantType::OBJECT, type)); }
 		return std::shared_ptr<Object>(*(std::shared_ptr<Object>*) data.get());
+	}
+
+	std::expected<Event::EventBus*, TypeError> Variant::asEventBus() const {
+		if(!isEventBus()) { return std::unexpected(TypeError(VariantType::EVENT_BUS, type)); }
+		return (Event::EventBus*) data.get();
 	}
 
 	std::expected<glm::vec2, TypeError> Variant::asVec2() const {

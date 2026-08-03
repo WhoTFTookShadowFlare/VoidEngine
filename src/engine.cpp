@@ -40,16 +40,16 @@ namespace VoidEngine {
 		switch (signal) {
 		case SIGINT:
 		case SIGTERM: {
-			Events::EQuitEvent event;
+			std::shared_ptr<Events::EQuitEvent> event = std::make_shared<Events::EQuitEvent>();
 			std::shared_ptr<Engine> engine = Engine::getInstance();
-			engine->onQuit(event);
+			engine->onQuit.fireEvent(event);
 			}; break;
 		}
 	}
 
 	Engine::~Engine() {
-		Events::EQuitEvent evt;
-		onQuit(evt);
+		std::shared_ptr<Events::EQuitEvent> evt = std::make_shared<Events::EQuitEvent>();
+		onQuit.fireEvent(evt);
 		mainWindow = nullptr;
 		renderer = nullptr;
 		SDL_Quit();
@@ -151,8 +151,8 @@ namespace VoidEngine {
 				case SDL_EVENT_DISPLAY_REMOVED:
 				case SDL_EVENT_DISPLAY_MOVED:
 				case SDL_EVENT_DISPLAY_ADDED: {
-					Events::EScreenLayoutChangedEvent event;
-					onScreenLayoutChanged(event);
+					auto event = std::make_shared<Events::EScreenLayoutChangedEvent>();
+					onScreenLayoutChanged.fireEvent(event);
 					}; break;
 				case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
@@ -386,8 +386,8 @@ namespace VoidEngine {
 	}
 
 	void Engine::finalize() {
-		Events::EQuitEvent evt;
-		onQuit(evt);
+		auto evt = std::make_shared<Events::EQuitEvent>();
+		onQuit.fireEvent(evt);
 		instance = nullptr;
 	}
 }

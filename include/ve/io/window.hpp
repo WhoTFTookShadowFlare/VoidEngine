@@ -52,18 +52,18 @@ namespace VoidEngine::IO {
 	public:
 		virtual ~Window();
 
-		Event::EventBus<Events::EWindowCloseRequested> onCloseRequested;
-		Event::EventBus<Events::EWindowSizeChanged> onSizeChanged;
-		Event::EventBus<Events::EWindowRepositioned> onReposition;
-		Event::EventBus<Events::EWindowFocus> onFocusChanged;
-		Event::EventBus<Events::EMouseEnter> onMouseEnter;
-		Event::EventBus<Events::EWindowMinimized> onMinimize;
-		Event::EventBus<Events::EWindowRestored> onRestore;
-		Event::EventBus<Events::EWindowMaximized> onMaximize;
+		Event::EventBusLegacy<Events::EWindowCloseRequested> onCloseRequested;
+		Event::EventBusLegacy<Events::EWindowSizeChanged> onSizeChanged;
+		Event::EventBusLegacy<Events::EWindowRepositioned> onReposition;
+		Event::EventBusLegacy<Events::EWindowFocus> onFocusChanged;
+		Event::EventBusLegacy<Events::EMouseEnter> onMouseEnter;
+		Event::EventBusLegacy<Events::EWindowMinimized> onMinimize;
+		Event::EventBusLegacy<Events::EWindowRestored> onRestore;
+		Event::EventBusLegacy<Events::EWindowMaximized> onMaximize;
 
-		Event::EventBus<Events::EMouseMotion> onMouseMotion;
-		Event::EventBus<Events::EMouseButton> onMouseButton;
-		Event::EventBus<Events::EKeyButton> onKeyButton;
+		Event::EventBusLegacy<Events::EMouseMotion> onMouseMotion;
+		Event::EventBusLegacy<Events::EMouseButton> onMouseButton;
+		Event::EventBusLegacy<Events::EKeyButton> onKeyButton;
 
 		virtual void swapBuffers() = 0;
 

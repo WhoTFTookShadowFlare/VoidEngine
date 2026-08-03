@@ -49,8 +49,11 @@ namespace VoidEngine {
 		Engine& operator=(const Engine&) = delete;
 		~Engine();
 
-		Event::EventBus<Events::EQuitEvent> onQuit;
-		Event::EventBus<Events::EScreenLayoutChangedEvent> onScreenLayoutChanged;
+		// Event::EventBusLegacy<Events::EQuitEvent> onQuit;
+		// Event::EventBusLegacy<Events::EScreenLayoutChangedEvent> onScreenLayoutChanged;
+
+		Event::EventBus onQuit = &Events::EQuitEvent::ClassData;
+		Event::EventBus onScreenLayoutChanged = &Events::EScreenLayoutChangedEvent::ClassData;
 
 		static void initialize(int argc, char** argv);
 		[[nodiscard]] static std::shared_ptr<Engine> getInstance();
