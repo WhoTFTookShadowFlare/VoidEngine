@@ -54,14 +54,14 @@ namespace VoidEngine::Scene {
 		void addComponent(std::shared_ptr<AObjectComponent> component);
 		void removeComponent(std::shared_ptr<AObjectComponent> component);
 
-		Event::EventBusLegacy<Events::EAddedToScene> onAddedToScene;
-		Event::EventBusLegacy<Events::ERemovedFromScene> onRemovedFromScene;
+		Event::EventBus onAddedToScene = &Events::EAddedToScene::ClassData;
+		Event::EventBus onRemovedFromScene = &Events::ERemovedFromScene::ClassData;
 
-		Event::EventBusLegacy<Events::EComponentAddedToObject> onComponentAdded;
-		Event::EventBusLegacy<Events::EComponentRemovedFromObject> onComponentRemoved;
+		Event::EventBus onComponentAdded = &Events::EComponentAddedToObject::ClassData;
+		Event::EventBus onComponentRemoved = &Events::EComponentRemovedFromObject::ClassData;
 
-		Event::EventBusLegacy<Events::EChildAdded> onChildAdded;
-		Event::EventBusLegacy<Events::EChildRemoved> onChildRemoved;
+		Event::EventBus onChildAdded = &Events::EChildAdded::ClassData;
+		Event::EventBus onChildRemoved = &Events::EChildRemoved::ClassData;
 
 		void draw(Events::ESceneDraw& draw);
 

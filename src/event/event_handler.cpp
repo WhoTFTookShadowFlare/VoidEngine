@@ -2,7 +2,7 @@
 #include "ve/variant.hpp"
 
 namespace VoidEngine::Event {
-	EventHandler::EventHandler(std::shared_ptr<Object> obj, MethodBase* func) {
+	EventHandler::EventHandler(std::shared_ptr<Object> obj, const MethodBase* func) {
 		handlerObj = obj;
 		this->func = func;
 	}

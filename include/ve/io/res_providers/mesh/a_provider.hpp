@@ -16,7 +16,7 @@ namespace VoidEngine::IO::ResourceProviders {
 
 	class AMeshProvider {
 	public:
-		Event::EventBusLegacy<EMeshProviderChanged> meshChanged;
+		Event::EventBus meshChanged = &EMeshProviderChanged::ClassData;
 
 		virtual ~AMeshProvider() {}
 		virtual std::vector<VoidEngine::IO::GFX::Vertex> getVertices() = 0;

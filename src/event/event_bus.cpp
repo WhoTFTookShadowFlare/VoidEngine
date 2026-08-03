@@ -10,11 +10,11 @@ namespace VoidEngine::Event {
 		this->eventClass = eventClass;
 	}
 	
-	void EventBus::addHandler(std::shared_ptr<EventHandler>& handler) {
+	void EventBus::addHandler(std::shared_ptr<EventHandler> handler) {
 		handlers.push_back(handler);
 	}
 
-	void EventBus::removeHandler(std::shared_ptr<EventHandler>& handler) {
+	void EventBus::removeHandler(std::shared_ptr<EventHandler> handler) {
 		handlers.resize(std::distance(
 			handlers.begin(),
 			std::remove_if(handlers.begin(), handlers.end(), [](const auto& iter) {
@@ -23,7 +23,7 @@ namespace VoidEngine::Event {
 		));
 	}
 
-	bool EventBus::hasHandler(std::shared_ptr<EventHandler>& handler) const {
+	bool EventBus::hasHandler(std::shared_ptr<EventHandler> handler) const {
 		const auto idx = std::find_if(handlers.cbegin(), handlers.cend(), [&handler](const auto& iter) {
 			return *iter == *handler;
 		});
@@ -31,6 +31,7 @@ namespace VoidEngine::Event {
 	}
 
 	void EventBus::fireEvent(std::shared_ptr<AEvent> event) const {
+		if(event == nullptr) return;
 		if(!event->getClass()->instanceOf(eventClass)) {
 			std::println("[ERR] Provided event ({}) is not of type {}", event->getClass()->getName(), eventClass->getName());
 			return;

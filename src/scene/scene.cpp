@@ -302,15 +302,15 @@ namespace VoidEngine::Scene {
 	void Scene::addObject(std::shared_ptr<GameObject> obj) {
 		auto prev = getObject(obj->getName());
 		if(prev != nullptr) {
-			Events::ERemovedFromScene evt(shared_from_this(), prev);
-			prev->onRemovedFromScene(evt);
+			auto evt = std::shared_ptr<Events::ERemovedFromScene>(new Events::ERemovedFromScene(shared_from_this(), prev));
+			prev->onRemovedFromScene.fireEvent(evt);
 		}
 
 		objects[obj->getName()] = obj;
 
 		if(obj != nullptr) {
-			Events::EAddedToScene evt(shared_from_this(), obj);
-			obj->onAddedToScene(evt);
+			auto evt = std::shared_ptr<Events::EAddedToScene>(new Events::EAddedToScene(shared_from_this(), obj));
+			obj->onAddedToScene.fireEvent(evt);
 		}
 	}
 

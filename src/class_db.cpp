@@ -54,6 +54,8 @@ namespace VoidEngine {
 		registerClass(&Scene::Events::EChildAdded::ClassData, &Event::AEvent::ClassData);
 		registerClass(&Scene::Events::EChildRemoved::ClassData, &Event::AEvent::ClassData);
 
+		registerClass(&IO::Events::WindowCloseRequestedDefaultHandler::ClassData, &Object::ClassData);
+
 		registerClass(&Scene::Scene::ClassData, &Object::ClassData);
 		registerClass(&Scene::GameObject::ClassData, &Object::ClassData);
 

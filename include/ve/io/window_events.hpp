@@ -2,8 +2,10 @@
 
 #include "ve/event/event.hpp"
 #include "ve/event/event_listener.hpp"
+#include "ve/variant.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace VoidEngine::IO {
 	class Window;
@@ -52,9 +54,11 @@ namespace VoidEngine::IO::Events {
 		EWindowCloseRequested(std::shared_ptr<Window> window) : BasicWindowEvent (window) {}
 	};
 
-	class WindowCloseRequestedDefaultHandler : public Event::IEventListener<EWindowCloseRequested> {
+	class WindowCloseRequestedDefaultHandler : public Object {
 	public:
-		void onEvent(EWindowCloseRequested& evt);
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
+		Variant onCloseEvent(std::vector<Variant> evt);
 	};
 
 	class EWindowSizeChanged final : public Event::AEvent {

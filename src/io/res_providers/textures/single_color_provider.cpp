@@ -27,8 +27,8 @@ namespace VoidEngine::IO::ResourceProviders {
 	void SingleColorTextureProvider::setColor(VoidEngine::Variant value) {
 		if(!value.isVec4()) return;
 		color = value.asVec4().value();
-		ETextureChanged evt;
-		onTextureChange(evt);
+		auto evt = std::make_shared<ETextureChanged>();
+		onTextureChange.fireEvent(evt);
 	}
 
 	VoidEngine::Variant SingleColorTextureProvider::getColor() {

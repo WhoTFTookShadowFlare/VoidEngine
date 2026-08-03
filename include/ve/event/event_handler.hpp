@@ -10,9 +10,9 @@ namespace VoidEngine::Event {
 	struct EventHandler {
 	private:
 		std::weak_ptr<Object> handlerObj;
-		MethodBase* func;
+		const MethodBase* func;
 	public:
-		EventHandler(std::shared_ptr<Object>, MethodBase*);
+		EventHandler(std::shared_ptr<Object>, const MethodBase*);
 		std::shared_ptr<Object> getHandlerObject() const;
 		std::string getHandlerMethodName() const;
 		void handle(std::shared_ptr<AEvent>& evt) const;

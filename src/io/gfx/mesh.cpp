@@ -5,15 +5,16 @@
 
 namespace VoidEngine::IO::GFX {
 	void Mesh::setMeshProvider(std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> provider) {
+		// FIXME: Event migration
 		if(this->provider != nullptr) {
-			this->provider->meshChanged -= weak_from_this();
+			// this->provider->meshChanged -= weak_from_this();
 		}
 
 		this->provider = provider;
 		buildMesh();
 
 		if(this->provider != nullptr) {
-			this->provider->meshChanged += weak_from_this();
+			// this->provider->meshChanged += weak_from_this();
 		}
 	}
 

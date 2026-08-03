@@ -42,15 +42,15 @@ namespace VoidEngine::Scene {
 		components[comp->getClass()] = comp;
 		comp->tiedTo.push_back(weak_from_this());
 
-		Events::EComponentAddedToObject evt(shared_from_this(), comp);
-		comp->onComponentAdded(evt);
-		onComponentAdded(evt);
+		auto evt = std::shared_ptr<Events::EComponentAddedToObject>(new Events::EComponentAddedToObject(shared_from_this(), comp));
+		comp->onComponentAdded.fireEvent(evt);
+		onComponentAdded.fireEvent(evt);
 	}
 
 	void GameObject::removeComponent(std::shared_ptr<AObjectComponent> comp) {
-		Events::EComponentRemovedFromObject evt(shared_from_this(), comp);
-		components[comp->getClass()]->onComponentRemoved(evt);
-		onComponentRemoved(evt);
+		auto evt = std::shared_ptr<Events::EComponentRemovedFromObject>(new Events::EComponentRemovedFromObject(shared_from_this(), comp));
+		components[comp->getClass()]->onComponentRemoved.fireEvent(evt);
+		onComponentRemoved.fireEvent(evt);
 		components.erase(comp->getClass());
 	}
 
@@ -88,8 +88,8 @@ namespace VoidEngine::Scene {
 		child->parent = weak_from_this();
 
 		children[child->getName()] = child;
-		Events::EChildAdded evt(shared_from_this(), child);
-		onChildAdded(evt);
+		auto evt = std::shared_ptr<Events::EChildAdded>(new Events::EChildAdded(shared_from_this(), child));
+		onChildAdded.fireEvent(evt);
 	}
 
 	void GameObject::removeChild(std::string name) {
@@ -97,8 +97,8 @@ namespace VoidEngine::Scene {
 
 		std::shared_ptr<GameObject> child = children[name];
 		children.erase(name);
-		Events::EChildRemoved evt(shared_from_this(), child);
-		onChildRemoved(evt);
+		auto evt = std::shared_ptr<Events::EChildRemoved>(new Events::EChildRemoved(shared_from_this(), child));
+		onChildRemoved.fireEvent(evt);
 	}
 
 	std::shared_ptr<GameObject> GameObject::getChild(std::string name) {
@@ -128,9 +128,9 @@ namespace VoidEngine::Scene {
 	}
 
 	void GameObject::draw(Events::ESceneDraw& scnDraw) {
-		Events::EComponentDraw draw(scnDraw, shared_from_this());
+		auto draw = std::shared_ptr<Events::EComponentDraw>(new Events::EComponentDraw(scnDraw, shared_from_this()));
 		for(auto& child : children) if(child.second != nullptr) child.second->draw(scnDraw);
-		for(auto& comp : components) if(comp.second != nullptr) comp.second->onDraw(draw);
+		for(auto& comp : components) if(comp.second != nullptr) comp.second->onDraw.fireEvent(draw);
 	}
 
 	std::shared_ptr<AObjectComponent> GameObject::getComponent(const Class* cls) {

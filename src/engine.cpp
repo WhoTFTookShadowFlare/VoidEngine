@@ -1,5 +1,6 @@
 #include "ve/engine.hpp"
 #include "ve/engine_events.hpp"
+#include "ve/event/event_handler.hpp"
 #include "ve/io/window.hpp"
 #include "ve/io/window_events.hpp"
 #include "ve/io/input.hpp"
@@ -81,7 +82,11 @@ namespace VoidEngine {
 		instance->mainWindow = instance->renderer->createWindow(options);
 		instance->input = IO::Input::getInstance();
 
-		instance->winDefaultClose = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
+		instance->winDefaultCloseObj = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
+		instance->winDefaultClose = std::make_shared<Event::EventHandler>(
+			instance->winDefaultCloseObj,
+			IO::Events::WindowCloseRequestedDefaultHandler::ClassData.findMethod("onCloseEvent")
+		);
 
 		Scene::ComponentUpdater::ensureSetup();
 		auto compDB = ClassDB::getInstance();
@@ -96,7 +101,7 @@ namespace VoidEngine {
 		return mainWindow;
 	}
 
-	std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> Engine::getDefaultWindowCloseEvent() const {
+	std::shared_ptr<Event::EventHandler> Engine::getDefaultWindowCloseEvent() const {
 		return winDefaultClose;
 	}
 
@@ -158,83 +163,83 @@ namespace VoidEngine {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EWindowCloseRequested closeRequest(winPtr);
-					winPtr->onCloseRequested(closeRequest);
+					auto closeRequest = std::make_shared<IO::Events::EWindowCloseRequested>(winPtr);
+					winPtr->onCloseRequested.fireEvent(closeRequest);
 					} break;
 				case SDL_EVENT_WINDOW_RESIZED: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EWindowSizeChanged sizeChanged(winPtr);
-					winPtr->onSizeChanged(sizeChanged);
+					auto sizeChanged = std::make_shared<IO::Events::EWindowSizeChanged>(winPtr);
+					winPtr->onSizeChanged.fireEvent(sizeChanged);
 					} break;
 				case SDL_EVENT_WINDOW_MOVED: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EWindowRepositioned moved(winPtr);
-					winPtr->onReposition(moved);
+					auto moved = std::make_shared<IO::Events::EWindowRepositioned>(winPtr);
+					winPtr->onReposition.fireEvent(moved);
 					} break;
 				case SDL_EVENT_WINDOW_FOCUS_GAINED:
 				case SDL_EVENT_WINDOW_FOCUS_LOST: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EWindowFocus focus(winPtr, event.type == SDL_EVENT_WINDOW_FOCUS_GAINED);
-					winPtr->onFocusChanged(focus);
+					auto focus = std::make_shared<IO::Events::EWindowFocus>(winPtr, event.type == SDL_EVENT_WINDOW_FOCUS_GAINED);
+					winPtr->onFocusChanged.fireEvent(focus);
 					} break;
 				case SDL_EVENT_WINDOW_MOUSE_ENTER:
 				case SDL_EVENT_WINDOW_MOUSE_LEAVE: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EMouseEnter enter(winPtr, event.type == SDL_EVENT_WINDOW_MOUSE_ENTER);
-					winPtr->onMouseEnter(enter);
+					auto enter = std::make_shared<IO::Events::EMouseEnter>(winPtr, event.type == SDL_EVENT_WINDOW_MOUSE_ENTER);
+					winPtr->onMouseEnter.fireEvent(enter);
 					} break;
 				case SDL_EVENT_WINDOW_MINIMIZED: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EWindowMinimized minimize(winPtr);
-					winPtr->onMinimize(minimize);
+					auto minimize = std::make_shared<IO::Events::EWindowMinimized>(winPtr);
+					winPtr->onMinimize.fireEvent(minimize);
 					}; break;
 				case SDL_EVENT_WINDOW_MAXIMIZED: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EWindowMaximized maximize(winPtr);
-					winPtr->onMaximize(maximize);
+					auto maximize = std::make_shared<IO::Events::EWindowMaximized>(winPtr);
+					winPtr->onMaximize.fireEvent(maximize);
 					} break;
 				case SDL_EVENT_WINDOW_RESTORED: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.window.windowID];
 					auto winPtr = window.lock();
 					if (winPtr == nullptr) continue;
-					IO::Events::EWindowRestored restored(winPtr);
-					winPtr->onRestore(restored);
+					auto restored = std::make_shared<IO::Events::EWindowRestored>(winPtr);
+					winPtr->onRestore.fireEvent(restored);
 					} break;
 				case SDL_EVENT_MOUSE_MOTION: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.motion.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EMouseMotion motion(
+					auto motion = std::make_shared<IO::Events::EMouseMotion>(
 						winPtr,
-						{ event.motion.x, event.motion.y },
-						{ event.motion.xrel, event.motion.yrel }
+						glm::vec2 { event.motion.x, event.motion.y },
+						glm::vec2 { event.motion.xrel, event.motion.yrel }
 					);
-					winPtr->onMouseMotion(motion);
-					input->onMouseMotion(motion);
+					winPtr->onMouseMotion.fireEvent(motion);
+					input->onMouseMotion.fireEvent(motion);
 					} break;
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				case SDL_EVENT_MOUSE_BUTTON_UP: {
 					std::weak_ptr<IO::Window> window = IO::Window::WindowMap[event.button.windowID];
 					auto winPtr = window.lock();
 					if(winPtr == nullptr) continue;
-					IO::Events::EMouseButton button(
+					auto button = std::make_shared<IO::Events::EMouseButton>(
 						winPtr, event.button.which, event.button.button, event.button.down, event.button.clicks,
-						{ event.button.x, event.button.y }
+						glm::vec2 { event.button.x, event.button.y }
 					);
-					winPtr->onMouseButton(button);
-					input->onMouseButton(button);
+					winPtr->onMouseButton.fireEvent(button);
+					input->onMouseButton.fireEvent(button);
 					}; break;
 				case SDL_EVENT_KEY_DOWN:
 				case SDL_EVENT_KEY_UP: {
@@ -242,11 +247,12 @@ namespace VoidEngine {
 					auto winPtr = window.lock();
 					if (winPtr == nullptr) continue;
 					
-					IO::Events::EKeyButton button(winPtr, event.key.which, event.key.key,
+					auto button = std::make_shared<IO::Events::EKeyButton>(
+						winPtr, event.key.which, event.key.key,
 						event.key.mod, event.key.down, event.key.repeat
 					);
-					winPtr->onKeyButton(button);
-					input->onKeyButton(button);
+					winPtr->onKeyButton.fireEvent(button);
+					input->onKeyButton.fireEvent(button);
 					} break;
 			}
 		}

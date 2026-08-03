@@ -1,11 +1,7 @@
 #include "ve/scene/component_updater.hpp"
 #include "ve/scene/object_component.hpp"
 #include <algorithm>
-#include <cstdint>
-#include <format>
-#include <iostream>
 #include <memory>
-#include <thread>
 #include <vector>
 
 namespace VoidEngine::Scene {
@@ -52,13 +48,13 @@ namespace VoidEngine::Scene {
 
 	void ComponentUpdater::updateComponents(double delta) {
 		bool needsCleanup = false;
-		Events::EComponentUpdate update(delta);
+		auto update = std::shared_ptr<Events::EComponentUpdate>(new Events::EComponentUpdate(delta));
 		for_each(components.begin(), components.end(), [&needsCleanup, &update](auto& comp) {
 			if(comp.expired()) {
 				needsCleanup = true;
 				return;
 			}
-			if(auto component = comp.lock()) component->onUpdate(update);
+			if(auto component = comp.lock()) component->onUpdate.fireEvent(update);
 		});
 		if(needsCleanup) cleanComponents();
 	}

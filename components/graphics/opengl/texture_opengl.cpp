@@ -38,9 +38,10 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	}
 
 	void GLTexture::setTextureProvider(std::shared_ptr<ResourceProviders::ATextureProvider> textureData) {
-		if(textureProvider) textureProvider->onTextureChange -= weak_from_this();
+		// FIXME: Event migration
+		// if(textureProvider) textureProvider->onTextureChange -= weak_from_this();
 		textureProvider = textureData;
-		if(textureProvider) textureProvider->onTextureChange += weak_from_this();
+		// if(textureProvider) textureProvider->onTextureChange += weak_from_this();
 		uploadTexture();
 	}
 

@@ -12,7 +12,8 @@ namespace VoidEngine::Scene::Components {
 
 	std::shared_ptr<MeshComponent> MeshComponent::create() {
 		auto self = std::shared_ptr<MeshComponent>(new MeshComponent);
-		self->onDraw += self;
+		// FIXME: Event migration
+		// self->onDraw += self;
 		return self;
 	}
 
@@ -21,7 +22,7 @@ namespace VoidEngine::Scene::Components {
 		if(mesh == nullptr) return;
 
 		auto objs = getObjectsUsing();
-		std::for_each(objs.cbegin(), objs.cend(), [&](const auto& obj) {
+		std::for_each(objs.cbegin(), objs.cend(), [&](const std::shared_ptr<GameObject>& obj) {
 			draw.frame->addDraw(mesh, program, obj->getModelMatrix());
 		});
 	}

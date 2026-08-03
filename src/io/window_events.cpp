@@ -1,5 +1,9 @@
 #include "ve/io/window_events.hpp"
+#include "ve/class_methods.hpp"
 #include "ve/io/window.hpp"
+#include "ve/variant.hpp"
+#include <memory>
+#include <vector>
 
 namespace VoidEngine::IO::Events {
 	const Class BasicWindowEvent::ClassData = {
@@ -38,7 +42,16 @@ namespace VoidEngine::IO::Events {
 		.name = "EWindowFocues"
 	};
 
-	void WindowCloseRequestedDefaultHandler::onEvent(EWindowCloseRequested& evt) {
-		evt.window->close();
+	const Class WindowCloseRequestedDefaultHandler::ClassData = {
+		.name = "WindowCloseRequestedDefaultHandler",
+		.methods = {
+			new Method("onCloseEvent", &WindowCloseRequestedDefaultHandler::onCloseEvent)
+		}
+	};
+
+	Variant WindowCloseRequestedDefaultHandler::onCloseEvent(std::vector<Variant> evt) {
+		auto winEvt = std::static_pointer_cast<Events::EWindowCloseRequested>(evt[0].asObject().value());
+		winEvt->window->close();
+		return nullptr;
 	}
 }

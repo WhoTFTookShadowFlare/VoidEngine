@@ -43,7 +43,8 @@ namespace VoidEngine::Scene::Components {
 
 	std::shared_ptr<PointLightComponent> PointLightComponent::create() {
 		std::shared_ptr<PointLightComponent> self(new PointLightComponent);
-		self->onDraw += self;
+		// FIXME: Event migration
+		// self->onDraw += self;
 		return self;
 	}
 
@@ -65,7 +66,8 @@ namespace VoidEngine::Scene::Components {
 
 	std::shared_ptr<SpotLightComponent> SpotLightComponent::create() {
 		std::shared_ptr<SpotLightComponent> self(new SpotLightComponent);
-		self->onDraw += self;
+		// FIXME: Event migration
+		// self->onDraw += self;
 		return self;
 	}
 

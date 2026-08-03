@@ -20,6 +20,6 @@ namespace VoidEngine::IO::ResourceProviders {
 		virtual glm::ivec2 getSize() = 0;
 		virtual std::vector<uint8_t> getData() = 0;
 
-		Event::EventBusLegacy<ETextureChanged> onTextureChange;
+		Event::EventBus onTextureChange = &ETextureChanged::ClassData;
 	};
 }
