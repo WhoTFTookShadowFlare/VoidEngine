@@ -99,11 +99,6 @@ namespace VoidEngine {
 		const std::vector<const MethodBase*>& getMethods() const { return methods; }
 		const std::vector<const EventHandlerBase*>& getEventHandlers() const { return eventHandlers; }
 
-		~Class() {
-			if(constructor != nullptr) delete constructor;
-			if(name != nullptr) delete name;
-		}
-
 		bool operator==(Class* RHS) const { return name == RHS->name; }
 
 		bool instanceOf(const Class* cls) const {
