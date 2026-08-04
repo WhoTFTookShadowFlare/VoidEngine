@@ -40,7 +40,7 @@ namespace VoidEngine::Scene {
 	const Class AObjectComponent::ClassData = {
 		.name = "AObjectComponent",
 		.methods = {
-			new Method("getObjectsUsing", &AObjectComponent::scr_getObjectsUsing)
+			new NativeMethod("getObjectsUsing", &AObjectComponent::scr_getObjectsUsing)
 		}
 	};
 }

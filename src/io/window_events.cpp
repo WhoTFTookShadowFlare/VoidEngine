@@ -1,6 +1,8 @@
 #include "ve/io/window_events.hpp"
+#include "ve/class_event_handler.hpp"
 #include "ve/class_methods.hpp"
 #include "ve/io/window.hpp"
+#include "ve/object.hpp"
 #include "ve/variant.hpp"
 #include <memory>
 #include <vector>
@@ -44,14 +46,13 @@ namespace VoidEngine::IO::Events {
 
 	const Class WindowCloseRequestedDefaultHandler::ClassData = {
 		.name = "WindowCloseRequestedDefaultHandler",
-		.methods = {
-			new Method("onCloseEvent", &WindowCloseRequestedDefaultHandler::onCloseEvent)
+		.eventHandlers = {
+			new NativeEventHandler(&EWindowCloseRequested::ClassData, &WindowCloseRequestedDefaultHandler::onCloseEvent)
 		}
 	};
 
-	Variant WindowCloseRequestedDefaultHandler::onCloseEvent(std::vector<Variant> evt) {
-		auto winEvt = std::static_pointer_cast<Events::EWindowCloseRequested>(evt[0].asObject().value());
+	void WindowCloseRequestedDefaultHandler::onCloseEvent(std::shared_ptr<Object> evt) {
+		auto winEvt = std::static_pointer_cast<EWindowCloseRequested>(evt);
 		winEvt->window->close();
-		return nullptr;
 	}
 }

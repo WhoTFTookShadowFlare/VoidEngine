@@ -4,17 +4,16 @@
 #include "ve/event/event.hpp"
 #include "ve/object.hpp"
 #include <memory>
-#include <string>
 
 namespace VoidEngine::Event {
 	struct EventHandler {
 	private:
 		std::weak_ptr<Object> handlerObj;
-		const MethodBase* func;
+		const EventHandlerBase* func;
 	public:
-		EventHandler(std::shared_ptr<Object>, const MethodBase*);
+		EventHandler(std::shared_ptr<Object>, const EventHandlerBase*);
 		std::shared_ptr<Object> getHandlerObject() const;
-		std::string getHandlerMethodName() const;
+		const EventHandlerBase* getHandlerFunction() const;
 		void handle(std::shared_ptr<AEvent>& evt) const;
 
 		bool isValid() const;

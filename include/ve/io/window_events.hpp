@@ -2,6 +2,7 @@
 
 #include "ve/event/event.hpp"
 #include "ve/event/event_listener.hpp"
+#include "ve/object.hpp"
 #include "ve/variant.hpp"
 
 #include <memory>
@@ -58,7 +59,7 @@ namespace VoidEngine::IO::Events {
 	public:
 		static const Class ClassData;
 		virtual const Class* getClass() const { return &ClassData; }
-		Variant onCloseEvent(std::vector<Variant> evt);
+		void onCloseEvent(std::shared_ptr<Object> evt);
 	};
 
 	class EWindowSizeChanged final : public Event::AEvent {

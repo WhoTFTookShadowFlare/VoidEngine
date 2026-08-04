@@ -7,17 +7,17 @@
 
 namespace VoidEngine {
 	template<IsAbstractClass T>
-	struct Property : public PropertyBase {
+	struct NativeProperty : public PropertyBase {
 		using Getter = Variant (T::*)(void) const;
 		using Setter = void (T::*)(Variant);
 	private:
 		const Getter getterFn;
 		const Setter setterFn;
 	public:
-		Property(std::string name, Getter getterFn) :
+		NativeProperty(std::string name, Getter getterFn) :
 			PropertyBase(name), getterFn(getterFn), setterFn(nullptr)
 		{}
-		Property(std::string name, Getter getterFn, Setter setterFn) :
+		NativeProperty(std::string name, Getter getterFn, Setter setterFn) :
 			PropertyBase(name), getterFn(getterFn), setterFn(setterFn)
 		{}
 

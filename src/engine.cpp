@@ -82,11 +82,7 @@ namespace VoidEngine {
 		instance->mainWindow = instance->renderer->createWindow(options);
 		instance->input = IO::Input::getInstance();
 
-		instance->winDefaultCloseObj = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
-		instance->winDefaultClose = std::make_shared<Event::EventHandler>(
-			instance->winDefaultCloseObj,
-			IO::Events::WindowCloseRequestedDefaultHandler::ClassData.findMethod("onCloseEvent")
-		);
+		instance->winDefaultClose = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
 
 		Scene::ComponentUpdater::ensureSetup();
 		auto compDB = ClassDB::getInstance();
@@ -101,7 +97,7 @@ namespace VoidEngine {
 		return mainWindow;
 	}
 
-	std::shared_ptr<Event::EventHandler> Engine::getDefaultWindowCloseEvent() const {
+	std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> Engine::getDefaultWindowCloseEvent() const {
 		return winDefaultClose;
 	}
 

@@ -54,6 +54,16 @@ namespace VoidEngine {
 		virtual Variant call(std::shared_ptr<Object> obj, std::vector<Variant> args) const = 0;
 	};
 
+	struct EventHandlerBase {
+	protected:
+		EventHandlerBase(const Class* event) : event(event) {}
+	public:
+		virtual ~EventHandlerBase() = default;
+
+		const Class* event;
+		virtual void handleEvent(std::shared_ptr<Object> obj, std::shared_ptr<Object> event) const = 0;
+	};
+
 	struct ConstructorBase {
 	protected:
 		ConstructorBase() {}
@@ -80,12 +90,14 @@ namespace VoidEngine {
 		const Class *super;
 		std::vector<const PropertyBase*> properties;
 		std::vector<const MethodBase*> methods;
+		std::vector<const EventHandlerBase*> eventHandlers;
 		const ConstructorBase* constructor = nullptr;
 
 		const char* getName() const { return name; }
 		const Class* getSuper() const { return super; }
 		const std::vector<const PropertyBase*>& getProperties() const { return properties; }
 		const std::vector<const MethodBase*>& getMethods() const { return methods; }
+		const std::vector<const EventHandlerBase*>& getEventHandlers() const { return eventHandlers; }
 
 		~Class() {
 			if(constructor != nullptr) delete constructor;
@@ -110,7 +122,6 @@ namespace VoidEngine {
 		const PropertyBase* findProperty(std::string name) const {
 			const Class* cls = this;
 			while(cls != nullptr) {
-
 				const auto idx = std::find_if(cls->properties.cbegin(), cls->properties.cend(), [&name](const auto prop) {
 					return prop->name == name;
 				});
@@ -126,11 +137,25 @@ namespace VoidEngine {
 		const MethodBase* findMethod(std::string name) const {
 			const Class* cls = this;
 			while(cls != nullptr) {
-
 				const auto idx = std::find_if(cls->methods.cbegin(), cls->methods.cend(), [&name](const auto meth) {
 					return meth->name == name;
 				});
 				if(idx == methods.cend()) {
+					cls = cls->super;
+					continue;
+				}
+				return *idx;
+			}
+			return nullptr;
+		}
+
+		const EventHandlerBase* findEventHandler(const Class* eventClass) const {
+			const Class* cls = this;
+			while(cls != nullptr) {
+				const auto idx = std::find_if(cls->eventHandlers.cbegin(), cls->eventHandlers.cend(), [&eventClass](const auto handler) {
+					return handler->event == eventClass;
+				});
+				if(idx == eventHandlers.cend()) {
 					cls = cls->super;
 					continue;
 				}

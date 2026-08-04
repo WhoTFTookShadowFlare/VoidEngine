@@ -3,6 +3,7 @@
 #include "ve/engine_events.hpp"
 #include "ve/event/event_bus.hpp"
 #include "ve/event/event_handler.hpp"
+#include "ve/io/window_events.hpp"
 #include "ve/math/rect2.hpp"
 #include <filesystem>
 #include <glm/ext/vector_float2.hpp>
@@ -44,8 +45,7 @@ namespace VoidEngine {
 
 		std::shared_ptr<IO::Window> mainWindow = nullptr;
 
-		std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> winDefaultCloseObj = nullptr;
-		std::shared_ptr<Event::EventHandler> winDefaultClose = nullptr;
+		std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> winDefaultClose = nullptr;
 	public:
 		Engine(const Engine&) = delete;
 		Engine& operator=(const Engine&) = delete;
@@ -58,7 +58,7 @@ namespace VoidEngine {
 		[[nodiscard]] static std::shared_ptr<Engine> getInstance();
 		[[nodiscard]] std::shared_ptr<IO::Window> getMainWindow() const;
 
-		[[nodiscard]] std::shared_ptr<Event::EventHandler> getDefaultWindowCloseEvent() const;
+		[[nodiscard]] std::shared_ptr<IO::Events::WindowCloseRequestedDefaultHandler> getDefaultWindowCloseEvent() const;
 
 		void setupScriptEngines();
 

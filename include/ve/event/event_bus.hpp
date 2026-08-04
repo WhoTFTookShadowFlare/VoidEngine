@@ -9,7 +9,7 @@
 namespace VoidEngine::Event {
 	class EventBus final {
 	private:
-		std::vector<std::shared_ptr<EventHandler>> handlers;
+		std::vector<EventHandler> handlers;
 		const Class* eventClass;
 
 	public:
@@ -17,9 +17,10 @@ namespace VoidEngine::Event {
 		EventBus(EventBus&&) = delete;
 		EventBus(const Class* eventClass);
 
-		void addHandler(std::shared_ptr<EventHandler>);
-		void removeHandler(std::shared_ptr<EventHandler>);
-		bool hasHandler(std::shared_ptr<EventHandler>) const;
+		// TODO: addHandler takes the OBJECT and generates the EventHandler from that
+		void addHandler(std::shared_ptr<Object>);
+		void removeHandler(std::shared_ptr<Object>);
+		bool hasHandler(std::shared_ptr<Object>) const;
 
 		// fireEvent? What did they do?
 		void fireEvent(std::shared_ptr<AEvent>) const;

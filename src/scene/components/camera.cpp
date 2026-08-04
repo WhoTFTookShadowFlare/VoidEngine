@@ -73,14 +73,14 @@ namespace VoidEngine::Scene::Components {
 	const Class ACamera::ClassData = {
 		.name = "ACamera",
 		.properties = {
-			new Property<ACamera>("zfar", &ACamera::getZFar, &ACamera::setZFar)
+			new NativeProperty<ACamera>("zfar", &ACamera::getZFar, &ACamera::setZFar)
 		}
 	};
 
 	const Class PerspectiveCamera::ClassData = {
 		.name = "PerspectiveCamera",
 		.properties = {
-			new Property<PerspectiveCamera>("fov", &PerspectiveCamera::getFOV, &PerspectiveCamera::setFOV)
+			new NativeProperty<PerspectiveCamera>("fov", &PerspectiveCamera::getFOV, &PerspectiveCamera::setFOV)
 		},
 		.constructor = new NativeConstructor(PerspectiveCamera::create)
 	};

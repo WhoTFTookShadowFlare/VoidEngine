@@ -8,12 +8,12 @@
 
 namespace VoidEngine {
 	template<IsAbstractClass T>
-	struct Method : public MethodBase {
+	struct NativeMethod : public MethodBase {
 		using Func = Variant (T::*)(std::vector<Variant>);
 	private:
 		const Func fn;
 	public:
-		Method(std::string name, Func fn) : MethodBase(name), fn(fn) {}
+		NativeMethod(std::string name, Func fn) : MethodBase(name), fn(fn) {}
 
 		Variant call(std::shared_ptr<Object> obj, std::vector<Variant> args) const {
 			if(obj == nullptr) return nullptr; // TODO: Support for static functions.

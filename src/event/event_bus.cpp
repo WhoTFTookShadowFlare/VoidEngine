@@ -1,8 +1,10 @@
 #include "ve/event/event_bus.hpp"
 #include "ve/class_db.hpp"
 #include "ve/event/event.hpp"
+#include "ve/event/event_handler.hpp"
 #include <algorithm>
 #include <memory>
+#include <print>
 
 namespace VoidEngine::Event {
 	EventBus::EventBus(const Class* eventClass) {
@@ -10,22 +12,30 @@ namespace VoidEngine::Event {
 		this->eventClass = eventClass;
 	}
 	
-	void EventBus::addHandler(std::shared_ptr<EventHandler> handler) {
-		handlers.push_back(handler);
+	void EventBus::addHandler(std::shared_ptr<Object> handlerObj) {
+		const EventHandlerBase* handler = handlerObj->getClass()->findEventHandler(eventClass);
+		if(handler == nullptr) {
+			std::println("[ERR] Object of class {} cannot handle event {}", handlerObj->getClass()->getName(), eventClass->getName());
+			return;
+		}
+		handlers.push_back(EventHandler(handlerObj, handler));
 	}
 
-	void EventBus::removeHandler(std::shared_ptr<EventHandler> handler) {
-		handlers.resize(std::distance(
-			handlers.begin(),
-			std::remove_if(handlers.begin(), handlers.end(), [](const auto& iter) {
-				return iter->isValid();
-			})
-		));
+	void EventBus::removeHandler(std::shared_ptr<Object> handlerObj) {
+		// handlers.resize(std::distance(
+			// handlers.begin(),
+			// std::remove_if(handlers.begin(), handlers.end(), [](const auto& iter) {
+				// return iter.isValid();
+			// })
+		// ));
 	}
 
-	bool EventBus::hasHandler(std::shared_ptr<EventHandler> handler) const {
+	bool EventBus::hasHandler(std::shared_ptr<Object> handlerobj) const {
+		if(handlerobj == nullptr) return false;
+		if(handlerobj->getClass()->findEventHandler(eventClass) == nullptr) return false;
+		const EventHandler handler(handlerobj, handlerobj->getClass()->findEventHandler(eventClass));
 		const auto idx = std::find_if(handlers.cbegin(), handlers.cend(), [&handler](const auto& iter) {
-			return *iter == *handler;
+			return iter == handler;
 		});
 		return idx != handlers.cend();
 	}
@@ -38,7 +48,7 @@ namespace VoidEngine::Event {
 		}
 		
 		std::for_each(handlers.cbegin(), handlers.cend(), [&](const auto& handler) {
-			handler->handle(event);
+			handler.handle(event);
 		});
 	}
 }

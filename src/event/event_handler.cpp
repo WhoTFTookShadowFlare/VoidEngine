@@ -1,8 +1,9 @@
 #include "ve/event/event_handler.hpp"
+#include "ve/class_db.hpp"
 #include "ve/variant.hpp"
 
 namespace VoidEngine::Event {
-	EventHandler::EventHandler(std::shared_ptr<Object> obj, const MethodBase* func) {
+	EventHandler::EventHandler(std::shared_ptr<Object> obj, const EventHandlerBase* func) {
 		handlerObj = obj;
 		this->func = func;
 	}
@@ -12,13 +13,13 @@ namespace VoidEngine::Event {
 		return handlerObj.lock();
 	}
 	
-	std::string EventHandler::getHandlerMethodName() const {
-		return func->name;
+	const EventHandlerBase* EventHandler::getHandlerFunction() const {
+		return func;
 	}
 	
 	void EventHandler::handle(std::shared_ptr<AEvent>& evt) const {
 		if(!isValid()) return;
-		func->call(getHandlerObject(), { Variant(evt) });
+		func->handleEvent(getHandlerObject(), evt);
 	}
 
 	bool EventHandler::isValid() const {
