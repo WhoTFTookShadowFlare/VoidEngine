@@ -17,7 +17,6 @@ namespace VoidEngine::Event {
 		EventBus(EventBus&&) = delete;
 		EventBus(const Class* eventClass);
 
-		// TODO: addHandler takes the OBJECT and generates the EventHandler from that
 		void addHandler(std::shared_ptr<Object>);
 		void removeHandler(std::shared_ptr<Object>);
 		bool hasHandler(std::shared_ptr<Object>) const;

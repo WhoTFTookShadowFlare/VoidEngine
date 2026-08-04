@@ -8,9 +8,7 @@
 #include <optional>
 
 namespace VoidEngine::Scene::Components {
-	class MeshComponent : public AObjectComponent,
-		public Event::IEventListener<Events::EComponentDraw>
-	{
+	class MeshComponent : public AObjectComponent {
 		std::shared_ptr<VoidEngine::IO::GFX::Mesh> mesh = nullptr;
 		std::shared_ptr<VoidEngine::IO::GFX::GraphicsProgram> program = nullptr;
 
@@ -24,7 +22,7 @@ namespace VoidEngine::Scene::Components {
 		static const Class ClassData;
 		static std::shared_ptr<MeshComponent> create();
 
-		void onEvent(Events::EComponentDraw& evt) override;
+		void onDrawEvent(std::shared_ptr<Object> evt);
 
 		std::shared_ptr<VoidEngine::IO::GFX::Mesh> getMesh();
 		std::shared_ptr<VoidEngine::IO::GFX::GraphicsProgram> getProgram();

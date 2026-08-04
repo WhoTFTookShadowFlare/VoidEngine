@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/ext/vector_float3.hpp"
-#include "ve/event/event_listener.hpp"
+#include "ve/object.hpp"
 #include "ve/scene/events.hpp"
 #include "ve/scene/object_component.hpp"
 #include <memory>
@@ -27,9 +27,7 @@ namespace VoidEngine::Scene::Components {
 		void setSpecular(glm::vec3);
 	};
 
-	class PointLightComponent final : public LightComponent,
-		public Event::IEventListener<Events::EComponentDraw>
-	{
+	class PointLightComponent final : public LightComponent	{
 	private:
 		float constant = 1.0f;
 		float linear = 0.09f;
@@ -41,12 +39,10 @@ namespace VoidEngine::Scene::Components {
 
 		static std::shared_ptr<PointLightComponent> create();
 
-		void onEvent(Events::EComponentDraw&);
+		void onDrawEvent(std::shared_ptr<Object>);
 	};
 
-	class SpotLightComponent final : public LightComponent,
-		public Event::IEventListener<Events::EComponentDraw>
-	{
+	class SpotLightComponent final : public LightComponent {
 	private:
 		float constant = 1.0f;
 		float linear = 0.09f;
@@ -60,6 +56,6 @@ namespace VoidEngine::Scene::Components {
 
 		static std::shared_ptr<SpotLightComponent> create();
 
-		void onEvent(Events::EComponentDraw&);
+		void onDrawEvent(std::shared_ptr<Object>);
 	};
 }

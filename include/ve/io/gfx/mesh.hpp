@@ -1,14 +1,14 @@
 #pragma once
 
+#include "ve/class_db.hpp"
 #include "ve/io/gfx/material.hpp"
 #include "ve/io/res_providers/mesh/a_provider.hpp"
-#include "ve/event/event_listener.hpp"
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
 	class GraphicsProgram;
-	class Mesh : public std::enable_shared_from_this<Mesh>,
-		public Event::IEventListener<VoidEngine::IO::ResourceProviders::EMeshProviderChanged>
+	class Mesh : public Object,
+		public std::enable_shared_from_this<Mesh>
 	{
 		friend class GraphicsProgram;
 
@@ -19,6 +19,9 @@ namespace VoidEngine::IO::GFX {
 	protected:
 		virtual void buildMesh() = 0;
 	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
+
 		virtual ~Mesh() {}
 
 		void setMeshProvider(std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider>);
@@ -27,7 +30,7 @@ namespace VoidEngine::IO::GFX {
 		void setMaterial(std::shared_ptr<Material>);
 		std::shared_ptr<Material> getMaterial();
 
-		void onEvent(VoidEngine::IO::ResourceProviders::EMeshProviderChanged& evt);
+		void onMeshProviderChangedEvent(std::shared_ptr<Object> evt);
 	};
 }
 

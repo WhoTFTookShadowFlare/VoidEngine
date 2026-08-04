@@ -1,12 +1,12 @@
 #include "ve/event/event_listener.hpp"
 #include "ve/io/gfx/texture.hpp"
 #include "ve/io/res_providers/texture/a_provider.hpp"
+#include "ve/object.hpp"
 #include <cstdint>
 #include <memory>
 
 namespace VoidEngine::IO::GFX::OpenGL {
 	class GLTexture : public Texture,
-		public Event::IEventListener<ResourceProviders::ETextureChanged>,
 		public std::enable_shared_from_this<GLTexture>
 	{
 	private:
@@ -16,6 +16,9 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		void uploadTexture();
 
 	public:
+		static const Class ClassData;
+		virtual const Class* getClass() const { return &ClassData; }
+
 		GLTexture(uint8_t slot);
 		~GLTexture();
 
@@ -25,7 +28,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		void setFiltered(bool);
 		bool isFiltered();
 
-		void onEvent(ResourceProviders::ETextureChanged&);
+		void onTextureChangeEvent(std::shared_ptr<Object>);
 	};
 }
 

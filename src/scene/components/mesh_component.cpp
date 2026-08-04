@@ -1,6 +1,8 @@
+#include "ve/class_event_handler.hpp"
 #include "ve/io/gfx/mesh.hpp"
 #include "ve/scene/components/mesh.hpp"
 #include "ve/io/gfx/graphics_program.hpp"
+#include "ve/scene/events.hpp"
 #include "ve/scene/game_object.hpp"
 #include <algorithm>
 #include <glm/ext/matrix_float4x4.hpp>
@@ -12,18 +14,19 @@ namespace VoidEngine::Scene::Components {
 
 	std::shared_ptr<MeshComponent> MeshComponent::create() {
 		auto self = std::shared_ptr<MeshComponent>(new MeshComponent);
-		// FIXME: Event migration
-		// self->onDraw += self;
+		self->onDraw.addHandler(self);
 		return self;
 	}
 
-	void MeshComponent::onEvent(Events::EComponentDraw& draw) {
+	void MeshComponent::onDrawEvent(std::shared_ptr<Object> evt) {
 		if(program == nullptr) return;
 		if(mesh == nullptr) return;
 
+		auto draw = std::static_pointer_cast<Events::EComponentDraw>(evt);
+
 		auto objs = getObjectsUsing();
 		std::for_each(objs.cbegin(), objs.cend(), [&](const std::shared_ptr<GameObject>& obj) {
-			draw.frame->addDraw(mesh, program, obj->getModelMatrix());
+			draw->frame->addDraw(mesh, program, obj->getModelMatrix());
 		});
 	}
 
@@ -45,7 +48,10 @@ namespace VoidEngine::Scene::Components {
 
 	const Class MeshComponent::ClassData = {
 		.name = "MeshComponent",
-		.constructor = new NativeConstructor(MeshComponent::create)
+		.eventHandlers = {
+			new NativeEventHandler(&Events::EComponentDraw::ClassData, &MeshComponent::onDrawEvent)
+		},
+		.constructor = new NativeConstructor(MeshComponent::create),
 	};
 }
 

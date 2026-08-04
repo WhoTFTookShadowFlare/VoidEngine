@@ -2,6 +2,7 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include "ve/class_db.hpp"
+#include "ve/class_event_handler.hpp"
 #include "ve/io/gfx/light.hpp"
 #include "ve/scene/events.hpp"
 #include "ve/scene/game_object.hpp"
@@ -15,12 +16,18 @@ namespace VoidEngine::Scene::Components {
 
 	const Class PointLightComponent::ClassData = {
 		.name = "PointLightComponent",
-		.constructor = new NativeConstructor(PointLightComponent::create)
+		.eventHandlers = {
+			new NativeEventHandler(&Events::EComponentDraw::ClassData, &PointLightComponent::onDrawEvent)
+		},
+		.constructor = new NativeConstructor(PointLightComponent::create),
 	};
 
 	const Class SpotLightComponent::ClassData = {
 		.name = "SpotLightComponent",
-		.constructor = new NativeConstructor(SpotLightComponent::create)
+		.eventHandlers = {
+			new NativeEventHandler(&Events::EComponentDraw::ClassData, &SpotLightComponent::onDrawEvent)
+		},
+		.constructor = new NativeConstructor(SpotLightComponent::create),
 	};
 
 	LightComponent::LightComponent() {}
@@ -43,12 +50,13 @@ namespace VoidEngine::Scene::Components {
 
 	std::shared_ptr<PointLightComponent> PointLightComponent::create() {
 		std::shared_ptr<PointLightComponent> self(new PointLightComponent);
-		// FIXME: Event migration
-		// self->onDraw += self;
+		self->onDraw.addHandler(self);
 		return self;
 	}
 
-	void PointLightComponent::onEvent(Events::EComponentDraw& evt) {
+	void PointLightComponent::onDrawEvent(std::shared_ptr<Object> draw) {
+		auto evt = std::static_pointer_cast<Events::EComponentDraw>(draw);
+
 		auto objs = getObjectsUsing();
 		std::for_each(objs.cbegin(), objs.cend(), [&](const std::shared_ptr<GameObject>& obj) {
 			IO::GFX::PointLight light;
@@ -60,18 +68,19 @@ namespace VoidEngine::Scene::Components {
 			light.linear = linear;
 			light.quadratic = quadratic;
 
-			evt.frame->addPointLight(light);
+			evt->frame->addPointLight(light);
 		});
 	}
 
 	std::shared_ptr<SpotLightComponent> SpotLightComponent::create() {
 		std::shared_ptr<SpotLightComponent> self(new SpotLightComponent);
-		// FIXME: Event migration
-		// self->onDraw += self;
+		self->onDraw.addHandler(self);
 		return self;
 	}
 
-	void SpotLightComponent::onEvent(Events::EComponentDraw& evt) {
+	void SpotLightComponent::onDrawEvent(std::shared_ptr<Object> draw) {
+		auto evt = std::static_pointer_cast<Events::EComponentDraw>(draw);
+
 		auto objs = getObjectsUsing();
 		std::for_each(objs.cbegin(), objs.cend(), [&](const std::shared_ptr<GameObject>& obj) {
 			IO::GFX::SpotLight light;
@@ -91,7 +100,7 @@ namespace VoidEngine::Scene::Components {
 			light.cutoffAngle = cutoffAngle;
 			light.outerCutoffAngle = outerCutoffAngle;
 
-			evt.frame->addSpotLight(light);
+			evt->frame->addSpotLight(light);
 		});
 	}
 }

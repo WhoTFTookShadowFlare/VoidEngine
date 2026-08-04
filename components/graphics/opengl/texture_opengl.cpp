@@ -1,4 +1,5 @@
 #include "texture_opengl.hpp"
+#include "ve/class_event_handler.hpp"
 #include "ve/io/gfx/texture.hpp"
 #include "ve/io/res_providers/texture/a_provider.hpp"
 #include <cstdint>
@@ -6,9 +7,17 @@
 #include <glbinding/gl/functions.h>
 #include <glbinding/gl46core/gl.h>
 #include <glm/ext/vector_int2.hpp>
+#include <memory>
 
 namespace VoidEngine::IO::GFX::OpenGL {
 	using namespace gl;
+
+	const Class GLTexture::ClassData = {
+		.name = "GLTexture",
+		.eventHandlers = {
+			new NativeEventHandler(&ResourceProviders::ETextureChanged::ClassData, &GLTexture::onTextureChangeEvent)
+		}
+	};
 
 	void GLTexture::uploadTexture() {
 		auto provider =  getTextureProvider();
@@ -38,10 +47,9 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	}
 
 	void GLTexture::setTextureProvider(std::shared_ptr<ResourceProviders::ATextureProvider> textureData) {
-		// FIXME: Event migration
-		// if(textureProvider) textureProvider->onTextureChange -= weak_from_this();
+		if(textureProvider) textureProvider->onTextureChange.addHandler(shared_from_this());
 		textureProvider = textureData;
-		// if(textureProvider) textureProvider->onTextureChange += weak_from_this();
+		if(textureProvider) textureProvider->onTextureChange.addHandler(shared_from_this());
 		uploadTexture();
 	}
 
@@ -57,7 +65,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		return filtered;
 	}
 
-	void GLTexture::onEvent(ResourceProviders::ETextureChanged& evt) {
+	void GLTexture::onTextureChangeEvent(std::shared_ptr<Object> evt) {
 		uploadTexture();
 	}
 }

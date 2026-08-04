@@ -1,20 +1,28 @@
 #include "ve/io/gfx/mesh.hpp"
+#include "ve/class_event_handler.hpp"
 #include "ve/io/gfx/material.hpp"
 #include "ve/io/res_providers/mesh/a_provider.hpp"
+#include "ve/object.hpp"
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
+	const Class Mesh::ClassData = {
+		.name = "Mesh",
+		.eventHandlers = {
+			new NativeEventHandler(&ResourceProviders::EMeshProviderChanged::ClassData, &Mesh::onMeshProviderChangedEvent)
+		}
+	};
+	
 	void Mesh::setMeshProvider(std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> provider) {
-		// FIXME: Event migration
 		if(this->provider != nullptr) {
-			// this->provider->meshChanged -= weak_from_this();
+			this->provider->meshChanged.addHandler(shared_from_this());
 		}
 
 		this->provider = provider;
 		buildMesh();
 
 		if(this->provider != nullptr) {
-			// this->provider->meshChanged += weak_from_this();
+			this->provider->meshChanged.addHandler(shared_from_this());
 		}
 	}
 
@@ -30,7 +38,7 @@ namespace VoidEngine::IO::GFX {
 		return material;
 	}
 
-	void Mesh::onEvent(VoidEngine::IO::ResourceProviders::EMeshProviderChanged& evt) {
+	void Mesh::onMeshProviderChangedEvent(std::shared_ptr<Object> evt) {
 		buildMesh();
 	}
 }
