@@ -4,8 +4,7 @@
 
 namespace VoidEngine::Event {
 	class AEvent : public Object {
+		VE_CLASS(AEvent)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
 	};
 }

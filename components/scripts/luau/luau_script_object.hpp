@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ve/object.hpp"
 #include "ve/script/a_script_engine.hpp"
 #include "ve/script/a_script_object.hpp"
 #include "ve/variant.hpp"
@@ -8,12 +9,10 @@
 namespace VoidEngine::Scripts::Luau {
 	class LuauScriptObject final : public AScriptObject {
 		friend class LuauScriptModule;
+		VE_CLASS(LuauScriptObject)
 	private:
 		LuauScriptObject();
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const override { return &ClassData; }
-
 		~LuauScriptObject();
 		std::shared_ptr<AScriptEngine> getScriptEngine() override;
 		Variant call(std::string fnName, std::vector<Variant> args) override;

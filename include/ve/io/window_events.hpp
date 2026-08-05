@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ve/event/event.hpp"
-#include "ve/event/event_listener.hpp"
 #include "ve/object.hpp"
 #include "ve/variant.hpp"
 
@@ -14,87 +13,68 @@ namespace VoidEngine::IO {
 
 namespace VoidEngine::IO::Events {
 	class BasicWindowEvent : public Event::AEvent {
+		VE_CLASS(BasicWindowEvent)
 	protected:
 		BasicWindowEvent(std::shared_ptr<Window> window) : window(window) {}
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		const std::shared_ptr<Window> window;
 	};
 
 	class EWindowMinimized final : public BasicWindowEvent {
+		VE_CLASS(EWindowMinimized)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EWindowMinimized(std::shared_ptr<Window> window) : BasicWindowEvent(window) {}
 	};
 
 	class EWindowRestored final : public BasicWindowEvent {
+		VE_CLASS(EWindowRestored)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EWindowRestored(std::shared_ptr<Window> window) : BasicWindowEvent(window) {}
 	};
 
 	class EWindowMaximized final : public BasicWindowEvent {
+		VE_CLASS(EWindowMaximized)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EWindowMaximized(std::shared_ptr<Window> window) : BasicWindowEvent(window) {}
 	};
 
 	class EWindowCloseRequested final : public BasicWindowEvent {
+		VE_CLASS(EWindowCloseRequested)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EWindowCloseRequested(std::shared_ptr<Window> window) : BasicWindowEvent (window) {}
 	};
 
 	class WindowCloseRequestedDefaultHandler : public Object {
+		VE_CLASS(WindowCloseRequestedDefaultHandler)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
 		void onCloseEvent(std::shared_ptr<Object> evt);
 	};
 
 	class EWindowSizeChanged final : public Event::AEvent {
+		VE_CLASS(EWindowSizeChanged)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EWindowSizeChanged(std::shared_ptr<Window> window) : window(window) {}
 		const std::shared_ptr<Window> window;
 	};
 
 	class EWindowRepositioned final : public Event::AEvent {
+		VE_CLASS(EWindowRepositioned)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EWindowRepositioned(std::shared_ptr<Window> window) : window(window) {}
 		const std::shared_ptr<Window> window;
 	};
 
 	class EMouseEnter final : public Event::AEvent {
+		VE_CLASS(EMouseEnter)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EMouseEnter(std::shared_ptr<Window> window, bool entered) : window(window), entered(entered) {}
 		const std::shared_ptr<Window> window;
 		const bool entered;
 	};
 
 	class EWindowFocus final : public Event::AEvent {
+		VE_CLASS(EWindowFocus)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-		
 		EWindowFocus(std::shared_ptr<Window> window, bool focused) : window(window), focused(focused) {}
 		const std::shared_ptr<Window> window;
 		const bool focused;

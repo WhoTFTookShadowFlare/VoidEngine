@@ -3,6 +3,7 @@
 #include "ve/class_db.hpp"
 #include "ve/io/gfx/material.hpp"
 #include "ve/io/res_providers/mesh/a_provider.hpp"
+#include "ve/object.hpp"
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
@@ -10,6 +11,7 @@ namespace VoidEngine::IO::GFX {
 	class Mesh : public Object,
 		public std::enable_shared_from_this<Mesh>
 	{
+		VE_CLASS(Mesh)
 		friend class GraphicsProgram;
 
 		std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider> provider = nullptr;
@@ -19,9 +21,6 @@ namespace VoidEngine::IO::GFX {
 	protected:
 		virtual void buildMesh() = 0;
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		virtual ~Mesh() {}
 
 		void setMeshProvider(std::shared_ptr<VoidEngine::IO::ResourceProviders::AMeshProvider>);

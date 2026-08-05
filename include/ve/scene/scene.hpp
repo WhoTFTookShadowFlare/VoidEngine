@@ -21,6 +21,8 @@ namespace VoidEngine::Scene::Components {
 
 namespace VoidEngine::Scene {
 	class Scene final : public Object, public std::enable_shared_from_this<Scene> {
+		VE_CLASS(Scene)
+
 		std::map<std::string, std::shared_ptr<GameObject>> objects = {};
 
 		std::shared_ptr<GameObject> currentCamera = nullptr;
@@ -33,9 +35,6 @@ namespace VoidEngine::Scene {
 			{ -0.5f, -1.0f, -0.5f },
 		};
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		static std::shared_ptr<Scene> create();
 		static std::shared_ptr<Scene> loadFrom(std::filesystem::path);
 

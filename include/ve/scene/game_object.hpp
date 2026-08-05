@@ -19,6 +19,7 @@
 
 namespace VoidEngine::Scene {
 	class GameObject final : public Object, public std::enable_shared_from_this<GameObject> {
+		VE_CLASS(GameObject)
 		std::map<const Class*, std::shared_ptr<AObjectComponent>> components;
 
 		std::map<std::string, std::shared_ptr<GameObject>> children;
@@ -34,9 +35,6 @@ namespace VoidEngine::Scene {
 			scale = { 1.0f, 1.0f, 1.0f };
 
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		static std::shared_ptr<GameObject> create(std::string name);
 
 		std::string getName() const;

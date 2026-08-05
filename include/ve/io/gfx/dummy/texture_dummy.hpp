@@ -5,6 +5,7 @@
 
 namespace VoidEngine::IO::GFX::Dummy {
 	class DummyTexture final : public Texture {
+		VE_CLASS(DummyTexture)
 	private:
 		DummyTexture();
 

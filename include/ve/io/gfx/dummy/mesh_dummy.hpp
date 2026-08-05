@@ -1,9 +1,11 @@
 #pragma once
 
 #include "ve/io/gfx/mesh.hpp"
+#include "ve/object.hpp"
 #include <memory>
 namespace VoidEngine::IO::GFX::Dummy {
 	class DummyMesh final : public Mesh {
+		VE_CLASS(DummyMesh)
 	private:
 		DummyMesh();
 

@@ -2,15 +2,15 @@
 
 #include "ve/event/event.hpp"
 #include "ve/event/event_bus.hpp"
+#include "ve/object.hpp"
 #include <cstdint>
 #include <glm/ext/vector_int2.hpp>
 #include <vector>
 
 namespace VoidEngine::IO::ResourceProviders {
 	class ETextureChanged final : public Event::AEvent {
+		VE_CLASS(ETextureChanged)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
 	};
 
 	class ATextureProvider {

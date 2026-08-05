@@ -9,12 +9,13 @@
 namespace VoidEngine::Scripts {
 	class AScriptEngine;
 
+	// TODO: Move this to AObjectScript
 	class AScriptObject : public Object {
 	private:
 	protected:
 	public:
 		static const Class ClassData;
-		virtual const Class* getClass() const override { return &ClassData; }
+		// virtual const Class* getClass() const override { return &ClassData; }
 
 		virtual ~AScriptObject() {}
 		virtual std::shared_ptr<AScriptEngine> getScriptEngine() = 0;

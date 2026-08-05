@@ -1,4 +1,3 @@
-#include "ve/event/event_listener.hpp"
 #include "ve/io/gfx/texture.hpp"
 #include "ve/io/res_providers/texture/a_provider.hpp"
 #include "ve/object.hpp"
@@ -9,6 +8,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	class GLTexture : public Texture,
 		public std::enable_shared_from_this<GLTexture>
 	{
+		VE_CLASS(GLTexture)
 	private:
 		uint32_t texture = 0;
 		bool filtered = false;
@@ -16,9 +16,6 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		void uploadTexture();
 
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		GLTexture(uint8_t slot);
 		~GLTexture();
 

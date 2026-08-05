@@ -7,16 +7,14 @@
 
 namespace VoidEngine::Scene::Components {
 	class SoundComponent : public AObjectComponent {
+		VE_CLASS(SoundComponent)
 	private:
 		SoundComponent();
 
 		std::shared_ptr<VoidEngine::IO::SFX::AudioSource> source;
 	public:
-		static const Class ClassData;
 		static std::shared_ptr<SoundComponent> create();
 
 		std::shared_ptr<VoidEngine::IO::SFX::AudioSource> getSource();
-
-		virtual const Class* getClass() const override { return &ClassData; }
 	};
 }

@@ -14,6 +14,7 @@ namespace VoidEngine::Scene {
 
 	class AObjectComponent : public Object {
 		friend class GameObject;
+		VE_CLASS(AObjectComponent)
 	private:
 		std::vector<std::weak_ptr<GameObject>> tiedTo;
 
@@ -21,9 +22,6 @@ namespace VoidEngine::Scene {
 		Variant scr_getObjectsUsing(std::vector<Variant>);
 
 	public:
-		static const Class ClassData;
-		virtual ~AObjectComponent() {}
-
 		Event::EventBus onComponentAdded = &Events::EComponentAddedToObject::ClassData;
 		Event::EventBus onComponentRemoved = &Events::EComponentRemovedFromObject::ClassData;
 
@@ -31,7 +29,5 @@ namespace VoidEngine::Scene {
 		Event::EventBus onDraw = &Events::EComponentDraw::ClassData;
 
 		std::vector<std::shared_ptr<GameObject>> getObjectsUsing();
-
-		virtual const Class* getClass() const { return &ClassData; }
 	};
 }

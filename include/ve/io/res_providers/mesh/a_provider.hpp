@@ -4,14 +4,14 @@
 #include "ve/event/event.hpp"
 #include "ve/event/event_bus.hpp"
 #include "ve/io/gfx/vertex.hpp"
+#include "ve/object.hpp"
 #include <cstdint>
 #include <vector>
 
 namespace VoidEngine::IO::ResourceProviders {
 	class EMeshProviderChanged final : public Event::AEvent {
+		VE_CLASS(EMeshProviderChanged)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
 	};
 
 	class AMeshProvider {

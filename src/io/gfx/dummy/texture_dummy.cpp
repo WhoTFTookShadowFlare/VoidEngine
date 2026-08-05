@@ -3,6 +3,10 @@
 #include <memory>
 
 namespace VoidEngine::IO::GFX::Dummy {
+	const Class DummyTexture::ClassData = {
+		.name = "DummyTexture"
+	};
+
 	DummyTexture::DummyTexture() : Texture(0) {}
 
 	std::shared_ptr<DummyTexture> DummyTexture::create() {

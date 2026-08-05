@@ -3,6 +3,7 @@
 #include <memory>
 #include <glm/ext/vector_float2.hpp>
 #include "ve/event/event.hpp"
+#include "ve/object.hpp"
 
 namespace VoidEngine::IO {
 	class Window;
@@ -10,10 +11,8 @@ namespace VoidEngine::IO {
 
 namespace VoidEngine::IO::Events {
 	class EMouseMotion final : public Event::AEvent {
+		VE_CLASS(EMouseMotion)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		EMouseMotion(std::shared_ptr<Window> window, glm::vec2 motion, glm::vec2 relative) :
 			window(window), motion(motion), relative(relative)
 		{}
@@ -24,10 +23,8 @@ namespace VoidEngine::IO::Events {
 	};
 
 	class EMouseButton final : public Event::AEvent {
+		VE_CLASS(EMouseButton)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		EMouseButton(
 			std::shared_ptr<Window> window, uint32_t mouseID, uint8_t button, bool pressed, uint8_t clicks, glm::vec2 position
 		) : window(window), mouseID(mouseID), button(button), pressed(pressed), clicks(clicks), position(position)
@@ -42,10 +39,8 @@ namespace VoidEngine::IO::Events {
 	};
 
 	class EKeyButton final : public Event::AEvent {
+		VE_CLASS(EKeyButton)
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		EKeyButton(
 			std::shared_ptr<Window> window, uint32_t keyboardID, uint32_t key, uint16_t mods, bool pressed, bool repeat
 		) : window(window), keyboardID(keyboardID), key(key), modKeys(mods), pressed(pressed), repeat(repeat)

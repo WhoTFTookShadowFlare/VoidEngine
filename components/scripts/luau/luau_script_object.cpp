@@ -2,6 +2,7 @@
 #include "lua.h"
 #include "lualib.h"
 #include "luau_script_engine.hpp"
+#include "ve/script/a_script_object.hpp"
 #include "ve/variant.hpp"
 #include <algorithm>
 #include <cassert>
@@ -12,7 +13,8 @@
 
 namespace VoidEngine::Scripts::Luau {
 	const Class LuauScriptObject::ClassData = {
-		.name = "LuauScriptObject"
+		.name = "LuauScriptObject",
+		.super = &AScriptObject::ClassData
 	};
 
 	LuauScriptObject::LuauScriptObject() {

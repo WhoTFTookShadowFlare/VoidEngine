@@ -2,6 +2,10 @@
 #include <memory>
 
 namespace VoidEngine::IO::GFX::Dummy {
+	const Class DummyMesh::ClassData = {
+		.name = "DummyMesh"
+	};
+
 	DummyMesh::DummyMesh() {}
 
 	void DummyMesh::draw() {}

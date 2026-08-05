@@ -8,15 +8,13 @@
 
 namespace VoidEngine::IO::GFX {
 	class Material final : public Object {
+		VE_CLASS(Material)
 	private:
 		std::shared_ptr<Texture> diffuse, specular;
 		float shininess = 32.0f;
 
 		Material();
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		static std::shared_ptr<Material> create();
 
 		void setAlbedo(std::shared_ptr<ResourceProviders::ATextureProvider>);

@@ -9,6 +9,10 @@
 
 namespace VoidEngine::IO::GFX::OpenGL {
 	using namespace gl;
+
+	const Class GLMesh::ClassData = {
+		.name = "GLMesh"
+	};
 	
 	GLMesh::GLMesh() {
 		glGenBuffers(1, &VBO);

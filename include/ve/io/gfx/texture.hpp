@@ -7,14 +7,12 @@
 
 namespace VoidEngine::IO::GFX {
 	class Texture : public Object {
+		VE_CLASS(Texture)
 	private:
 		uint8_t slot;
 	protected:
 		std::shared_ptr<ResourceProviders::ATextureProvider> textureProvider;
 	public:
-		static const Class ClassData;
-		virtual const Class* getClass() const { return &ClassData; }
-
 		Texture(uint8_t slot) : slot(slot) {}
 		virtual ~Texture() {}
 
