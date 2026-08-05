@@ -176,19 +176,6 @@ namespace VoidEngine {
 
 		const Class* getClassByName(std::string);
 
-		// TODO: remove parent and have Classes setup super themselfs (includes script engines)
-		void registerClass(const Class* cls, const Class* parent) {
-			if(componentClasses[cls->name] != nullptr) {
-				std::println("[ERR] Duplicate class name {}", cls->name);
-				return;
-			}
-
-			{
-				Class* eCls = (Class*) cls;
-				eCls->super = parent;
-			}
-
-			componentClasses[cls->name] = cls;
-		}
+		void registerClass(const Class* cls);
 	};
 }

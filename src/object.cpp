@@ -5,5 +5,6 @@
 namespace VoidEngine {
 	const Class Object::ClassData = {
 		.name = "Object",
+		.super = nullptr
 	};
 }

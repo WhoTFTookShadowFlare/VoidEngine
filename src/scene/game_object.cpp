@@ -16,6 +16,7 @@
 namespace VoidEngine::Scene {
 	const Class GameObject::ClassData = {
 		.name = "GameObject",
+		.super = &Object::ClassData,
 		.properties = {
 			new NativeProperty<GameObject>("position", &GameObject::getPosition, &GameObject::setPosition),
 			new NativeProperty<GameObject>("rotation", &GameObject::getRotation, &GameObject::setRotation),

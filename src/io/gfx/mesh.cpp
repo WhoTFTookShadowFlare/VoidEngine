@@ -8,6 +8,7 @@
 namespace VoidEngine::IO::GFX {
 	const Class Mesh::ClassData = {
 		.name = "Mesh",
+		.super = &Object::ClassData,
 		.eventHandlers = {
 			new NativeEventHandler(&ResourceProviders::EMeshProviderChanged::ClassData, &Mesh::onMeshProviderChangedEvent)
 		}

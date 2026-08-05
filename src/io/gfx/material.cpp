@@ -2,10 +2,14 @@
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/io/gfx/texture.hpp"
 #include "ve/io/res_providers/texture/a_provider.hpp"
+#include "ve/object.hpp"
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
-	const Class Material::ClassData = { .name = "Material" };
+	const Class Material::ClassData = {
+		.name = "Material",
+		.super = &Object::ClassData
+	};
 
 	Material::Material() {
 		auto renderer = Renderer::getInstance();

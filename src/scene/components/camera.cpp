@@ -7,6 +7,7 @@
 #include "ve/io/gfx/render_target.hpp"
 #include "ve/io/window.hpp"
 #include "ve/scene/game_object.hpp"
+#include "ve/scene/object_component.hpp"
 #include "ve/variant.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -72,6 +73,7 @@ namespace VoidEngine::Scene::Components {
 
 	const Class ACamera::ClassData = {
 		.name = "ACamera",
+		.super = &AObjectComponent::ClassData,
 		.properties = {
 			new NativeProperty<ACamera>("zfar", &ACamera::getZFar, &ACamera::setZFar)
 		}
@@ -79,6 +81,7 @@ namespace VoidEngine::Scene::Components {
 
 	const Class PerspectiveCamera::ClassData = {
 		.name = "PerspectiveCamera",
+		.super = &ACamera::ClassData,
 		.properties = {
 			new NativeProperty<PerspectiveCamera>("fov", &PerspectiveCamera::getFOV, &PerspectiveCamera::setFOV)
 		},
@@ -87,6 +90,7 @@ namespace VoidEngine::Scene::Components {
 
 	const Class OrthoCamera::ClassData = {
 		.name = "OrthoCamera",
+		.super = &ACamera::ClassData,
 		.constructor = new NativeConstructor(OrthoCamera::create)
 	};
 }

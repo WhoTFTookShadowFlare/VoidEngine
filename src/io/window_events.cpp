@@ -1,51 +1,59 @@
 #include "ve/io/window_events.hpp"
 #include "ve/class_event_handler.hpp"
-#include "ve/class_methods.hpp"
 #include "ve/io/window.hpp"
 #include "ve/object.hpp"
 #include "ve/variant.hpp"
 #include <memory>
-#include <vector>
 
 namespace VoidEngine::IO::Events {
 	const Class BasicWindowEvent::ClassData = {
-		.name = "BasicWindowEvent"
+		.name = "BasicWindowEvent",
+		.super = &AEvent::ClassData
 	};
 
 	const Class EWindowMinimized::ClassData = {
-		.name = "EWindowMinimized"
+		.name = "EWindowMinimized",
+		.super = &BasicWindowEvent::ClassData
 	};
 
 	const Class EWindowRestored::ClassData = {
-		.name = "EWindowRestored"
+		.name = "EWindowRestored",
+		.super = &BasicWindowEvent::ClassData
 	};
 
 	const Class EWindowMaximized::ClassData = {
-		.name = "EWindowMaximized"
+		.name = "EWindowMaximized",
+		.super = &BasicWindowEvent::ClassData
 	};
 
 	const Class EWindowCloseRequested::ClassData = {
-		.name = "EWindowCloseRequested"
+		.name = "EWindowCloseRequested",
+		.super = &BasicWindowEvent::ClassData
 	};
 
 	const Class EWindowSizeChanged::ClassData = {
-		.name = "EWindowSizeChanged"
+		.name = "EWindowSizeChanged",
+		.super = &AEvent::ClassData
 	};
 
 	const Class EWindowRepositioned::ClassData = {
-		.name = "EWindowRepositioned"
+		.name = "EWindowRepositioned",
+		.super = &AEvent::ClassData
 	};
 
 	const Class EMouseEnter::ClassData = {
-		.name = "EMouseEnter"
+		.name = "EMouseEnter",
+		.super = &AEvent::ClassData
 	};
 
 	const Class EWindowFocus::ClassData = {
-		.name = "EWindowFocues"
+		.name = "EWindowFocues",
+		.super = &AEvent::ClassData
 	};
 
 	const Class WindowCloseRequestedDefaultHandler::ClassData = {
 		.name = "WindowCloseRequestedDefaultHandler",
+		.super = &Object::ClassData,
 		.eventHandlers = {
 			new NativeEventHandler(&EWindowCloseRequested::ClassData, &WindowCloseRequestedDefaultHandler::onCloseEvent)
 		}

@@ -471,7 +471,12 @@ namespace VoidEngine::Scripts::Luau {
 		ClassHolder* cls = (ClassHolder*) luaL_checkudata(L, 1, "Class");
 		ClassHolder* parent = (ClassHolder*) luaL_checkudata(L, 2, "Class");
 
-		ClassDB::getInstance()->registerClass(cls->cls, parent->cls);
+		{
+			Class* clsData = const_cast<Class*>(cls->cls);
+			clsData->super = parent->cls;
+		}
+
+		ClassDB::getInstance()->registerClass(cls->cls);
 
 		return 0;
 	}

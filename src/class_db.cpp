@@ -22,55 +22,55 @@ namespace VoidEngine {
 	}
 
 	ClassDB::ClassDB() {
-		componentClasses["Object"] = &Object::ClassData;
+		registerClass(&Object::ClassData);
 
-		registerClass(&Scripts::AScriptObject::ClassData, &Object::ClassData);
+		registerClass(&Scripts::AScriptObject::ClassData);
 
-		registerClass(&Event::AEvent::ClassData, &Object::ClassData);
+		registerClass(&Event::AEvent::ClassData);
 
-		registerClass(&IO::ResourceProviders::EMeshProviderChanged::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::ResourceProviders::ETextureChanged::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::ResourceProviders::EMeshProviderChanged::ClassData);
+		registerClass(&IO::ResourceProviders::ETextureChanged::ClassData);
 
-		registerClass(&Events::EQuitEvent::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Events::EScreenLayoutChangedEvent::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Events::EQuitEvent::ClassData);
+		registerClass(&Events::EScreenLayoutChangedEvent::ClassData);
 
-		registerClass(&IO::Events::BasicWindowEvent::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EWindowMinimized::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EWindowRestored::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EWindowMaximized::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EWindowCloseRequested::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EWindowSizeChanged::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EWindowRepositioned::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EMouseEnter::ClassData, &Event::AEvent::ClassData);
-		registerClass(&IO::Events::EWindowFocus::ClassData, &Event::AEvent::ClassData);
+		registerClass(&IO::Events::BasicWindowEvent::ClassData);
+		registerClass(&IO::Events::EWindowMinimized::ClassData);
+		registerClass(&IO::Events::EWindowRestored::ClassData);
+		registerClass(&IO::Events::EWindowMaximized::ClassData);
+		registerClass(&IO::Events::EWindowCloseRequested::ClassData);
+		registerClass(&IO::Events::EWindowSizeChanged::ClassData);
+		registerClass(&IO::Events::EWindowRepositioned::ClassData);
+		registerClass(&IO::Events::EMouseEnter::ClassData);
+		registerClass(&IO::Events::EWindowFocus::ClassData);
 
-		registerClass(&Scene::Events::EComponentUpdate::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::ESceneDraw::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::EComponentDraw::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::EAddedToScene::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::ERemovedFromScene::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::EComponentAddedToObject::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::EComponentRemovedFromObject::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::EChildAdded::ClassData, &Event::AEvent::ClassData);
-		registerClass(&Scene::Events::EChildRemoved::ClassData, &Event::AEvent::ClassData);
+		registerClass(&Scene::Events::EComponentUpdate::ClassData);
+		registerClass(&Scene::Events::ESceneDraw::ClassData);
+		registerClass(&Scene::Events::EComponentDraw::ClassData);
+		registerClass(&Scene::Events::EAddedToScene::ClassData);
+		registerClass(&Scene::Events::ERemovedFromScene::ClassData);
+		registerClass(&Scene::Events::EComponentAddedToObject::ClassData);
+		registerClass(&Scene::Events::EComponentRemovedFromObject::ClassData);
+		registerClass(&Scene::Events::EChildAdded::ClassData);
+		registerClass(&Scene::Events::EChildRemoved::ClassData);
 
-		registerClass(&IO::Events::WindowCloseRequestedDefaultHandler::ClassData, &Object::ClassData);
+		registerClass(&IO::Events::WindowCloseRequestedDefaultHandler::ClassData);
 
-		registerClass(&Scene::Scene::ClassData, &Object::ClassData);
-		registerClass(&Scene::GameObject::ClassData, &Object::ClassData);
+		registerClass(&Scene::Scene::ClassData);
+		registerClass(&Scene::GameObject::ClassData);
 
-		registerClass(&Scene::AObjectComponent::ClassData, &Object::ClassData);
+		registerClass(&Scene::AObjectComponent::ClassData);
 
-		registerClass(&Scene::Components::LightComponent::ClassData, &Scene::AObjectComponent::ClassData);
-		registerClass(&Scene::Components::PointLightComponent::ClassData, &Scene::Components::LightComponent::ClassData);
-		registerClass(&Scene::Components::SpotLightComponent::ClassData, &Scene::Components::LightComponent::ClassData);
-		registerClass(&Scene::Components::MeshComponent::ClassData, &Scene::AObjectComponent::ClassData);
+		registerClass(&Scene::Components::LightComponent::ClassData);
+		registerClass(&Scene::Components::PointLightComponent::ClassData);
+		registerClass(&Scene::Components::SpotLightComponent::ClassData);
+		registerClass(&Scene::Components::MeshComponent::ClassData);
 
-		registerClass(&Scene::Components::SoundComponent::ClassData, &Scene::AObjectComponent::ClassData);
+		registerClass(&Scene::Components::SoundComponent::ClassData);
 
-		registerClass(&Scene::Components::ACamera::ClassData, &Scene::AObjectComponent::ClassData);
-		registerClass(&Scene::Components::OrthoCamera::ClassData, &Scene::Components::ACamera::ClassData);
-		registerClass(&Scene::Components::PerspectiveCamera::ClassData, &Scene::Components::ACamera::ClassData);
+		registerClass(&Scene::Components::ACamera::ClassData);
+		registerClass(&Scene::Components::OrthoCamera::ClassData);
+		registerClass(&Scene::Components::PerspectiveCamera::ClassData);
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {
@@ -80,5 +80,18 @@ namespace VoidEngine {
 
 	const Class* ClassDB::getClassByName(std::string name) {
 		return componentClasses[name];
+	}
+
+	void ClassDB::registerClass(const Class* cls) {
+		if(componentClasses[cls->name] != nullptr) [[unlikely]] {
+			std::println("[ERR] Duplicate class name {}", cls->name);
+			return;
+		}
+
+		if(cls->super == nullptr && cls != &Object::ClassData) [[unlikely]] {
+			std::println("[WARN] {} did not setup ClassData::super", cls->getName());
+		}
+
+		componentClasses[cls->name] = cls;
 	}
 }

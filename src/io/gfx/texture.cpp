@@ -3,7 +3,8 @@
 
 namespace VoidEngine::IO::GFX {
 	const Class Texture::ClassData = {
-		.name = "Texture"
+		.name = "Texture",
+		.super = &Object::ClassData
 	};
 
 	std::shared_ptr<ResourceProviders::ATextureProvider> Texture::getTextureProvider() {

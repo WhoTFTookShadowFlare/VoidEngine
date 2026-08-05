@@ -1,15 +1,19 @@
 #include "ve/io/input_events.hpp"
+#include "ve/event/event.hpp"
 
 namespace VoidEngine::IO::Events {
 	const Class EMouseMotion::ClassData = {
-		.name = "EMouseMotion"
+		.name = "EMouseMotion",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EMouseButton::ClassData = {
-		.name = "EMouseButton"
+		.name = "EMouseButton",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EKeyButton::ClassData = {
-		.name = "EKeyButton"
+		.name = "EKeyButton",
+		.super = &Event::AEvent::ClassData
 	};
 }

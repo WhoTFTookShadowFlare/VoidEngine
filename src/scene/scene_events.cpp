@@ -2,38 +2,47 @@
 
 namespace VoidEngine::Scene::Events {
 	const Class EComponentUpdate::ClassData = {
-		.name = "EComponentUpdate"
+		.name = "EComponentUpdate",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class ESceneDraw::ClassData = {
-		.name = "ESceneDraw"
+		.name = "ESceneDraw",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EComponentDraw::ClassData = {
-		.name = "EComponentDraw"
+		.name = "EComponentDraw",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EAddedToScene::ClassData = {
-		.name = "EAddedToScene"
+		.name = "EAddedToScene",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class ERemovedFromScene::ClassData = {
-		.name = "ERemovedFromScene"
+		.name = "ERemovedFromScene",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EComponentAddedToObject::ClassData = {
-		.name = "EComponentAddedToObject"
+		.name = "EComponentAddedToObject",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EComponentRemovedFromObject::ClassData = {
-		.name = "EComponentRemovedFromObject"
+		.name = "EComponentRemovedFromObject",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EChildAdded::ClassData = {
-		.name = "EChildAdded"
+		.name = "EChildAdded",
+		.super = &Event::AEvent::ClassData
 	};
 
 	const Class EChildRemoved::ClassData = {
-		.name = "EChildRemoved"
+		.name = "EChildRemoved",
+		.super = &Event::AEvent::ClassData
 	};
 }

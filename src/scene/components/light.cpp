@@ -11,11 +11,13 @@
 
 namespace VoidEngine::Scene::Components {
 	const Class LightComponent::ClassData = {
-		.name = "LightComponent"
+		.name = "LightComponent",
+		.super = &AObjectComponent::ClassData
 	};
 
 	const Class PointLightComponent::ClassData = {
 		.name = "PointLightComponent",
+		.super = &LightComponent::ClassData,
 		.eventHandlers = {
 			new NativeEventHandler(&Events::EComponentDraw::ClassData, &PointLightComponent::onDrawEvent)
 		},
@@ -24,6 +26,7 @@ namespace VoidEngine::Scene::Components {
 
 	const Class SpotLightComponent::ClassData = {
 		.name = "SpotLightComponent",
+		.super = &LightComponent::ClassData,
 		.eventHandlers = {
 			new NativeEventHandler(&Events::EComponentDraw::ClassData, &SpotLightComponent::onDrawEvent)
 		},

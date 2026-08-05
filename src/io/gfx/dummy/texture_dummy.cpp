@@ -4,7 +4,8 @@
 
 namespace VoidEngine::IO::GFX::Dummy {
 	const Class DummyTexture::ClassData = {
-		.name = "DummyTexture"
+		.name = "DummyTexture",
+		.super = &Texture::ClassData
 	};
 
 	DummyTexture::DummyTexture() : Texture(0) {}

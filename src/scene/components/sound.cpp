@@ -5,6 +5,7 @@
 namespace VoidEngine::Scene::Components {
 	const Class SoundComponent::ClassData = {
 		.name = "SoundComponent",
+		.super = &AObjectComponent::ClassData,
 		.constructor = new NativeConstructor(SoundComponent::create)
 	};
 

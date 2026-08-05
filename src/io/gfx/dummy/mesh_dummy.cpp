@@ -1,9 +1,11 @@
 #include "ve/io/gfx/dummy/mesh_dummy.hpp"
+#include "ve/io/gfx/mesh.hpp"
 #include <memory>
 
 namespace VoidEngine::IO::GFX::Dummy {
 	const Class DummyMesh::ClassData = {
-		.name = "DummyMesh"
+		.name = "DummyMesh",
+		.super = &Mesh::ClassData
 	};
 
 	DummyMesh::DummyMesh() {}

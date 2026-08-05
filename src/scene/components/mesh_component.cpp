@@ -48,6 +48,7 @@ namespace VoidEngine::Scene::Components {
 
 	const Class MeshComponent::ClassData = {
 		.name = "MeshComponent",
+		.super = &AObjectComponent::ClassData,
 		.eventHandlers = {
 			new NativeEventHandler(&Events::EComponentDraw::ClassData, &MeshComponent::onDrawEvent)
 		},

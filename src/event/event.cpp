@@ -3,6 +3,7 @@
 
 namespace VoidEngine::Event {
 	const Class AEvent::ClassData = {
-		.name = "AEvent"
+		.name = "AEvent",
+		.super = &Object::ClassData
 	};
 }

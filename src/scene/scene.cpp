@@ -24,6 +24,7 @@
 namespace VoidEngine::Scene {
 	const Class Scene::ClassData = {
 		.name = "Scene",
+		.super = &Object::ClassData,
 		.constructor = new NativeConstructor(Scene::create)
 	};
 
