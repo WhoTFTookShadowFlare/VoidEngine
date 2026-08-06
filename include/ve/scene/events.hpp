@@ -22,7 +22,10 @@ namespace VoidEngine::Scene::Events {
 		VE_CLASS(EComponentUpdate)
 	private:
 		EComponentUpdate(double delta) : delta(delta) {}
+		EComponentUpdate() : delta(0.0) {}
 	public:
+		static std::shared_ptr<EComponentUpdate> create();
+
 		const double delta;
 	};
 

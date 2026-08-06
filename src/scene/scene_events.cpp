@@ -1,10 +1,17 @@
+#include "ve/class_db.hpp"
 #include "ve/scene/events.hpp"
+#include <memory>
 
 namespace VoidEngine::Scene::Events {
 	const Class EComponentUpdate::ClassData = {
 		.name = "EComponentUpdate",
-		.super = &Event::AEvent::ClassData
+		.super = &Event::AEvent::ClassData,
+		.constructor = new NativeConstructor(&EComponentUpdate::create)
 	};
+
+	std::shared_ptr<EComponentUpdate> EComponentUpdate::create() {
+		return std::shared_ptr<EComponentUpdate>(new EComponentUpdate);
+	}
 
 	const Class ESceneDraw::ClassData = {
 		.name = "ESceneDraw",

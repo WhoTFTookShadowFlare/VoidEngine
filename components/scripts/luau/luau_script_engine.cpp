@@ -2,11 +2,13 @@
 #include "lua.h"
 #include "lualib.h"
 #include "luacode.h"
+#include "luau_event_handler.hpp"
 #include "luau_function.hpp"
 #include "luau_property.hpp"
 #include "luau_script.hpp"
 #include "luau_script_module.hpp"
 #include "ve/class_db.hpp"
+#include "ve/event/event.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/object.hpp"
 #include "ve/script/a_script_engine.hpp"
@@ -65,8 +67,10 @@ namespace VoidEngine::Scripts::Luau {
 
 	static int ClassAddMethod(lua_State* L);
 	static int ClassAddProperty(lua_State* L);
+	static int ClassAddEventHandler(lua_State* L);
 	static int ClassFindProperty(lua_State* L);
 	static int ClassFindMethod(lua_State* L);
+	static int ClassFindEventHandler(lua_State* L);
 	static int ClassIsAbstract(lua_State* L);
 	static int ClassInstanceOf(lua_State* L);
 	static int ClassCreate(lua_State* L);
@@ -139,6 +143,26 @@ namespace VoidEngine::Scripts::Luau {
 		{ nullptr, nullptr }
 	};
 
+	struct EventHandlerHolder {
+		const EventHandlerBase* handler;
+	};
+
+	static int EventHandlerNew(lua_State* L);
+
+	static int EventHandlerToString(lua_State* L);
+	static int EventHandlerEq(lua_State* L);
+
+	static const luaL_Reg eventHandlerMeth[] = {
+		{ "__tostring", EventHandlerToString },
+		{ "__eq", EventHandlerEq },
+		{ nullptr, nullptr }
+	};
+
+	static const luaL_Reg eventHandlerLib[] = {
+		{ "new", EventHandlerNew },
+		{ nullptr, nullptr }
+	};
+
 	void LuauScriptEngine::setupNativeTypes() {
 		luaL_register(vmState, "Object", objectLib);
 		lua_pop(vmState, 1);
@@ -150,6 +174,9 @@ namespace VoidEngine::Scripts::Luau {
 		lua_pop(vmState, 1);
 
 		luaL_register(vmState, "Property", propertyLib);
+		lua_pop(vmState, 1);
+
+		luaL_register(vmState, "EventHandler", eventHandlerLib);
 		lua_pop(vmState, 1);
 		
 		luaL_sandbox(vmState);
@@ -419,8 +446,21 @@ namespace VoidEngine::Scripts::Luau {
 			return 0;
 		}
 
+		const Class* super = nullptr;
+		if(lua_isstring(L, 2)) {
+			super = ClassDB::getInstance()->getClassByName(luaL_checkstring(L, 2));
+		} else {
+			ClassHolder* clsHolder = static_cast<ClassHolder*>(luaL_checkudata(L, 2, "Class"));
+			super = clsHolder->cls;
+		}
+
 		const char* name = luaL_checkstring(L, 1);
 		if(name == nullptr) return 0;
+
+		if(super == nullptr) {
+			std::println("[ERR] [LUAU] No super for class {}", name);
+			return 0;
+		}
 
 		ClassHolder* ptr = static_cast<ClassHolder*>(lua_newuserdatadtor(L, sizeof(ClassHolder), [](void* data) {
 			ClassHolder* cls = static_cast<ClassHolder*>(data);
@@ -469,15 +509,7 @@ namespace VoidEngine::Scripts::Luau {
 
 	static int RegisterClass(lua_State* L) {
 		ClassHolder* cls = (ClassHolder*) luaL_checkudata(L, 1, "Class");
-		ClassHolder* parent = (ClassHolder*) luaL_checkudata(L, 2, "Class");
-
-		{
-			Class* clsData = const_cast<Class*>(cls->cls);
-			clsData->super = parent->cls;
-		}
-
 		ClassDB::getInstance()->registerClass(cls->cls);
-
 		return 0;
 	}
 
@@ -500,8 +532,10 @@ namespace VoidEngine::Scripts::Luau {
 
 		if(fnName == "addproperty") return ClassAddProperty(L);
 		if(fnName == "addmethod") return ClassAddMethod(L);
+		if(fnName == "addeventhandler") return ClassAddEventHandler(L);
 		if(fnName == "findproperty") return ClassFindProperty(L);
 		if(fnName == "findmethod") return ClassFindMethod(L);
+		if(fnName == "findeventhandler") return ClassFindEventHandler(L);
 
 		// setconstructor
 		if(fnName == "isabstract") return ClassIsAbstract(L);
@@ -542,6 +576,15 @@ namespace VoidEngine::Scripts::Luau {
 
 		Class* cls = const_cast<Class*>(clsHolder->cls);
 		cls->properties.push_back(prop);
+		return 0;
+	}
+
+	static int ClassAddEventHandler(lua_State* L) {
+		ClassHolder* clsHolder = static_cast<ClassHolder*>(luaL_checkudata(L, 1, "Class"));
+		const EventHandlerHolder* evtHandler = static_cast<EventHandlerHolder*>(luaL_checkudata(L, 2, "EventHandler"));
+
+		Class* cls = const_cast<Class*>(clsHolder->cls);
+		cls->eventHandlers.push_back(evtHandler->handler);
 		return 0;
 	}
 
@@ -596,6 +639,28 @@ namespace VoidEngine::Scripts::Luau {
 		lua_setmetatable(L, -2);
 
 		methHolder->meth = meth;
+		return 1;
+	}
+
+	static int ClassFindEventHandler(lua_State* L) {
+		ClassHolder* cls = static_cast<ClassHolder*>(lua_touserdata(L, 1));
+		ClassHolder* evtClass = static_cast<ClassHolder*>(luaL_checkudata(L, 2, "Class"));
+
+		const EventHandlerBase* toWrap = cls->cls->findEventHandler(evtClass->cls);
+		if(toWrap == nullptr) {
+			lua_pushnil(L);
+			return 1;
+		}
+
+		EventHandlerHolder* evtHolder = static_cast<EventHandlerHolder*>(lua_newuserdata(L, sizeof(EventHandlerHolder)));
+		if(luaL_newmetatable(L, "EventHandler")) {
+			luaL_register(L, nullptr, eventHandlerMeth);
+			lua_pushliteral(L, "EventHandler");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+		
+		evtHolder->handler = toWrap;
 		return 1;
 	}
 
@@ -806,6 +871,53 @@ namespace VoidEngine::Scripts::Luau {
 		MethodHolder* RHS = static_cast<MethodHolder*>(luaL_checkudata(L, 2, "Method"));
 
 		lua_pushboolean(L, LHS->meth == RHS->meth);
+		return 1;
+	}
+
+	static int EventHandlerNew(lua_State* L) {
+		const Class* evtCls = nullptr;
+		if(lua_isstring(L, 1)) {
+			evtCls = ClassDB::getInstance()->getClassByName(luaL_checkstring(L, 1));
+		} else {
+			ClassHolder* clsHolder = static_cast<ClassHolder*>(luaL_checkudata(L, 1, "Class"));
+			evtCls = clsHolder->cls;
+		}
+
+		if(!evtCls->instanceOf(&Event::AEvent::ClassData)) {
+			std::println("[ERR] [LUAU] EventHandler.new arg 0 must be a class of type AEvent");
+			return 0;
+		}
+
+		if(!lua_isfunction(L, 2)) {
+			std::println("[ERR] [LUAU] EventHandler.new arg 1 must be a function");
+			return 0;
+		}
+
+		EventHandlerHolder* ptr = static_cast<EventHandlerHolder*>(
+			lua_newuserdata(L, sizeof(EventHandlerHolder))
+		);
+		ptr->handler = new LuauEventHandler(evtCls, L, 2);
+
+		if(luaL_newmetatable(L, "EventHandler")) {
+			luaL_register(L, nullptr, eventHandlerMeth);
+			lua_pushliteral(L, "EventHandler");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		return 1;
+	}
+
+	static int EventHandlerToString(lua_State* L) {
+		EventHandlerHolder* evt = static_cast<EventHandlerHolder*>(luaL_checkudata(L, 1, "EventHandler"));
+		lua_pushstring(L, std::format("EventHandler ({})", evt->handler->event->getName()).c_str());
+		return 1;
+	}
+
+	static int EventHandlerEq(lua_State* L) {
+		EventHandlerHolder* LHS = static_cast<EventHandlerHolder*>(luaL_checkudata(L, 1, "EventHandler"));
+		EventHandlerHolder* RHS = static_cast<EventHandlerHolder*>(luaL_checkudata(L, 2, "EventHandler"));
+		lua_pushboolean(L, LHS->handler == RHS->handler);
 		return 1;
 	}
 }
