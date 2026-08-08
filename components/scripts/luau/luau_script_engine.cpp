@@ -9,6 +9,7 @@
 #include "luau_script_module.hpp"
 #include "ve/class_db.hpp"
 #include "ve/event/event.hpp"
+#include "ve/event/event_bus.hpp"
 #include "ve/io/res_providers/source/a_provider.hpp"
 #include "ve/object.hpp"
 #include "ve/script/a_script_engine.hpp"
@@ -163,6 +164,29 @@ namespace VoidEngine::Scripts::Luau {
 		{ nullptr, nullptr }
 	};
 
+	struct EventBusHolder {
+		Event::EventBus* bus;
+	};
+
+	static int EventBusNew(lua_State* L);
+
+	static int EventBusCall(lua_State* L);
+
+	static int EventBusAddHandler(lua_State* L);
+	static int EventBusRemoveHandler(lua_State* L);
+	static int EventBusHasHandler(lua_State* L);
+	static int EventBusFireEvent(lua_State* L);
+
+	static const luaL_Reg eventBusMeth[] = {
+		{ "__namecall", EventBusCall },
+		{ nullptr, nullptr }
+	};
+
+	static const luaL_Reg eventBusLib[] = {
+		{ "new", EventBusNew },
+		{ nullptr, nullptr }
+	};
+
 	void LuauScriptEngine::setupNativeTypes() {
 		luaL_register(vmState, "Object", objectLib);
 		lua_pop(vmState, 1);
@@ -177,6 +201,9 @@ namespace VoidEngine::Scripts::Luau {
 		lua_pop(vmState, 1);
 
 		luaL_register(vmState, "EventHandler", eventHandlerLib);
+		lua_pop(vmState, 1);
+
+		luaL_register(vmState, "EventBus", eventBusLib);
 		lua_pop(vmState, 1);
 		
 		luaL_sandbox(vmState);
@@ -223,7 +250,22 @@ namespace VoidEngine::Scripts::Luau {
 			case LUA_TNUMBER: return (float) luaL_checknumber(vmState, idx);
 			case LUA_TINTEGER: return luaL_checkinteger(vmState, idx);
 			// case LUA_TOBJECT: return static_cast<ObjectHolder*>(lua_touserdata(vmState, idx))->obj;
-			case LUA_TUSERDATA: return static_cast<ObjectHolder*>(lua_touserdata(vmState, idx))->obj;
+			case LUA_TUSERDATA: {
+				void* ptr = lua_touserdata(vmState, idx);
+				if(ptr == nullptr) return nullptr;
+				if(!lua_getmetatable(vmState, idx)) return nullptr;
+
+				lua_getfield(vmState, -1, "__type");
+				std::string type = luaL_checkstring(vmState, -1);
+
+				lua_pop(vmState, 2);
+
+				if(type == "EventBus") return static_cast<EventBusHolder*>(lua_touserdata(vmState, idx))->bus;
+				if(type == "Object") return static_cast<ObjectHolder*>(lua_touserdata(vmState, idx))->obj;
+
+				std::println("[ERR] Cannot convert type '{}' to Variant", type);
+				return nullptr;
+			} break;
 			case LUA_TSTRING: return luaL_checkstring(vmState, idx);
 			case LUA_TTABLE: {
 				bool isArray = true;
@@ -320,6 +362,18 @@ namespace VoidEngine::Scripts::Luau {
 
 				new(&ptr->obj) std::shared_ptr<Object>(value.asObject().value());
 			}; break;
+			case VoidEngine::VariantType::EVENT_BUS: {
+				EventBusHolder* ptr = static_cast<EventBusHolder*>(lua_newuserdata(vmState, sizeof(EventBusHolder)));
+				
+				if(luaL_newmetatable(vmState, "EventBus")) {
+					luaL_register(vmState, nullptr, eventBusMeth);
+					lua_pushliteral(vmState, "EventBus");
+					lua_rawsetfield(vmState, -2, "__type");
+				}
+				lua_setmetatable(vmState, -2);
+
+				ptr->bus = value.asEventBus().value();
+			}; break;
 			default: {
 				std::println("Lua Variant type conversion to {} is not yet implemented", (uint8_t) value.getType());
 			}
@@ -410,9 +464,6 @@ namespace VoidEngine::Scripts::Luau {
 		std::vector<Variant> args;
 		for(int32_t arg = 1; arg < lua_gettop(L); arg++) {
 			*stackIndex = arg + 1;
-
-			std::println("luau arg type: {}", lua_type(L, *stackIndex));
-
 			args.push_back(engine->objectToVariant(stackIndex));
 		}
 		delete stackIndex;
@@ -659,7 +710,7 @@ namespace VoidEngine::Scripts::Luau {
 			lua_rawsetfield(L, -2, "__type");
 		}
 		lua_setmetatable(L, -2);
-		
+
 		evtHolder->handler = toWrap;
 		return 1;
 	}
@@ -919,5 +970,68 @@ namespace VoidEngine::Scripts::Luau {
 		EventHandlerHolder* RHS = static_cast<EventHandlerHolder*>(luaL_checkudata(L, 2, "EventHandler"));
 		lua_pushboolean(L, LHS->handler == RHS->handler);
 		return 1;
+	}
+
+	static int EventBusNew(lua_State* L) {
+		const Class* cls = nullptr;
+		if(lua_isstring(L, 1)) {
+			cls = ClassDB::getInstance()->getClassByName(luaL_checkstring(L, 1));
+		} else {
+			cls = static_cast<ClassHolder*>(luaL_checkudata(L, 1, "Class"))->cls;
+		}
+
+		if(cls == nullptr) {
+			std::println("[ERR] [LUAU] Cannot make an EventBus without a class of type AEvent");
+			return 0;
+		}
+
+		if(!cls->instanceOf(&Event::AEvent::ClassData)) {
+			std::println("[ERR] [LUAU] Cannot make an EventBus without a class of type AEvent");
+			return 0;
+		}
+
+		EventBusHolder* holder = static_cast<EventBusHolder*>(lua_newuserdatadtor(L, sizeof(EventBusHolder), [](void* ptr) {
+			EventBusHolder* busHolder = static_cast<EventBusHolder*>(ptr);
+			delete busHolder->bus;
+		}));
+
+		holder->bus = new Event::EventBus(cls);
+		
+		if(luaL_newmetatable(L, "EventBus")) {
+			luaL_register(L, nullptr, eventBusMeth);
+			lua_pushliteral(L, "EventBus");
+			lua_rawsetfield(L, -2, "__type");
+		}
+		lua_setmetatable(L, -2);
+
+		return 1;
+	}
+
+	static int EventBusCall(lua_State* L) {
+		std::string fnName = lua_namecallatom(L, nullptr);
+
+		if(fnName == "addhandler") return EventBusAddHandler(L);
+		if(fnName == "removehandler") return EventBusRemoveHandler(L);
+		if(fnName == "hashandler") return EventBusHasHandler(L);
+		if(fnName == "fireevent") return EventBusFireEvent(L);
+
+		return 0;
+	}
+
+	static int EventBusAddHandler(lua_State* L) {
+		return 0;
+	}
+
+	static int EventBusRemoveHandler(lua_State* L) {
+		return 0;
+	}
+
+	static int EventBusHasHandler(lua_State* L) {
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	static int EventBusFireEvent(lua_State* L) {
+		return 0;
 	}
 }
