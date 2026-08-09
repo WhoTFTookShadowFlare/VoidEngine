@@ -15,6 +15,6 @@ namespace VoidEngine::Scripts::Luau {
 		std::shared_ptr<AScriptEngine> getScriptEngine();
 		std::vector<std::string> getFunctions();
 		Variant call(std::string fnName, std::vector<Variant> args);
-		std::shared_ptr<AScriptObject> instanceObject();
+		std::shared_ptr<AObjectScript> instanceObject();
 	};
 }

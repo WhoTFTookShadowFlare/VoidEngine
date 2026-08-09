@@ -9,7 +9,7 @@ namespace VoidEngine::Scripts::Luau {
 	class LuauScriptEngine final : public AScriptEngine {
 		friend class LuauScript;
 		friend class LuauScriptModule;
-		friend class LuauScriptObject;
+		friend class LuauObjectScript;
 	private:
 		static std::shared_ptr<LuauScriptEngine> instance;
 
@@ -21,6 +21,8 @@ namespace VoidEngine::Scripts::Luau {
 	public:
 		~LuauScriptEngine();
 		static std::shared_ptr<LuauScriptEngine> getInstance();
+
+		std::string getLanguage();
 
 		std::shared_ptr<Script> compileScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>);
 		std::shared_ptr<AScriptModule> compileModuleScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>);

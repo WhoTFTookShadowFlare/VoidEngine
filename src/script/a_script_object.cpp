@@ -2,8 +2,5 @@
 #include "ve/object.hpp"
 
 namespace VoidEngine::Scripts {
-	const Class AScriptObject::ClassData = {
-		.name = "AScriptObject",
-		.super = &Object::ClassData
-	};
+	
 }

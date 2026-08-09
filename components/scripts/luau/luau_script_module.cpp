@@ -85,7 +85,7 @@ namespace VoidEngine::Scripts::Luau {
 		return top;
 	}
 
-	std::shared_ptr<AScriptObject> LuauScriptModule::instanceObject() {
+	std::shared_ptr<AObjectScript> LuauScriptModule::instanceObject() {
 		auto engine = getScriptEngine();
 		auto vmState = LuauScriptEngine::getInstance()->vmState;
 		if(luau_load(vmState, "<unknown>", (const char*) getByteCode().code, getByteCode().size, 0)) {
@@ -101,7 +101,7 @@ namespace VoidEngine::Scripts::Luau {
 		}
 
 		lua_pcall(vmState, 0, 1, 0);
-		std::shared_ptr<AScriptObject> instance = std::shared_ptr<AScriptObject>(new LuauScriptObject());
+		std::shared_ptr<AObjectScript> instance = std::shared_ptr<AObjectScript>(new LuauObjectScript());
 
 		lua_pop(vmState, 2);
 		return instance;

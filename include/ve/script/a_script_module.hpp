@@ -21,6 +21,6 @@ namespace VoidEngine::Scripts {
 
 		virtual std::vector<std::string> getFunctions() = 0;
 		virtual Variant call(std::string fnName, std::vector<Variant> args) = 0;
-		virtual std::shared_ptr<AScriptObject> instanceObject() = 0;
+		virtual std::shared_ptr<AObjectScript> instanceObject() = 0;
 	};
 }

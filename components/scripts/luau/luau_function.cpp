@@ -2,6 +2,7 @@
 #include "lua.h"
 #include "luau_script_engine.hpp"
 #include "luau_script_object.hpp"
+#include "ve/object.hpp"
 #include "ve/class_db.hpp"
 #include "ve/variant.hpp"
 #include <algorithm>
@@ -33,8 +34,24 @@ namespace VoidEngine::Scripts::Luau {
 		lua_gettable(L, LUA_REGISTRYINDEX);
 
 		auto engine = LuauScriptEngine::getInstance();
-		if(obj != nullptr && obj->getClass()->instanceOf(&LuauScriptObject::ClassData)) {
-			std::shared_ptr<LuauScriptObject> script = std::static_pointer_cast<LuauScriptObject>(obj);
+		if(obj != nullptr) {
+			if(obj->getScript() == nullptr) {
+				std::println("[ERR] Cannot call function if the object has no script for the function implementation");
+				lua_pop(L, 1);
+				return nullptr;
+			}
+
+			if(obj->getScript()->getScriptEngine() != engine) {
+				std::println(
+					"[ERR] Cannot call function if the objects script engine differs from the function implementation"
+					" (expected Luau, got {})",
+					obj->getScript()->getScriptEngine()->getLanguage()
+				);
+				lua_pop(L, 1);
+				return nullptr;
+			}
+			
+			std::shared_ptr<LuauObjectScript> script = std::static_pointer_cast<LuauObjectScript>(obj->getScript());
 			lua_pushlightuserdata(L, script.get());
 			lua_gettable(L, LUA_REGISTRYINDEX);
 		}

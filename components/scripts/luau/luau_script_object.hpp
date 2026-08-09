@@ -1,20 +1,19 @@
 #pragma once
 
-#include "ve/object.hpp"
 #include "ve/script/a_script_engine.hpp"
 #include "ve/script/a_script_object.hpp"
 #include "ve/variant.hpp"
 #include <vector>
 
 namespace VoidEngine::Scripts::Luau {
-	class LuauScriptObject final : public AScriptObject {
+	class LuauObjectScript final : public AObjectScript {
 		friend class LuauScriptModule;
-		VE_CLASS(LuauScriptObject)
 	private:
-		LuauScriptObject();
+		LuauObjectScript();
 	public:
-		~LuauScriptObject();
+		~LuauObjectScript();
 		std::shared_ptr<AScriptEngine> getScriptEngine() override;
+		const Class* getClass() override;
 		Variant call(std::string fnName, std::vector<Variant> args) override;
 		Variant get(std::string name) override;
 		void set(std::string name, Variant value) override;

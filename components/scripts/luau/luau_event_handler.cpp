@@ -48,20 +48,23 @@ namespace VoidEngine::Scripts::Luau {
 	}
 
 	void LuauEventHandler::handleEvent(std::shared_ptr<Object> obj, std::shared_ptr<Object> event) const {
-		if(!obj->getClass()->instanceOf(&LuauScriptObject::ClassData)) {
-			std::println("[ERR] [LUAU] Could not fire event, obj is not a LuauScriptObject");
+		if(obj->getScript() == nullptr) {
+			std::println("[ERR] Cannot handle event, object does not have a script.");
 			return;
 		}
 
 		auto engine = LuauScriptEngine::getInstance();
+		if(obj->getScript()->getScriptEngine() != engine) {
+			std::println("[ERR] Cannot handle event, object script language differs from event handler implementation");
+			return;
+		}
 
 		lua_pushlightuserdata(L, const_cast<LuauEventHandler*>(this));
 		lua_gettable(L, LUA_REGISTRYINDEX);
 
 		lua_pushlightuserdata(L, obj.get());
+		lua_gettable(L, LUA_REGISTRYINDEX);
 		engine->objectFromVariant(event);
 		lua_pcall(L, 2, 0, 0);
-
-		lua_pop(L, 1);
 	}
 }

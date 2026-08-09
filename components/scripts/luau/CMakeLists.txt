@@ -1,7 +1,7 @@
 set(LUAU_BUILD_CLI OFF)
 add_subdirectory(components/scripts/luau/luau)
 
-file(GLOB luauScriptSrc "components/scripts/luau/*.cpp")
+file(GLOB luauScriptSrc "components/scripts/luau/*.cpp" "components/scripts/luau/types/*.cpp")
 target_sources(VoidEngine PRIVATE ${luauScriptSrc})
 target_include_directories(VoidEngine PRIVATE components/scripts/luau)
 

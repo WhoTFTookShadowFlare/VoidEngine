@@ -21,6 +21,8 @@ namespace VoidEngine::Scripts {
 	protected:
 		virtual void setupNativeTypes() = 0;
 	public:
+		virtual std::string getLanguage() = 0;
+
 		virtual std::shared_ptr<Script> compileScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>) = 0;
 		virtual std::shared_ptr<AScriptModule> compileModuleScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>) = 0;
 

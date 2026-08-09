@@ -2,6 +2,8 @@
 #include "lua.h"
 #include "lualib.h"
 #include "luau_script_engine.hpp"
+#include "types/class_holder.hpp"
+#include "ve/class_db.hpp"
 #include "ve/script/a_script_object.hpp"
 #include "ve/variant.hpp"
 #include <algorithm>
@@ -12,12 +14,7 @@
 #include <vector>
 
 namespace VoidEngine::Scripts::Luau {
-	const Class LuauScriptObject::ClassData = {
-		.name = "LuauScriptObject",
-		.super = &AScriptObject::ClassData
-	};
-
-	LuauScriptObject::LuauScriptObject() {
+	LuauObjectScript::LuauObjectScript() {
 		auto L = LuauScriptEngine::getInstance()->vmState;
 		assert(lua_gettop(L) > 0);
 
@@ -26,18 +23,49 @@ namespace VoidEngine::Scripts::Luau {
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
-	LuauScriptObject::~LuauScriptObject() {
+	LuauObjectScript::~LuauObjectScript() {
 		auto L = LuauScriptEngine::getInstance()->vmState;
 		lua_pushlightuserdata(L, this);
 		lua_pushnil(L);
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
-	std::shared_ptr<AScriptEngine> LuauScriptObject::getScriptEngine() {
+	std::shared_ptr<AScriptEngine> LuauObjectScript::getScriptEngine() {
 		return LuauScriptEngine::getInstance();
 	}
 
-	Variant LuauScriptObject::call(std::string fnName, std::vector<Variant> args) {
+	const Class* LuauObjectScript::getClass() {
+		auto L = LuauScriptEngine::getInstance()->vmState;
+		lua_pushlightuserdata(L, this);
+		lua_gettable(L, LUA_REGISTRYINDEX);
+
+		lua_pushstring(L, "getClass");
+		lua_gettable(L, -2);
+
+		lua_pcall(L, 0, 1, 0);
+
+		const Class* cls = nullptr;
+		if(lua_isstring(L, -1)) {
+			cls = ClassDB::getInstance()->getClassByName(luaL_checkstring(L, -1));
+		} else if(lua_isuserdata(L, -1)) {
+			void* ptr = lua_touserdata(L, -1);
+			if(ptr != nullptr) {
+				if(lua_getmetatable(L, -1)) {
+					lua_getfield(L, -1, "__type");
+					std::string type = luaL_checkstring(L, -1);
+					lua_pop(L, 2);
+
+					if(type == "Class") {
+						cls = static_cast<ClassHolder*>(lua_touserdata(L, -1))->cls;
+					}
+				}
+			}
+		}
+
+		return cls;
+	}
+
+	Variant LuauObjectScript::call(std::string fnName, std::vector<Variant> args) {
 		auto engine = LuauScriptEngine::getInstance();
 		auto L = engine->vmState;
 		lua_pushlightuserdata(L, this);
@@ -65,7 +93,7 @@ namespace VoidEngine::Scripts::Luau {
 		return retVal;
 	}
 
-	Variant LuauScriptObject::get(std::string name) {
+	Variant LuauObjectScript::get(std::string name) {
 		auto engine = LuauScriptEngine::getInstance();
 		auto L = engine->vmState;
 		lua_pushlightuserdata(L, this);
@@ -82,7 +110,7 @@ namespace VoidEngine::Scripts::Luau {
 		return retVal;
 	}
 
-	void LuauScriptObject::set(std::string name, Variant value) {
+	void LuauObjectScript::set(std::string name, Variant value) {
 		auto engine = LuauScriptEngine::getInstance();
 		auto L = engine->vmState;
 		lua_pushlightuserdata(L, this);
@@ -96,7 +124,7 @@ namespace VoidEngine::Scripts::Luau {
 		lua_pop(L, 1);
 	}
 
-	std::vector<std::string> LuauScriptObject::getFunctions() {
+	std::vector<std::string> LuauObjectScript::getFunctions() {
 		auto* L = LuauScriptEngine::getInstance()->vmState;
 		lua_pushlightuserdata(L, this);
 		lua_gettable(L, LUA_REGISTRYINDEX);
@@ -118,7 +146,7 @@ namespace VoidEngine::Scripts::Luau {
 		return funcs;
 	}
 
-	std::vector<std::string> LuauScriptObject::getProperties() {
+	std::vector<std::string> LuauObjectScript::getProperties() {
 		auto* L = LuauScriptEngine::getInstance()->vmState;
 		lua_pushlightuserdata(L, this);
 		lua_gettable(L, LUA_REGISTRYINDEX);

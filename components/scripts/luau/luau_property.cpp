@@ -1,17 +1,27 @@
 #include "luau_property.hpp"
+#include "luau_script_engine.hpp"
 #include "luau_script_object.hpp"
 #include "ve/class_db.hpp"
 #include "ve/object.hpp"
 #include <memory>
+#include <print>
 
 namespace VoidEngine::Scripts::Luau {
 	LuauProperty::LuauProperty(std::string name, bool readonly) : PropertyBase(name), readonly(readonly) {}
 
 	Variant LuauProperty::get(std::shared_ptr<Object> object) const {
 		if(object == nullptr) return nullptr;
-		if(!object->getClass()->instanceOf(&LuauScriptObject::ClassData)) return nullptr;
+		if(object->getScript() == nullptr) {
+			std::println("[ERR] Cannot get property of script class if the object does not have a script");
+			return nullptr;
+		}
 
-		std::shared_ptr<LuauScriptObject> script = std::static_pointer_cast<LuauScriptObject>(object);
+		if(object->getScript()->getScriptEngine() != LuauScriptEngine::getInstance()) {
+			std::println("[ERR] Cannot get property, script language differs from engine property implementation");
+			return nullptr;
+		}
+
+		std::shared_ptr<LuauObjectScript> script = std::static_pointer_cast<LuauObjectScript>(object->getScript());
 		return script->get(name);
 	}
 
@@ -19,9 +29,17 @@ namespace VoidEngine::Scripts::Luau {
 		if(isReadOnly()) return;
 
 		if(object == nullptr) return;
-		if(!object->getClass()->instanceOf(&LuauScriptObject::ClassData)) return;
+		if(object->getScript() == nullptr) {
+			std::println("[ERR] Cannot set property of script class if the object does not have a script");
+			return;
+		}
 
-		std::shared_ptr<LuauScriptObject> script = std::static_pointer_cast<LuauScriptObject>(object);
+		if(object->getScript()->getScriptEngine() != LuauScriptEngine::getInstance()) {
+			std::println("[ERR] Cannot set property, script language differs from engine property implementation");
+			return;
+		}
+
+		std::shared_ptr<LuauObjectScript> script = std::static_pointer_cast<LuauObjectScript>(object->getScript());
 		script->set(name, value);
 	}
 

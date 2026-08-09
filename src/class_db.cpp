@@ -12,7 +12,6 @@
 #include "ve/scene/components/camera.hpp"
 #include "ve/scene/object_component.hpp"
 #include "ve/scene/scene.hpp"
-#include "ve/script/a_script_object.hpp"
 
 namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
@@ -23,8 +22,6 @@ namespace VoidEngine {
 
 	ClassDB::ClassDB() {
 		registerClass(&Object::ClassData);
-
-		registerClass(&Scripts::AScriptObject::ClassData);
 
 		registerClass(&Event::AEvent::ClassData);
 

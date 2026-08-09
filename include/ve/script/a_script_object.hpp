@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ve/variant.hpp"
-#include "ve/object.hpp"
+#include "ve/class_db.hpp"
 #include <memory>
 #include <string>
 #include <vector>
@@ -9,16 +9,14 @@
 namespace VoidEngine::Scripts {
 	class AScriptEngine;
 
-	// TODO: Move this to AObjectScript
-	class AScriptObject : public Object {
+	class AObjectScript {
 	private:
 	protected:
 	public:
-		static const Class ClassData;
-		// virtual const Class* getClass() const override { return &ClassData; }
-
-		virtual ~AScriptObject() {}
+		virtual ~AObjectScript() {}
 		virtual std::shared_ptr<AScriptEngine> getScriptEngine() = 0;
+
+		virtual const Class* getClass() = 0;
 
 		virtual Variant call(std::string fnName, std::vector<Variant> args) = 0;
 		virtual Variant get(std::string name) = 0;
