@@ -81,7 +81,7 @@ namespace VoidEngine::Scripts::Luau {
 		Variant retVal = engine->objectToVariant(top);
 		delete top;
 
-		lua_pop(vmState, 1);
+		lua_pop(vmState, 2);
 		return top;
 	}
 
