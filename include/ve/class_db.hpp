@@ -120,7 +120,7 @@ namespace VoidEngine {
 				const auto idx = std::find_if(cls->properties.cbegin(), cls->properties.cend(), [&name](const auto prop) {
 					return prop->name == name;
 				});
-				if(idx == properties.cend()) {
+				if(idx == cls->properties.cend()) {
 					cls = cls->super;
 					continue;
 				}
@@ -135,7 +135,7 @@ namespace VoidEngine {
 				const auto idx = std::find_if(cls->methods.cbegin(), cls->methods.cend(), [&name](const auto meth) {
 					return meth->name == name;
 				});
-				if(idx == methods.cend()) {
+				if(idx == cls->methods.cend()) {
 					cls = cls->super;
 					continue;
 				}
@@ -150,7 +150,7 @@ namespace VoidEngine {
 				const auto idx = std::find_if(cls->eventHandlers.cbegin(), cls->eventHandlers.cend(), [&eventClass](const auto handler) {
 					return handler->event == eventClass;
 				});
-				if(idx == eventHandlers.cend()) {
+				if(idx == cls->eventHandlers.cend()) {
 					cls = cls->super;
 					continue;
 				}
