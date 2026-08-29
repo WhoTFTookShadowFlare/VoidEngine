@@ -1,24 +1,24 @@
 [submodule "extern/glbinding"]
 	path = components/graphics/opengl/glbinding
 	url = https://github.com/cginternals/glbinding
-[submodule "extern/SDL3"]
-	path = extern/SDL3
-	url = https://github.com/libsdl-org/sdl
 [submodule "extern/stb"]
-	path = extern/stb
+	path = libs/stb
 	url = https://github.com/nothings/stb
 [submodule "extern/glm"]
-	path = extern/glm
+	path = libs/glm
 	url = https://github.com/g-truc/glm
 [submodule "extern/assimp"]
-	path = extern/assimp
+	path = libs/assimp
 	url = https://github.com/assimp/assimp
 [submodule "extern/openal"]
 	path = components/audio/openal/openal
 	url = https://github.com/kcat/openal-soft
 [submodule "extern/toml++"]
-	path = extern/toml++
+	path = libs/toml++
 	url = https://github.com/marzer/tomlplusplus
 [submodule "components/scripts/luau/luau"]
 	path = components/scripts/luau/luau
 	url = https://github.com/luau-lang/luau
+[submodule "libs/SDL3"]
+	path = libs/SDL3
+	url = https://github.com/libsdl-org/sdl
