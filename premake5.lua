@@ -6,6 +6,8 @@ workspace "VoidEngine"
 	targetdir "bin/%{cfg.buildcfg}"
 	location(path.join(_MAIN_SCRIPT_DIR, "VoidEngine"))
 
+	rtti "Off"
+
 	-- fatalwarnings "On"
 
 local libs = include("libs")
@@ -20,17 +22,6 @@ project "VoidEngine"
 
 	files { "src/**.cpp" }
 	includedirs { "generated" }
-	usage "PUBLIC"
-		includedirs { "include" }
-
-	filter "configurations:Debug"
-		defines { "DEBUG" }
-		symbols "On"
-
-	filter "configurations:Release"
-		optimize "On"
-
-	filter {}
 
 	libs.glm.use()
 	libs.stb.use()
@@ -39,6 +30,16 @@ project "VoidEngine"
 	libs.toml.use()
 
 	components.applyUses()
+
+	filter "configurations:Debug"
+		defines { "DEBUG" }
+		symbols "On"
+
+	filter "configurations:Release"
+		optimize "On"
+
+	usage "PUBLIC"
+		includedirs { "include" }
 
 function module.useVoidEngine()
 	uses { "VoidEngine" }

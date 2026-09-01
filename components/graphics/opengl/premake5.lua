@@ -38,10 +38,17 @@ function module.use()
 	includedirs {
 		path.join(module.libPath, "source/glbinding/include"),
 		path.join(module.libPath, "source/glbinding-aux/include"),
+		path.join(module.libPath, "build", "source/glbinding/include"),
+		path.join(module.libPath, "build", "source/glbinding-aux/include"),
+		path.join(module.libPath, "build", "source/include"),
 		path.getdirectory(module.libPath)
 	}
 	dependson { "GLBindingBuild" }
 	uses { "GLBindingBuild" }
+
+	files {
+		path.getrelative(path.getdirectory(_SCRIPT), path.join(path.getdirectory(module.libPath), "*.cpp"))
+	}
 end
 
 function module.setupProject()
@@ -58,9 +65,9 @@ function module.setupProject()
 			"cmake --build " .. GLBindingBuildDir,
 
 			-- this fucking library does not respect any options I throw at it.
-			"{MOVE} " .. path.join(GLBindingBuildDir, "*glbinding.*") .. ' ' ..
+			"{COPYFILE} " .. path.join(GLBindingBuildDir, "*glbinding.*") .. ' ' ..
 				path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"),
-			"{MOVE} " .. path.join(GLBindingBuildDir, "*glbinding-aux.*") .. ' ' ..
+			"{COPYFILE} " .. path.join(GLBindingBuildDir, "*glbinding-aux.*") .. ' ' ..
 				path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}")
 		}
 

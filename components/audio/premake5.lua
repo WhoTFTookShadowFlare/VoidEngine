@@ -7,49 +7,48 @@ module.components = {}
 for _, v in pairs(os.matchdirs(
 	path.join(path.getdirectory(path.getabsolute(_SCRIPT)), "*")
 )) do
-	local gfxModuleName = path.getname(v)
-	local gfxModule = include(v)
-	module.components[gfxModuleName] = gfxModule
+	local auxModuleName = path.getname(v)
+	local auxModule = include(v)
+	module.components[auxModuleName] = auxModule
 
-	gfxModule.enabled = true
-	if _OPTIONS["disable-" .. gfxModuleName] then
-		gfxModule.enabled = false
+	auxModule.enabled = true
+	if _OPTIONS["disable-" .. auxModuleName] then
+		auxModule.enabled = false
 	end
 
 	newoption {
-		trigger = "disable-" .. gfxModuleName,
-		description = "Weather " .. gfxModuleName .. " is disabled",
-		category = "Components/GFX",
+		trigger = "disable-" .. auxModuleName,
+		description = "Weather " .. auxModuleName .. " is disabled",
+		category = "Components/AUX"
 	}
 end
 
-
 local currentScript = _SCRIPT
 function module.runCodegen()
-	local targetFile = path.join(path.getabsolute(path.getdirectory(currentScript)), "../../generated/graphics_load_order.hpp")
+	local targetFile = path.join(path.getabsolute(path.getdirectory(currentScript)), "../../generated/audio_load_order.hpp")
 	os.mkdir(path.getdirectory(targetFile))
 	os.touchfile(targetFile)
 
 	local output = codegen.new()
-	output.prefixWrap = "// This file is auto generated, use 'premake codegen' to modify this file.\n\n"
+	output.prefixWrap = "// This file is auto generated, use 'premake codegne' to modify this file.\n\n"
 	output:addStringPart("#pragma once")
 	output:addStringPart("#include <vector>")
 	output:addStringPart("#include <functional>")
-	output:addStringPart("#include <ve/io/gfx/renderer_backend.hpp>")
-	output:addStringPart("#include <ve/io/gfx/dummy/backend_dummy.hpp>")
+	output:addStringPart("#include <ve/io/sfx/audio_backend.hpp>")
+	output:addStringPart("#include <ve/io/sfx/dummy/backend_dummy.hpp>")
 
 	local includeSection = output:addCodegenPart()
 	includeSection.stringEntryPrefix = "#include <"
 	includeSection.stringEntrySuffix = ">\n"
 
-	output:addStringPart("namespace VoidEngine::IO::GFX {")
-	output:addStringPart("\t::std::vector<std::function<ARendererBackend*()>> backendLoaders = {")
-
+	output:addStringPart("namespace VoidEngine::IO::SFX {")
+	output:addStringPart("\t::std::vector<std::function<AudioBackend*()> backendLoaders = {")
+	
 	local entrySection = output:addCodegenPart()
 	entrySection.stringEntryPrefix = "\t\t[]() { return new "
 	entrySection.stringEntrySuffix = "; },\n"
 
-	output:addStringPart("\t\t[]() { return new ::VoidEngine::IO::GFX::Dummy::DummyBackend; }")
+	output:addStringPart("\t\t[]() { return new ::VoidEngine::IO::SFX::Dummy::DummyBackend; }")
 	output:addStringPart("\t};")
 	output:addStringPart("}")
 
@@ -73,7 +72,6 @@ end
 
 function module.setupProjects()
 	for _, v in pairs(module.components) do
-		filter {}
 		if v.enabled then
 			v.setupProject()
 		end
@@ -82,7 +80,6 @@ end
 
 function module.setupExternal()
 	for _, v in pairs(module.components) do
-		filter {}
 		if v.enabled then
 			v.setupExternal()
 		end

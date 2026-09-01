@@ -45,7 +45,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	}
 
 	std::shared_ptr<Window> GLWindow::create(Window::CreationOptions& options) {
-		auto window = std::shared_ptr<Window>(new GLWindow(options));
+		auto window = std::shared_ptr<GLWindow>(new GLWindow(options));
 		WindowMap[SDL_GetWindowID(window->window)] = window;
 		return window;
 	}

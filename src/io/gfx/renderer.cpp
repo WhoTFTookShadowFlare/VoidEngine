@@ -9,22 +9,11 @@
 #include <print>
 #include <vector>
 
-#include "ve/io/gfx/dummy/backend_dummy.hpp"
-
-#ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
-#include "backend_opengl.hpp"
-#endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
+#include "graphics_load_order.hpp"
 
 namespace VoidEngine::IO::GFX {
 	using std::shared_ptr;
 	shared_ptr<Renderer> Renderer::instance = nullptr;
-
-	std::vector<std::function<ARendererBackend*()>> backendLoaders = {
-#ifdef COMPONENT_GRAPHICS_OPENGL_ENABLED
-		[]() { return new OpenGL::RendererOpenGL; },
-#endif // COMPONENT_GRAPHICS_OPENGL_ENABLED
-		[]() { return new Dummy::DummyBackend; }
-	};
 
 	Renderer::Renderer() {	}
 
