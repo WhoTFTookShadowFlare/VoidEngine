@@ -38,6 +38,7 @@ function module.use()
 	includedirs {
 		path.join(module.libPath, "source/glbinding/include"),
 		path.join(module.libPath, "source/glbinding-aux/include"),
+		path.join(module.libPath, "source/3rdparty/KHR/include"),
 		path.join(module.libPath, "build", "source/glbinding/include"),
 		path.join(module.libPath, "build", "source/glbinding-aux/include"),
 		path.join(module.libPath, "build", "source/include"),
@@ -58,6 +59,7 @@ function module.setupProject()
 	project("GLBindingBuild")
 		kind("Makefile")
 		location(module.libPath)
+		targetdir "bin/%{cfg.buildcfg}"
 
 		buildcommands {
 			"{MKDIR} " .. GLBindingBuildDir,

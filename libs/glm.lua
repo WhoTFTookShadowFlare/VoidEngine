@@ -18,6 +18,7 @@ end
 project("GLMBuild")
 	kind "Makefile"
 	location(module.libPath)
+	targetdir "bin/%{cfg.buildcfg}"
 
 	buildcommands {
 

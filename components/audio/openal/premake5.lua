@@ -52,6 +52,7 @@ function module.setupProject()
 	project("OpenALBuild")
 		kind("Makefile")
 		location(module.libPath)
+		targetdir "bin/%{cfg.buildcfg}"
 
 		buildcommands {
 			"{MKDIR} " .. OpenALBuildDir,

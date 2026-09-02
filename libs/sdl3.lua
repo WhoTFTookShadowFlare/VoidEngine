@@ -31,6 +31,7 @@ local SDL3BuildDir = path.join(module.libPath, "build")
 project("SDL3Build")
 	kind("Makefile")
 	location(module.libPath)
+	targetdir "bin/%{cfg.buildcfg}"
 
 	buildcommands {
 		"{MKDIR} " .. SDL3BuildDir,

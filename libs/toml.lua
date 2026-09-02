@@ -10,7 +10,7 @@ module.buildArgs = table.concat({
 }, " ")
 
 function module.use()
-	includedirs { module.libPath }
+	includedirs { path.join(module.libPath, "include") }
 	dependson { "TomlBuild" }
 	uses { "TomlBuild" }
 end
@@ -28,6 +28,7 @@ local tomlBuildDir = path.join(module.libPath, "build")
 project("TomlBuild")
 	kind "Makefile"
 	location(module.libPath)
+	targetdir "bin/%{cfg.buildcfg}"
 
 	buildcommands {
 		"{MKDIR} " .. tomlBuildDir,

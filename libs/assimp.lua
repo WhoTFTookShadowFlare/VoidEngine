@@ -14,7 +14,10 @@ module.buildArgs = table.concat({
 
 function module.use()
 	links { "assimp" }
-	includedirs { module.libPath }
+	includedirs {
+		path.join(module.libPath, "include"),
+		path.join(module.libPath, "build/include")
+	}
 	dependson { "AssimpBuild" }
 	uses { "AssimpBuild" }
 end
@@ -32,6 +35,7 @@ local assimpBuildDir = path.join(module.libPath, "build")
 project("AssimpBuild")
 	kind "Makefile"
 	location(module.libPath)
+	targetdir "bin/%{cfg.buildcfg}"
 
 	buildcommands {
 		"{MKDIR} " .. assimpBuildDir,

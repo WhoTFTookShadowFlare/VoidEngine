@@ -30,9 +30,9 @@
 #include <pwd.h>
 #endif // __unix
 
-#ifdef _WIN64
+#if defined(_WIN64) or defined(_WIN32)
 #include <Windows.h>
-#endif // _WIN64
+#endif // _WIN64 or _WIN32
 
 namespace VoidEngine {
 	std::shared_ptr<Engine> Engine::instance = nullptr;
@@ -111,11 +111,11 @@ namespace VoidEngine {
 	}
 	
 	std::filesystem::path Engine::getExecutablePath() {
-#ifdef _WIN64
+#if defined(_WIN64) or defined(_WIN32)
 		char exePath[MAX_PATH];
 		GetModuleFileNameA(nullptr, exePath, MAX_PATH);
 		return std::filesystem::path(exePath);
-#endif // _WIN64
+#endif // _WIN64 or _WIN32
 #ifdef __unix
 		return std::filesystem::canonical("/proc/self/exe");
 #endif // __unix
@@ -126,9 +126,9 @@ namespace VoidEngine {
 	}
 
 	std::filesystem::path Engine::getDataDirectory() {
-#ifdef _WIN64
+#if defined(_WIN64) or defined(_WIN32)
 		return std::filesystem::path(getenv("USERPROFILE")) / "Appdata/Roaming" / dataSubdir;
-#endif // _WIN64
+#endif // _WIN64 or _WIN32
 #ifdef __linux
 		std::filesystem::path homeDir = getpwuid(getuid())->pw_dir;
 		return homeDir / ".local/share" / dataSubdir;

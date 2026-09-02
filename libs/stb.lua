@@ -17,6 +17,7 @@ end
 project("STBBuild")
 	kind "Makefile"
 	location(module.libPath)
+	targetdir "bin/%{cfg.buildcfg}"
 
 	buildcommands {
 
