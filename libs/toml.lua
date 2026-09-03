@@ -32,13 +32,11 @@ project("TomlBuild")
 
 	buildcommands {
 		"{MKDIR} " .. tomlBuildDir,
-		"cmake " .. module.buildArgs .. cmake.outputArgs .. "-S " .. tomlSrcDir .. " -B " .. tomlBuildDir,
+		"cmake " .. module.buildArgs .. cmake.getOutputArgs() .. "-S " .. tomlSrcDir .. " -B " .. tomlBuildDir,
 		"cmake --build " .. tomlBuildDir
 	}
 
-	cleancommands {
-		"cmake --build " .. tomlBuildDir .. " --target clean"
-	}
+	cmake.setupBuildCleanup(module.libPath)
 
 	usage "PUBLIC"
 		includedirs { }

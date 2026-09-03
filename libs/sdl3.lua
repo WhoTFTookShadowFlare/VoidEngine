@@ -35,13 +35,11 @@ project("SDL3Build")
 
 	buildcommands {
 		"{MKDIR} " .. SDL3BuildDir,
-		"cmake " .. cmake.outputArgs .. module.buildArgs .. " -S " .. SDL3SrcDir .. " -B " .. SDL3BuildDir,
+		"cmake " .. cmake.getOutputArgs() .. module.buildArgs .. " -S " .. SDL3SrcDir .. " -B " .. SDL3BuildDir,
 		"cmake --build " .. SDL3BuildDir
 	}
 
-	cleancommands {
-		"cmake --build " .. SDL3BuildDir .. " --target clean"
-	}
+	cmake.setupBuildCleanup(module.libPath)
 
 	usage "PUBLIC"
 		includedirs {}

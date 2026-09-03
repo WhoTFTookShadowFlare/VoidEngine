@@ -2,6 +2,7 @@ local module = {}
 
 local codegen = dofile("../../../codegen.lua")
 local cmake = dofile("../../../libs/cmake.lua")
+local utils = dofile("../../../utils.lua")
 
 module.libPath = path.join(path.getdirectory(path.getabsolute(_SCRIPT)), "glbinding")
 
@@ -34,7 +35,6 @@ function module.use()
 		return
 	end
 
-	links { "glbinding" }
 	includedirs {
 		path.join(module.libPath, "source/glbinding/include"),
 		path.join(module.libPath, "source/glbinding-aux/include"),
@@ -50,6 +50,16 @@ function module.use()
 	files {
 		path.getrelative(path.getdirectory(_SCRIPT), path.join(path.getdirectory(module.libPath), "*.cpp"))
 	}
+
+	if utils.isVS() then
+		filter "configurations:Debug"
+			links { "glbindingd.lib", "glbinding-auxd" }
+		filter "configurations:Release"
+			links { "glbinding", "glbinding-aux" }
+		filter {}
+	else
+		links { "glbinding", "glbinding-aux" }
+	end
 end
 
 function module.setupProject()
@@ -63,22 +73,43 @@ function module.setupProject()
 
 		buildcommands {
 			"{MKDIR} " .. GLBindingBuildDir,
-			"cmake " .. cmake.outputArgs .. module.buildArgs .. " -S " .. GLBindingSrcDir .. " -B " .. GLBindingBuildDir,
+			"cmake " .. cmake.getOutputArgs() .. module.buildArgs .. " -S " .. GLBindingSrcDir .. " -B " .. GLBindingBuildDir,
 			"cmake --build " .. GLBindingBuildDir,
-
-			-- this fucking library does not respect any options I throw at it.
-			"{COPYFILE} " .. path.join(GLBindingBuildDir, "*glbinding.*") .. ' ' ..
-				path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"),
-			"{COPYFILE} " .. path.join(GLBindingBuildDir, "*glbinding-aux.*") .. ' ' ..
-				path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}")
+			"{MKDIR} " .. path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}")
 		}
 
-		cleancommands {
-			"cmake --build " .. GLBindingBuildDir .. " --target clean"
-		}
+		-- this fucking library does not respect any options I throw at it.
+		if utils.isVS() then
+			filter "configurations:Debug"
+				buildcommands {
+					"{COPYFILE} " .. path.join(GLBindingBuildDir, "%{cfg.buildcfg}/*glbindingd.*") .. ' ' ..
+						path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"),
+					"{COPYFILE} " .. path.join(GLBindingBuildDir, "%{cfg.buildcfg}/*glbinding-auxd.*") .. ' ' ..
+						path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}")
+				}
+			filter "configurations:Release"
+				buildcommands {
+					"{COPYFILE} " .. path.join(GLBindingBuildDir, "%{cfg.buildcfg}/*glbinding.*") .. ' ' ..
+						path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"),
+					"{COPYFILE} " .. path.join(GLBindingBuildDir, "%{cfg.buildcfg}/*glbinding-aux.*") .. ' ' ..
+						path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}")
+				}
+			filter {}
+		else
+			buildcommands {
+				"{COPYFILE} " .. path.join(GLBindingBuildDir, "*glbinding.*") .. ' ' ..
+					path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"),
+				"{COPYFILE} " .. path.join(GLBindingBuildDir, "*glbinding-aux.*") .. ' ' ..
+					path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}")
+			}
+		end
+
+		cmake.setupBuildCleanup(module.libPath)
 
 		usage "PUBLIC"
 			libdirs { path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}") }
+
+		
 end
 
 function module.setupExternal()

@@ -8,6 +8,8 @@ workspace "VoidEngine"
 
 	rtti "Off"
 
+	architecture "amd64"
+
 	-- fatalwarnings "On"
 
 local libs = include("libs")
@@ -16,7 +18,7 @@ local components = include("components")
 components.setupProjects()
 
 project "VoidEngine"
-	kind "SharedLib"
+	kind "StaticLib" --TODO: DLL exports to make this a SharedLib
 	targetdir(path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"))
 	language "C++"
 
@@ -38,12 +40,15 @@ project "VoidEngine"
 	filter "configurations:Release"
 		optimize "On"
 
+	filter {}
+
 	usage "PUBLIC"
 		includedirs { "include" }
 
 function module.useVoidEngine()
 	uses { "VoidEngine" }
 	links { "VoidEngine" }
+	libdirs { path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}") }
 	libs.glm.use()
 end
 

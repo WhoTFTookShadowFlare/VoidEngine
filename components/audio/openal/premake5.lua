@@ -1,6 +1,7 @@
 local module = {}
 
 local cmake = dofile("../../../libs/cmake.lua")
+local utils = dofile("../../../utils.lua")
 
 module.libPath = path.join(path.getdirectory(path.getabsolute(_SCRIPT)), "openal")
 
@@ -36,13 +37,18 @@ function module.use()
 		path.getrelative(path.getdirectory(_SCRIPT), path.join(path.getdirectory(module.libPath), "*.cpp"))
 	}
 
-	links { "openal" }
 	includedirs {
 		path.join(module.libPath, "include"),
 		path.getdirectory(module.libPath)
 	}
 	dependson { "OpenALBuild" }
 	uses { "OpenALBuild" }
+
+	if utils.isVS() then
+		links { "OpenAL32", "alsoft.common" }
+	else
+		links { "openal" }
+	end
 end
 
 function module.setupProject()
@@ -56,13 +62,11 @@ function module.setupProject()
 
 		buildcommands {
 			"{MKDIR} " .. OpenALBuildDir,
-			"cmake " .. cmake.outputArgs .. module.buildArgs .. " -S " .. OpenALBuildSrcDir .. " -B " .. OpenALBuildDir,
+			"cmake " .. cmake.getOutputArgs() .. module.buildArgs .. " -S " .. OpenALBuildSrcDir .. " -B " .. OpenALBuildDir,
 			"cmake --build " .. OpenALBuildDir
 		}
 
-		cleancommands {
-			"cmake --build " .. OpenALBuildDir .. " --target clean"
-		}
+		cmake.setupBuildCleanup(module.libPath)
 
 		usage "PUBLIC"
 			includedirs {}
