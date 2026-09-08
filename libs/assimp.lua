@@ -14,9 +14,15 @@ module.buildArgs = table.concat({
 }, " ")
 
 function module.use()
-	for _, v in pairs(os.matchfiles(
+	local toLink = os.matchfiles(
 		path.join(_MAIN_SCRIPT_DIR, "bin/*/assimp*.lib")
-	)) do
+	)
+
+	if #toLink == 0 then
+		print("[INFO] Be sure to rerun the command to link properly!")
+	end
+
+	for _, v in pairs(toLink) do
 		links { v }
 	end
 

@@ -11,7 +11,8 @@ namespace VoidEngine::IO::GFX::OpenGL {
 	using namespace gl;
 
 	const Class GLMesh::ClassData = {
-		.name = "GLMesh"
+		.name = "GLMesh",
+		.super = &Mesh::ClassData
 	};
 	
 	GLMesh::GLMesh() {

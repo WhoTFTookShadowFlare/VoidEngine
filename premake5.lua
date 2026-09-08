@@ -50,6 +50,8 @@ function module.useVoidEngine()
 	links { "VoidEngine" }
 	libdirs { path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}") }
 	libs.glm.use()
+
+	libs.sdl3.use()
 end
 
 function module.addVoidEngine()

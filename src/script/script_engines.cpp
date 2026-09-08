@@ -4,21 +4,10 @@
 #include "ve/script/script.hpp"
 #include <memory>
 
-#ifdef COMPONENT_SCRIPTS_LUAU_ENABLED
-#include "luau_script_engine.hpp"
-#endif
-
 namespace VoidEngine::Scripts {
 	std::shared_ptr<ScriptEngines> ScriptEngines::instance = nullptr;
 
 	ScriptEngines::ScriptEngines() {
-#ifdef COMPONENT_SCRIPTS_LUAU_ENABLED
-		{
-			std::shared_ptr<AScriptEngine> luauEngine = Luau::LuauScriptEngine::getInstance();
-			engines["luau"] = luauEngine;
-			luauEngine->setupNativeTypes();
-		}
-#endif // COMPONENT_SCRIPTS_LUAU_ENABLED
 	}
 
 	ScriptEngines::~ScriptEngines() {

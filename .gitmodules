@@ -16,9 +16,6 @@
 [submodule "extern/toml++"]
 	path = libs/toml++
 	url = https://github.com/marzer/tomlplusplus
-[submodule "components/scripts/luau/luau"]
-	path = components/scripts/luau/luau
-	url = https://github.com/luau-lang/luau
 [submodule "libs/SDL3"]
 	path = libs/SDL3
 	url = https://github.com/libsdl-org/sdl
