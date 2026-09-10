@@ -2,6 +2,7 @@
 
 #include <print>
 #include <lua_script.hpp>
+#include <lua_module.hpp>
 
 namespace VoidEngine::Scripts::Lua {
 	std::shared_ptr<LuaScriptEngine> LuaScriptEngine::instance = nullptr;
@@ -35,9 +36,8 @@ namespace VoidEngine::Scripts::Lua {
 		return std::shared_ptr<LuaScript>(new LuaScript(src));
 	}
 
-	std::shared_ptr<AScriptModule> LuaScriptEngine::compileModuleScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>) {
-		std::println("[WARN] compiling modules is NYI");
-		return nullptr;
+	std::shared_ptr<AScriptModule> LuaScriptEngine::compileModuleScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider> src) {
+		return std::shared_ptr<LuaModule>(new LuaModule(src));
 	}
 
 	Variant LuaScriptEngine::objectToVariant(void*) {
@@ -45,8 +45,29 @@ namespace VoidEngine::Scripts::Lua {
 		return nullptr;
 	}
 
-	void* LuaScriptEngine::objectFromVariant(Variant) {
-		std::println("[WARN] Cannot convert Variant to a lua object, NYI");
+	void* LuaScriptEngine::objectFromVariant(Variant value) {
+		switch(value.getType()) {
+		case VariantType::NIL:
+			lua_pushnil(state);
+			break;
+		case VariantType::INT:
+			lua_pushinteger(state, value.asInt().value());
+			break;
+		case VariantType::FLOAT:
+			lua_pushnumber(state, value.asFloat().value());
+			break;
+		case VariantType::BOOL:
+			lua_pushboolean(state, value.asBool().value());
+			break;
+		case VariantType::STRING:
+			lua_pushstring(state, value.asString().value().c_str());
+			break;
+			//ARRAY,
+			//MAP,
+		default:
+			std::println("[ERR] [Lua] Cannot convert Variant type {}, pushing nil", (int) value.getType());
+			lua_pushnil(state);
+		}
 		return nullptr;
 	}
 }

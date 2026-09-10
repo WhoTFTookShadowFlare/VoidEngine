@@ -11,10 +11,10 @@ namespace VoidEngine::Scripts {
 
 	class AScriptModule {
 	private:
-		ByteCode code;
+		std::shared_ptr<IO::ResourceProviders::ASourceProvider> code;
 	protected:
-		AScriptModule(ByteCode code) : code(code) {}
-		ByteCode getByteCode() { return code; }
+		AScriptModule(std::shared_ptr<IO::ResourceProviders::ASourceProvider> code) : code(code) {}
+		std::shared_ptr<IO::ResourceProviders::ASourceProvider> getCode() { return code; }
 	public:
 		virtual ~AScriptModule() {}
 		virtual std::shared_ptr<AScriptEngine> getScriptEngine() = 0;

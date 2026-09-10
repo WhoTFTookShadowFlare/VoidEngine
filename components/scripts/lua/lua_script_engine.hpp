@@ -11,6 +11,7 @@ extern "C" {
 namespace VoidEngine::Scripts::Lua {
 	class LuaScriptEngine final : public AScriptEngine {
 		friend class LuaScript;
+		friend class LuaModule;
 	private:
 		static std::shared_ptr<LuaScriptEngine> instance;
 
