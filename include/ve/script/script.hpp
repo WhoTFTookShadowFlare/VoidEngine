@@ -6,10 +6,10 @@
 namespace VoidEngine::Scripts {
 	class Script {
 	private:
-		ByteCode code;
+		std::shared_ptr<IO::ResourceProviders::ASourceProvider> code;
 	protected:
-		Script(ByteCode);
-		ByteCode getByteCode();
+		Script(std::shared_ptr<IO::ResourceProviders::ASourceProvider>);
+		std::shared_ptr<IO::ResourceProviders::ASourceProvider> getCode();
 	public:
 		virtual ~Script();
 		virtual void execute() = 0;

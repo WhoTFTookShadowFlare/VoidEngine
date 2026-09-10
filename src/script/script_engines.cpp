@@ -4,10 +4,17 @@
 #include "ve/script/script.hpp"
 #include <memory>
 
+#include <script_engine_load_order.hpp>
+
 namespace VoidEngine::Scripts {
 	std::shared_ptr<ScriptEngines> ScriptEngines::instance = nullptr;
 
 	ScriptEngines::ScriptEngines() {
+		for(const auto& ldFunc : engineLoaders) {
+			std::shared_ptr<AScriptEngine> engine = std::shared_ptr<AScriptEngine>(ldFunc());
+			if(engine == nullptr) return;
+			engines[engine->getLanguage()] = engine;
+		}
 	}
 
 	ScriptEngines::~ScriptEngines() {

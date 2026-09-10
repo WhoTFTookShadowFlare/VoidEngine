@@ -19,3 +19,6 @@
 [submodule "libs/SDL3"]
 	path = libs/SDL3
 	url = https://github.com/libsdl-org/sdl
+[submodule "components/scripts/lua/lua"]
+	path = components/scripts/lua/lua
+	url = https://github.com/lua/lua

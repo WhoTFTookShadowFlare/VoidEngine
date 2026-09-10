@@ -19,7 +19,7 @@ for _, v in pairs(os.matchdirs(
 	newoption {
 		trigger = "disable-" .. scriptModuleName,
 		description = "Weather " .. scriptModuleName .. " is disabled",
-		category = "Components/GFX",
+		category = "Components/Scripts",
 	}
 end
 
@@ -34,18 +34,19 @@ function module.runCodegen()
 	output:addStringPart("#pragma once")
 	output:addStringPart("#include <vector>")
 	output:addStringPart("#include <functional>")
+	output:addStringPart("#include <memory>")
 	output:addStringPart("#include <ve/script/a_script_engine.hpp>")
 
 	local includeSection = output:addCodegenPart()
 	includeSection.stringEntryPrefix = "#include <"
 	includeSection.stringEntrySuffix = ">\n"
 
-	output:addStringPart("namespace VoidEngine::Script {")
-	output:addStringPart("\t::std::vector<std::function<AScriptEngine*()>> engineLoaders = {")
+	output:addStringPart("namespace VoidEngine::Scripts {")
+	output:addStringPart("\t::std::vector<::std::function<::std::shared_ptr<AScriptEngine>()>> engineLoaders = {")
 
 	local entrySection = output:addCodegenPart()
-	entrySection.stringEntryPrefix = "\t\t[]() { return new "
-	entrySection.stringEntrySuffix = "; },\n"
+	entrySection.stringEntryPrefix = "\t\t[]() { return "
+	entrySection.stringEntrySuffix = "::getInstance(); },\n"
 
 	output:addStringPart("\t};")
 	output:addStringPart("}")

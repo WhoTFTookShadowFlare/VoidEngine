@@ -1,11 +1,9 @@
 #include "ve/script/script.hpp"
 
 namespace VoidEngine::Scripts {
-	Script::Script(ByteCode code) : code(code) {}
+	Script::Script(std::shared_ptr<IO::ResourceProviders::ASourceProvider> code) : code(code) {}
 
-	Script::~Script() {
-		delete (char*) code.code;
-	}
+	Script::~Script() {	}
 
-	ByteCode Script::getByteCode() { return code; }
+	std::shared_ptr<IO::ResourceProviders::ASourceProvider> Script::getCode() { return code; }
 }
