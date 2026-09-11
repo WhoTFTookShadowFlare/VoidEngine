@@ -74,7 +74,11 @@ namespace VoidEngine::Scripts::Lua {
 		for(Variant& arg : args) {
 			engine->objectFromVariant(arg);
 		}
-		lua_pcall(state, args.size(), 1, 0);
+		if(lua_pcall(state, args.size(), 1, 0) != 0) {
+			std::println("[ERR] [Lua] {}", luaL_checkstring(state, -1));
+			lua_pop(state, 1);
+			return nullptr;
+		}
 		
 		int* stackIdx = new int(-1);
 		Variant retVal = engine->objectToVariant(stackIdx);

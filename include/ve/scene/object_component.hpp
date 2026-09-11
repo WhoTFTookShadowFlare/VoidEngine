@@ -22,6 +22,8 @@ namespace VoidEngine::Scene {
 		Variant scr_getObjectsUsing(std::vector<Variant>);
 
 	public:
+		static std::shared_ptr<AObjectComponent> create();
+
 		Event::EventBus onComponentAdded = &Events::EComponentAddedToObject::ClassData;
 		Event::EventBus onComponentRemoved = &Events::EComponentRemovedFromObject::ClassData;
 

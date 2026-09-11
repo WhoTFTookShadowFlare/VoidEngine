@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ve/script/a_script_engine.hpp"
-#include "ve/script/a_script_object.hpp"
+#include "ve/script/a_object_script.hpp"
 #include "ve/variant.hpp"
 #include <memory>
 #include <vector>

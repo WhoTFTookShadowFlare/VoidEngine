@@ -1,6 +1,8 @@
 #include <api/lua_class.hpp>
 #include <api/lua_constructor.hpp>
 
+#include <ve/object.hpp>
+
 #include <print>
 
 namespace VoidEngine::Scripts::Lua::API {
@@ -11,12 +13,20 @@ namespace VoidEngine::Scripts::Lua::API {
 			return 0;
 		}
 
+		const Class* super = nullptr;
+		if(!luaL_testudata(state, 2, "Class")) {
+			super = &VoidEngine::Object::ClassData;
+		} else {
+			super = static_cast<LuaClass*>(luaL_checkudata(state, 2, "Class"))->cls;
+		}
+
 		LuaClass* cls = static_cast<LuaClass*>(lua_newuserdata(state, sizeof(LuaClass)));
 		luaL_getmetatable(state, "Class");
 		lua_setmetatable(state, -2);
 
 		cls->cls = new Class;
 		const_cast<Class*>(cls->cls)->name = luaL_checkstring(state, 1);
+		const_cast<Class*>(cls->cls)->super = super;
 		return 1;
 	}
 
@@ -52,6 +62,7 @@ namespace VoidEngine::Scripts::Lua::API {
 	int lua_ClassSetConstructor(lua_State* state) {
 		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
 		LuaConstructorWrapper* ctor = static_cast<LuaConstructorWrapper*>(luaL_checkudata(state, 2, "Constructor"));
+		const_cast<LuaConstructor*>(static_cast<const LuaConstructor*>(ctor->ctor))->cls = cls->cls;
 		const_cast<Class*>(cls->cls)->constructor = ctor->ctor;
 		return 0;
 	}
@@ -69,6 +80,28 @@ namespace VoidEngine::Scripts::Lua::API {
 		luaL_getmetatable(state, "Constructor");
 		lua_setmetatable(state, -2);
 		
+		return 1;
+	}
+
+	int lua_ClassInstanceOf(lua_State* state) {
+		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		LuaClass* other = static_cast<LuaClass*>(luaL_checkudata(state, 2, "Class"));
+		lua_pushboolean(state, cls->cls->instanceOf(other->cls));
+		return 1;
+	}
+
+	int lua_ClassGetSuper(lua_State* state) {
+		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		LuaClass* super = static_cast<LuaClass*>(lua_newuserdata(state, sizeof(LuaClass)));
+		super->cls = cls->cls->getSuper();
+		luaL_getmetatable(state, "Class");
+		lua_setmetatable(state, -2);
+		return 1;
+	}
+
+	int lua_ClassGetName(lua_State* state) {
+		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		lua_pushstring(state, cls->cls->getName());
 		return 1;
 	}
 
@@ -97,6 +130,9 @@ namespace VoidEngine::Scripts::Lua::API {
 		else if(idxName == "isAbstract") lua_pushcfunction(state, lua_ClassIsAbstract);
 		else if(idxName == "setConstructor") lua_pushcfunction(state, lua_ClassSetConstructor);
 		else if(idxName == "getConstructor") lua_pushcfunction(state, lua_ClassGetConstructor);
+		else if(idxName == "instanceOf") lua_pushcfunction(state, lua_ClassInstanceOf);
+		else if(idxName == "getSuper") lua_pushcfunction(state, lua_ClassGetSuper);
+		else if(idxName == "getName") lua_pushcfunction(state, lua_ClassGetName);
 		else {
 			lua_pushstring(state, std::format("Class does not have entry: {}", idxName).c_str());
 			lua_error(state);

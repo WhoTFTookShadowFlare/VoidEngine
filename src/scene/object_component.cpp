@@ -19,6 +19,10 @@ namespace VoidEngine::Scene {
 		));
 	}
 
+	std::shared_ptr<AObjectComponent> AObjectComponent::create() {
+		return std::shared_ptr<AObjectComponent>(new AObjectComponent);
+	}
+
 	std::vector<std::shared_ptr<GameObject>> AObjectComponent::getObjectsUsing() {
 		cleanTiedTo();
 		std::vector<std::shared_ptr<GameObject>> retVal(tiedTo.size());
@@ -42,7 +46,8 @@ namespace VoidEngine::Scene {
 		.super = &Object::ClassData,
 		.methods = {
 			new NativeMethod("getObjectsUsing", &AObjectComponent::scr_getObjectsUsing)
-		}
+		},
+		.constructor = new NativeConstructor(&AObjectComponent::create)
 	};
 }
 

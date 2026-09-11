@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ve/class_db.hpp"
-#include "ve/script/a_script_object.hpp"
+#include "ve/script/a_object_script.hpp"
 #include <memory>
 
 #ifdef VE_CLASS

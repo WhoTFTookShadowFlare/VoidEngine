@@ -1,14 +1,36 @@
 #include <api/lua_constructor.hpp>
+#include <api/lua_object_script.hpp>
+#include <lua_script_engine.hpp>
+
+#include <ve/object.hpp>
 
 namespace VoidEngine::Scripts::Lua::API {
-	LuaConstructor::LuaConstructor(lua_State* state, int funcIdx) {
+	LuaConstructor::LuaConstructor(int funcIdx) {
+		lua_State* state = LuaScriptEngine::getInstance()->state;
 		lua_pushlightuserdata(state, this);
 		lua_pushvalue(state, funcIdx);
 		lua_settable(state, LUA_REGISTRYINDEX);
 	}
 
 	std::shared_ptr<Object> LuaConstructor::create() const {
-		return nullptr;
+		if(cls->getSuper()->isAbstract()) {
+			std::println("[ERR] Cannot instance object, script super type is abstract.");
+			return nullptr;
+		}
+		std::shared_ptr<Object> obj = cls->getSuper()->constructor->create();
+
+		lua_State* state = LuaScriptEngine::getInstance()->state;
+
+		lua_pushlightuserdata(state, const_cast<void*>(static_cast<const void*>(this)));
+		lua_gettable(state, LUA_REGISTRYINDEX);
+		if(lua_pcall(state, 0, 1, 0) != 0) {
+			std::println("[ERR] [Lua] {}", luaL_checkstring(state, -1));
+			lua_pop(state, 1);
+			return nullptr;
+		}
+
+		obj->setScript(std::shared_ptr<LuaObjectScript>(new LuaObjectScript(state, -1, cls)));
+		return obj;
 	}
 
 	int lua_ConstructorNew(lua_State* state) {
@@ -21,7 +43,7 @@ namespace VoidEngine::Scripts::Lua::API {
 		LuaConstructorWrapper* wrapper = static_cast<LuaConstructorWrapper*>(
 			lua_newuserdata(state, sizeof(LuaConstructorWrapper))
 		);
-		wrapper->ctor = new LuaConstructor(state, 1);
+		wrapper->ctor = new LuaConstructor(1);
 
 		luaL_getmetatable(state, "Constructor");
 		lua_setmetatable(state, -2);

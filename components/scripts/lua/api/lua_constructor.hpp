@@ -9,9 +9,13 @@ extern "C" {
 }
 
 namespace VoidEngine::Scripts::Lua::API {
+	struct LuaClass;
+
 	struct LuaConstructor final : public ConstructorBase {
+	private:
 	public:
-		LuaConstructor(lua_State*, int funcIdx);
+		const Class* cls = nullptr;
+		LuaConstructor(int funcIdx);
 
 		std::shared_ptr<Object> create() const;
 	};

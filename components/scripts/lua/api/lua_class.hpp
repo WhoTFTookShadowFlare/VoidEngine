@@ -23,6 +23,9 @@ namespace VoidEngine::Scripts::Lua::API {
 	int lua_ClassRegister(lua_State* state);
 	int lua_ClassIsAbstract(lua_State* state);
 	int lua_ClassSetConstructor(lua_State* state);
+	int lua_ClassInstanceOf(lua_State* state);
+	int lua_ClassGetSuper(lua_State* state);
+	int lua_ClassGetName(lua_State* state);
 
 	static luaL_Reg classLib[] = {
 		{ "new", lua_ClassNew },

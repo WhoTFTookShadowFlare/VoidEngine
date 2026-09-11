@@ -9,9 +9,15 @@ extern "C" {
 }
 
 namespace VoidEngine::Scripts::Lua {
+	namespace API {
+		class LuaConstructor;
+	}
+
 	class LuaScriptEngine final : public AScriptEngine {
 		friend class LuaScript;
 		friend class LuaModule;
+
+		friend class API::LuaConstructor;
 	private:
 		static std::shared_ptr<LuaScriptEngine> instance;
 
