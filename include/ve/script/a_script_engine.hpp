@@ -26,6 +26,7 @@ namespace VoidEngine::Scripts {
 		virtual std::shared_ptr<Script> compileScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>) = 0;
 		virtual std::shared_ptr<AScriptModule> compileModuleScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>) = 0;
 
+		// TODO: data structs for these converter functions.
 		virtual Variant objectToVariant(void*) = 0;
 		virtual void* objectFromVariant(Variant) = 0;
 	};

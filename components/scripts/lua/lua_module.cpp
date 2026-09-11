@@ -76,9 +76,11 @@ namespace VoidEngine::Scripts::Lua {
 		}
 		lua_pcall(state, args.size(), 1, 0);
 		
-		std::println("[WARN] [Lua] Cannot convert return value, NYI");
+		int* stackIdx = new int(-1);
+		Variant retVal = engine->objectToVariant(stackIdx);
+		delete stackIdx;
 		lua_pop(state, 2);
-		return nullptr;
+		return retVal;
 	}
 
 	std::shared_ptr<AObjectScript> LuaModule::instanceObject() {

@@ -49,7 +49,7 @@ function module.use()
 	}
 
 	files {
-		path.join(path.getdirectory(module.libPath), "*.cpp")
+		path.join(path.getdirectory(module.libPath), "**.cpp")
 	}
 end
 

@@ -1,6 +1,9 @@
 #include <lua_script_engine.hpp>
 
 #include <print>
+
+#include <api/lua_class.hpp>
+#include <api/lua_constructor.hpp>
 #include <lua_script.hpp>
 #include <lua_module.hpp>
 
@@ -28,7 +31,10 @@ namespace VoidEngine::Scripts::Lua {
 		return instance;
 	}
 
-	void LuaScriptEngine::setupNativeTypes() {}
+	void LuaScriptEngine::setupNativeTypes() {
+		API::luaopen_Class(state);
+		API::luaopen_Constructor(state);
+	}
 
 	std::string LuaScriptEngine::getLanguage() { return "lua"; }
 
@@ -40,8 +46,27 @@ namespace VoidEngine::Scripts::Lua {
 		return std::shared_ptr<LuaModule>(new LuaModule(src));
 	}
 
-	Variant LuaScriptEngine::objectToVariant(void*) {
-		std::println("[WARN] Cannot convert lua object to a Variant, NYI");
+	Variant LuaScriptEngine::objectToVariant(void* convArg) {
+		if(convArg == nullptr) return nullptr;
+		int stackIdx = *(static_cast<int*>(convArg));
+		int top = lua_gettop(state);
+		if(top == 0) return nullptr;
+		if(stackIdx == 0) return nullptr;
+
+		int type = lua_type(state, stackIdx);
+		switch(type) {
+		case LUA_TNIL:
+			return nullptr;
+		case LUA_TBOOLEAN:
+			return static_cast<bool>(lua_toboolean(state, stackIdx));
+		case LUA_TNUMBER:
+			return static_cast<float>(lua_tonumber(state, stackIdx));
+		case LUA_TSTRING:
+			return lua_tostring(state, stackIdx);
+			// LUA_TTABLE
+		default:
+			std::println("[ERR] [Lua] Cannot convert lua type {} to variant", type);
+		}
 		return nullptr;
 	}
 
