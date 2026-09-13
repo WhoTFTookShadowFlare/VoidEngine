@@ -12,9 +12,8 @@ namespace VoidEngine::Scripts::Lua::API {
 	class LuaObjectScript final : public AObjectScript {
 	private:
 		const Class* cls = nullptr;
-		lua_State* state = nullptr;
 	public:
-		LuaObjectScript(lua_State* state, int objIdx, const Class* cls);
+		LuaObjectScript(int objIdx, const Class* cls);
 		~LuaObjectScript();
 
 		std::shared_ptr<AScriptEngine> getScriptEngine();

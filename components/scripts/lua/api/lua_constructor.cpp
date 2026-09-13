@@ -29,7 +29,7 @@ namespace VoidEngine::Scripts::Lua::API {
 			return nullptr;
 		}
 
-		obj->setScript(std::shared_ptr<LuaObjectScript>(new LuaObjectScript(state, -1, cls)));
+		obj->setScript(std::shared_ptr<LuaObjectScript>(new LuaObjectScript(-1, cls)));
 		return obj;
 	}
 

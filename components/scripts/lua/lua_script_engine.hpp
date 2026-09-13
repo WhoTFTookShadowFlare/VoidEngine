@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/lua_object_script.hpp"
 #include <ve/script/a_script_engine.hpp>
 
 extern "C" {
@@ -11,6 +12,7 @@ extern "C" {
 namespace VoidEngine::Scripts::Lua {
 	namespace API {
 		class LuaConstructor;
+		class LuaObjectScript;
 	}
 
 	class LuaScriptEngine final : public AScriptEngine {
@@ -18,6 +20,7 @@ namespace VoidEngine::Scripts::Lua {
 		friend class LuaModule;
 
 		friend class API::LuaConstructor;
+		friend class API::LuaObjectScript;
 	private:
 		static std::shared_ptr<LuaScriptEngine> instance;
 

@@ -23,7 +23,7 @@ namespace VoidEngine::Scripts::Lua {
 	}
 
 	LuaScriptEngine::~LuaScriptEngine() {
-		lua_close(state);
+		if(state != nullptr) lua_close(state);
 	}
 
 	std::shared_ptr<LuaScriptEngine> LuaScriptEngine::getInstance() {

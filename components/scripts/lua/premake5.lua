@@ -41,6 +41,14 @@ function module.setupProject()
 			path.join(module.libPath, "onelua.c"),
 			path.join(module.libPath, "lua.c")
 		}
+
+		filter "configurations:Debug"
+			defines { "DEBUG" }
+			symbols "On"
+
+		filter "configurations:Release"
+			defines { "NDEBUG" }
+			optimize "On"
 end
 
 function module.use()

@@ -3,20 +3,19 @@
 #include <lua_script_engine.hpp>
 
 namespace VoidEngine::Scripts::Lua::API {
-	LuaObjectScript::LuaObjectScript(lua_State* state, int objIdx, const Class* cls) {
+	LuaObjectScript::LuaObjectScript(int objIdx, const Class* cls) {
+		lua_State* state = LuaScriptEngine::getInstance()->state;
 		this->cls = cls;
-		this->state = lua_newthread(state);
-		lua_pushlightuserdata(this->state, this);
+		lua_pushlightuserdata(state, this);
 		lua_pushvalue(state, objIdx);
-		lua_xmove(state, this->state, 1);
-		lua_settable(this->state, LUA_REGISTRYINDEX);
+		lua_settable(state, LUA_REGISTRYINDEX);
 	}
 	
 	LuaObjectScript::~LuaObjectScript() {
+		lua_State* state = LuaScriptEngine::getInstance()->state;
 		lua_pushlightuserdata(state, this);
 		lua_pushnil(state);
 		lua_settable(state, LUA_REGISTRYINDEX);
-		lua_close(state);
 	}
 
 	std::shared_ptr<AScriptEngine> LuaObjectScript::getScriptEngine() {
