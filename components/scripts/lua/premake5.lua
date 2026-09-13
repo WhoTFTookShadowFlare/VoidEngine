@@ -25,7 +25,9 @@ function module.setupProject()
 		targetdir(path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"))
 		location(module.libPath)
 		language "C"
-		defines { "LUA_BUILD_AS_DLL" }
+		if utils.isVS() then
+			defines { "LUA_BUILD_AS_DLL" }
+		end
 
 		includedirs {
 			module.libPath
@@ -42,6 +44,7 @@ function module.setupProject()
 end
 
 function module.use()
+	print("links Lua")
 	links { "Lua" }
 	includedirs {
 		module.libPath,
