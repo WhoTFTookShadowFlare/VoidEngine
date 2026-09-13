@@ -1,9 +1,13 @@
+#include "api/lua_function.hpp"
+#include "lauxlib.h"
+#include "ve/class_db.hpp"
 #include <api/lua_class.hpp>
 #include <api/lua_constructor.hpp>
 
 #include <ve/object.hpp>
 
 #include <print>
+#include <vector>
 
 namespace VoidEngine::Scripts::Lua::API {
 	int lua_ClassNew(lua_State* state) {
@@ -13,9 +17,9 @@ namespace VoidEngine::Scripts::Lua::API {
 			return 0;
 		}
 
-		LuaClass* super = static_cast<LuaClass*>(luaL_checkudata(state, 2, "Class"));
+		LuaClassWrapper* super = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 2, "Class"));
 
-		LuaClass* cls = static_cast<LuaClass*>(lua_newuserdata(state, sizeof(LuaClass)));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(lua_newuserdata(state, sizeof(LuaClassWrapper)));
 		luaL_getmetatable(state, "Class");
 		lua_setmetatable(state, -2);
 
@@ -32,7 +36,7 @@ namespace VoidEngine::Scripts::Lua::API {
 			return 0;
 		}
 
-		LuaClass* cls = static_cast<LuaClass*>(lua_newuserdata(state, sizeof(LuaClass)));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(lua_newuserdata(state, sizeof(LuaClassWrapper)));
 		luaL_getmetatable(state, "Class");
 		lua_setmetatable(state, -2);
 
@@ -43,19 +47,19 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_ClassRegister(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
 		ClassDB::getInstance()->registerClass(cls->cls);
 		return 0;
 	}
 
 	int lua_ClassIsAbstract(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
 		lua_pushboolean(state, cls->cls->isAbstract());
 		return 1;
 	}
 	
 	int lua_ClassSetConstructor(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
 		LuaConstructorWrapper* ctor = static_cast<LuaConstructorWrapper*>(luaL_checkudata(state, 2, "Constructor"));
 		const_cast<LuaConstructor*>(static_cast<const LuaConstructor*>(ctor->ctor))->cls = cls->cls;
 		const_cast<Class*>(cls->cls)->constructor = ctor->ctor;
@@ -63,7 +67,7 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_ClassGetConstructor(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
 		if(cls->cls->constructor == nullptr) {
 			lua_pushnil(state);
 			return 1;
@@ -79,15 +83,15 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_ClassInstanceOf(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
-		LuaClass* other = static_cast<LuaClass*>(luaL_checkudata(state, 2, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* other = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 2, "Class"));
 		lua_pushboolean(state, cls->cls->instanceOf(other->cls));
 		return 1;
 	}
 
 	int lua_ClassGetSuper(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
-		LuaClass* super = static_cast<LuaClass*>(lua_newuserdata(state, sizeof(LuaClass)));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* super = static_cast<LuaClassWrapper*>(lua_newuserdata(state, sizeof(LuaClassWrapper)));
 		super->cls = cls->cls->getSuper();
 		luaL_getmetatable(state, "Class");
 		lua_setmetatable(state, -2);
@@ -95,13 +99,35 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_ClassGetName(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
 		lua_pushstring(state, cls->cls->getName());
 		return 1;
 	}
 
+	int lua_ClassAddFunction(lua_State* state) {
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		LuaFunctionWrapper* function = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 2, "Function"));
+
+		auto methods = const_cast<std::vector<const MethodBase*>*>(&self->cls->methods);
+		methods->push_back(function->method);
+
+		std::println("Added function");
+
+		return 0;
+	}
+
+	int lua_ClassAddProperty(lua_State* state) {
+		std::println("[WARN] [Lua] NYI");
+		return 0;
+	}
+
+	int lua_ClassAddEventHandler(lua_State* state) {
+		std::println("[WARN] [Lua] NYI");
+		return 0;
+	}
+
 	int lua_Class__tostring(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_testudata(state, 1, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_testudata(state, 1, "Class"));
 		if(cls == nullptr) {
 			lua_pushstring(state, "how?");
 			lua_error(state);
@@ -113,7 +139,7 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_Class__index(lua_State* state) {
-		LuaClass* cls = static_cast<LuaClass*>(luaL_testudata(state, 1, "Class"));
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_testudata(state, 1, "Class"));
 		if (cls == nullptr) {
 			lua_pushstring(state, "how?");
 			lua_error(state);
@@ -128,6 +154,9 @@ namespace VoidEngine::Scripts::Lua::API {
 		else if(idxName == "instanceOf") lua_pushcfunction(state, lua_ClassInstanceOf);
 		else if(idxName == "getSuper") lua_pushcfunction(state, lua_ClassGetSuper);
 		else if(idxName == "getName") lua_pushcfunction(state, lua_ClassGetName);
+		else if(idxName == "addProperty") lua_pushcfunction(state, lua_ClassAddProperty);
+		else if(idxName == "addFunction") lua_pushcfunction(state, lua_ClassAddFunction);
+		else if(idxName == "addEventHandler") lua_pushcfunction(state, lua_ClassAddEventHandler);
 		else {
 			lua_pushstring(state, std::format("Class does not have entry: {}", idxName).c_str());
 			lua_error(state);
@@ -138,13 +167,13 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_Class__eq(lua_State* state) {
-		LuaClass* RHS = static_cast<LuaClass*>(luaL_testudata(state, 2, "Class"));
+		LuaClassWrapper* RHS = static_cast<LuaClassWrapper*>(luaL_testudata(state, 2, "Class"));
 		if(RHS == nullptr) {
 			lua_pushboolean(state, false);
 			return 1;
 		}
 
-		LuaClass* LHS = static_cast<LuaClass*>(luaL_testudata(state, 1, "Class"));
+		LuaClassWrapper* LHS = static_cast<LuaClassWrapper*>(luaL_testudata(state, 1, "Class"));
 		if(LHS == nullptr) {
 			lua_pushboolean(state, false);
 			return 1;

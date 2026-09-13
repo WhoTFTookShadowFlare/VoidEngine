@@ -26,5 +26,7 @@ namespace VoidEngine::Scripts::Lua::API {
 
 		std::vector<std::string> getFunctions();
 		std::vector<std::string> getProperties();
+
+		void pushObject(lua_State* state);
 	};
 }

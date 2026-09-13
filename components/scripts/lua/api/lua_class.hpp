@@ -9,7 +9,7 @@ extern "C" {
 }
 
 namespace VoidEngine::Scripts::Lua::API {
-	struct LuaClass {
+	struct LuaClassWrapper {
 		const Class* cls;
 	};
 
@@ -26,6 +26,10 @@ namespace VoidEngine::Scripts::Lua::API {
 	int lua_ClassInstanceOf(lua_State* state);
 	int lua_ClassGetSuper(lua_State* state);
 	int lua_ClassGetName(lua_State* state);
+
+	int lua_ClassAddFunction(lua_State* state);
+	int lua_ClassAddProperty(lua_State* state);
+	int lua_ClassAddEventHandler(lua_State* state);
 
 	static luaL_Reg classLib[] = {
 		{ "new", lua_ClassNew },

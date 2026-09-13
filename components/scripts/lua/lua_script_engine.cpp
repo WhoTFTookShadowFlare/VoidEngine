@@ -1,3 +1,4 @@
+#include "api/lua_function.hpp"
 #include <lua_script_engine.hpp>
 
 #include <print>
@@ -34,6 +35,7 @@ namespace VoidEngine::Scripts::Lua {
 	void LuaScriptEngine::setupNativeTypes() {
 		API::luaopen_Class(state);
 		API::luaopen_Constructor(state);
+		API::luaopen_Function(state);
 	}
 
 	std::string LuaScriptEngine::getLanguage() { return "lua"; }

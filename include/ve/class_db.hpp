@@ -45,12 +45,14 @@ namespace VoidEngine {
 	};
 
 	struct MethodBase {
+	private:
+		const std::string name;
 	protected:
 		MethodBase(std::string name) : name(name) {}
 	public:
 		virtual ~MethodBase() = default;
 
-		const std::string name;
+		const std::string getName() const { return name; }
 		virtual Variant call(std::shared_ptr<Object> obj, std::vector<Variant> args) const = 0;
 	};
 
@@ -133,7 +135,7 @@ namespace VoidEngine {
 			const Class* cls = this;
 			while(cls != nullptr) {
 				const auto idx = std::find_if(cls->methods.cbegin(), cls->methods.cend(), [&name](const auto meth) {
-					return meth->name == name;
+					return meth->getName() == name;
 				});
 				if(idx == cls->methods.cend()) {
 					cls = cls->super;

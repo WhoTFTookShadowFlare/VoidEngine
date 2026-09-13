@@ -9,7 +9,7 @@ extern "C" {
 }
 
 namespace VoidEngine::Scripts::Lua::API {
-	struct LuaClass;
+	struct LuaClassWrapper;
 
 	struct LuaConstructor final : public ConstructorBase {
 	private:

@@ -1,0 +1,42 @@
+#pragma once
+
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
+
+#include "ve/object.hpp"
+#include "ve/variant.hpp"
+#include <memory>
+#include <ve/class_db.hpp>
+#include <vector>
+
+namespace VoidEngine::Scripts::Lua::API {
+	struct LuaFunction final : public MethodBase {
+		public:
+			virtual ~LuaFunction();
+			LuaFunction(std::string name, int funcIdx);
+
+			Variant call(std::shared_ptr<Object> obj, std::vector<Variant> args) const;
+	};
+
+	struct LuaFunctionWrapper final {
+		const MethodBase* method;
+	};
+
+	int lua_FunctionNew(lua_State* state);
+	int lua_Function__tostring(lua_State* state);
+	int lua_Function__eq(lua_State* state);
+
+	static luaL_Reg functionLib[] = {
+		{ "new", lua_FunctionNew },
+		{ "__tostring", lua_Function__tostring },
+		{ "__eq", lua_Function__eq },
+
+		{ nullptr, nullptr }
+	};
+
+	int luaopen_Function(lua_State* state);
+}

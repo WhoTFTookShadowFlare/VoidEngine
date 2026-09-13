@@ -27,6 +27,7 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	Variant LuaObjectScript::call(std::string fnName, std::vector<Variant> args) {
+		lua_State* state = LuaScriptEngine::getInstance()->state;
 		return nullptr;
 	}
 	
@@ -44,5 +45,10 @@ namespace VoidEngine::Scripts::Lua::API {
 	
 	std::vector<std::string> LuaObjectScript::getProperties() {
 		return {};
+	}
+
+	void LuaObjectScript::pushObject(lua_State* state) {
+		lua_pushlightuserdata(state, this);
+		lua_gettable(state, LUA_REGISTRYINDEX);
 	}
 }
