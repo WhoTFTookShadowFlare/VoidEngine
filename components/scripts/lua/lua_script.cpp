@@ -8,6 +8,8 @@ namespace VoidEngine::Scripts::Lua {
 		Script(src)
 	{	}
 
+	LuaScript::~LuaScript() {	}
+
 	void LuaScript::execute() {
 		lua_State* state = LuaScriptEngine::getInstance()->state;
 

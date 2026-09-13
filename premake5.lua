@@ -50,15 +50,17 @@ function module.useVoidEngine()
 	links { "VoidEngine" }
 	libdirs { path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}") }
 	libs.glm.use()
-
+	libs.assimp.use()
 	libs.sdl3.use()
+
+	components.applyUses()
 end
 
 function module.addVoidEngine()
 	externalproject("VoidEngine")
 	location("VoidEngine")
 	uuid(os.uuid("VoidEngine"))
-	kind("SharedLib")
+	kind("StaticLib")
 
 	libs.setupExternal()
 	components.setupExternal()

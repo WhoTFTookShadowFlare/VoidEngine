@@ -11,7 +11,7 @@ namespace VoidEngine::IO::GFX::OpenGL {
 		static SDL_GLContext context;
 	public:
 		static std::shared_ptr<Window> create(Window::CreationOptions&);
-		~GLWindow();
+		virtual ~GLWindow();
 
 		void swapBuffers() override;
 		void bindRenderTarget() override;

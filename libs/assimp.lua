@@ -14,16 +14,20 @@ module.buildArgs = table.concat({
 }, " ")
 
 function module.use()
-	local toLink = os.matchfiles(
-		path.join(_MAIN_SCRIPT_DIR, "bin/*/assimp*.lib")
-	)
-
-	if #toLink == 0 then
-		print("[INFO] Be sure to rerun the command to link properly!")
-	end
-
-	for _, v in pairs(toLink) do
-		links { v }
+	if utils.isVS() then
+		local toLink = os.matchfiles(
+			path.join(_MAIN_SCRIPT_DIR, "bin/*/assimp*.lib")
+		)
+		
+		if #toLink == 0 then
+			print("[INFO] Be sure to rerun the command to link properly!")
+		end
+		
+		for _, v in pairs(toLink) do
+			links { v }
+		end
+	else
+		links { "assimp" }
 	end
 
 	includedirs {

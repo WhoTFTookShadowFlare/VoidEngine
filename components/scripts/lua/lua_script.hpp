@@ -8,6 +8,7 @@ namespace VoidEngine::Scripts::Lua {
 	private:
 		LuaScript(std::shared_ptr<IO::ResourceProviders::ASourceProvider>);
 	public:
+		virtual ~LuaScript();
 
 		void execute();
 		std::shared_ptr<AScriptEngine> getScriptEngine();
