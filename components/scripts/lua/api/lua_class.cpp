@@ -13,12 +13,7 @@ namespace VoidEngine::Scripts::Lua::API {
 			return 0;
 		}
 
-		const Class* super = nullptr;
-		if(!luaL_testudata(state, 2, "Class")) {
-			super = &VoidEngine::Object::ClassData;
-		} else {
-			super = static_cast<LuaClass*>(luaL_checkudata(state, 2, "Class"))->cls;
-		}
+		LuaClass* super = static_cast<LuaClass*>(luaL_checkudata(state, 2, "Class"));
 
 		LuaClass* cls = static_cast<LuaClass*>(lua_newuserdata(state, sizeof(LuaClass)));
 		luaL_getmetatable(state, "Class");
@@ -26,7 +21,7 @@ namespace VoidEngine::Scripts::Lua::API {
 
 		cls->cls = new Class;
 		const_cast<Class*>(cls->cls)->name = luaL_checkstring(state, 1);
-		const_cast<Class*>(cls->cls)->super = super;
+		const_cast<Class*>(cls->cls)->super = super->cls;
 		return 1;
 	}
 

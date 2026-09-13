@@ -61,6 +61,7 @@ function module.setupExternal()
 	kind "SharedLib"
 	uuid(os.uuid("Lua"))
 	location(module.libPath)
+	targetdir(path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"))
 end
 
 return module

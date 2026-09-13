@@ -77,6 +77,7 @@ function module.setupExternal()
 	location(module.libPath)
 	uuid(os.uuid("OpenALBuild"))
 	kind("Makefile")
+	targetdir(path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"))
 end
 
 return module

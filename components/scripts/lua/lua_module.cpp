@@ -76,7 +76,7 @@ namespace VoidEngine::Scripts::Lua {
 		}
 		if(lua_pcall(state, args.size(), 1, 0) != 0) {
 			std::println("[ERR] [Lua] {}", luaL_checkstring(state, -1));
-			lua_pop(state, 1);
+			lua_pop(state, 2);
 			return nullptr;
 		}
 		

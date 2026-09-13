@@ -62,6 +62,8 @@ function module.addVoidEngine()
 	uuid(os.uuid("VoidEngine"))
 	kind("StaticLib")
 
+	targetdir(path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"))
+
 	libs.setupExternal()
 	components.setupExternal()
 end
