@@ -17,12 +17,12 @@ namespace VoidEngine::Scripts::Lua::API {
 		auto state = LuaScriptEngine::getInstance()->state;
 
 		lua_pushlightuserdata(state, this);
-		lua_pushvalue(state, getIdx);
+		lua_pushvalue(state, (getIdx < 0) ? getIdx - 1 : getIdx);
 		lua_settable(state, LUA_REGISTRYINDEX);
 
 		if(setIdx != 0) {
 			lua_pushlightuserdata(state, this + SETTER_OFFSET);
-			lua_pushvalue(state, setIdx);
+			lua_pushvalue(state, (setIdx < 0) ? setIdx - 1 : setIdx);
 			lua_settable(state, LUA_REGISTRYINDEX);
 		}
 	}
@@ -62,6 +62,11 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	void LuaProperty::set(std::shared_ptr<Object> object, Variant value) const {
+		if(isReadOnly()) {
+			std::println("[ERR] Cannot set a readonly property");
+			return;
+		}
+
 		if(object->getScript() == nullptr) {
 			std::println("[ERR] [Lua] Cannot get property {} from object, missing lua script", getName());
 			return;

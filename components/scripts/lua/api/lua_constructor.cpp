@@ -4,11 +4,17 @@
 
 #include <ve/object.hpp>
 
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
 namespace VoidEngine::Scripts::Lua::API {
 	LuaConstructor::LuaConstructor(int funcIdx) {
 		lua_State* state = LuaScriptEngine::getInstance()->state;
 		lua_pushlightuserdata(state, this);
-		lua_pushvalue(state, funcIdx);
+		lua_pushvalue(state, (funcIdx < 0) ? funcIdx - 1 : funcIdx);
 		lua_settable(state, LUA_REGISTRYINDEX);
 	}
 
@@ -30,6 +36,8 @@ namespace VoidEngine::Scripts::Lua::API {
 		}
 
 		obj->setScript(std::shared_ptr<LuaObjectScript>(new LuaObjectScript(-1, cls)));
+		lua_pop(state, 1);
+
 		return obj;
 	}
 

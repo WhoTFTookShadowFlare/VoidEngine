@@ -1,4 +1,5 @@
 #include "api/lua_function.hpp"
+#include "api/lua_object.hpp"
 #include "api/lua_property.hpp"
 #include <lua_script_engine.hpp>
 
@@ -38,6 +39,7 @@ namespace VoidEngine::Scripts::Lua {
 		API::luaopen_Constructor(state);
 		API::luaopen_Function(state);
 		API::luaopen_Property(state);
+		API::luaopen_Object(state);
 	}
 
 	std::string LuaScriptEngine::getLanguage() { return "lua"; }
@@ -93,6 +95,10 @@ namespace VoidEngine::Scripts::Lua {
 			break;
 			//ARRAY,
 			//MAP,
+		case VariantType::OBJECT: {
+			API::LuaObjectWrapper* wrapper = API::lua_pushObjectWrapper(state);
+			wrapper->object = value.asObject().value();
+		} break;
 		default:
 			std::println("[ERR] [Lua] Cannot convert Variant type {}, pushing nil", (int) value.getType());
 			lua_pushnil(state);

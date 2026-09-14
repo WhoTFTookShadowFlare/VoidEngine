@@ -1,13 +1,14 @@
 #include <api/lua_object_script.hpp>
 
 #include <lua_script_engine.hpp>
+#include <print>
 
 namespace VoidEngine::Scripts::Lua::API {
 	LuaObjectScript::LuaObjectScript(int objIdx, const Class* cls) {
 		lua_State* state = LuaScriptEngine::getInstance()->state;
 		this->cls = cls;
 		lua_pushlightuserdata(state, this);
-		lua_pushvalue(state, objIdx);
+		lua_pushvalue(state, (objIdx < 0) ? objIdx - 1: objIdx);
 		lua_settable(state, LUA_REGISTRYINDEX);
 	}
 	
@@ -50,5 +51,6 @@ namespace VoidEngine::Scripts::Lua::API {
 	void LuaObjectScript::pushObject(lua_State* state) {
 		lua_pushlightuserdata(state, this);
 		lua_gettable(state, LUA_REGISTRYINDEX);
+		std::println("PUSHED TYPE: {}", lua_typename(state, lua_type(state, -1)));
 	}
 }

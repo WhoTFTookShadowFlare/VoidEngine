@@ -8,17 +8,17 @@
 #include <print>
 
 namespace VoidEngine::Scripts::Lua::API {
+	LuaFunction::LuaFunction(std::string name, int funcIdx) : MethodBase(name) {
+		lua_State* state = LuaScriptEngine::getInstance()->state;
+		lua_pushlightuserdata(state, this);
+		lua_pushvalue(state, (funcIdx < 0) ? funcIdx - 1 : funcIdx);
+		lua_settable(state, LUA_REGISTRYINDEX);
+	}
+	
 	LuaFunction::~LuaFunction() {
 		lua_State* state = LuaScriptEngine::getInstance()->state;
 		lua_pushlightuserdata(state, this);
 		lua_pushnil(state);
-		lua_settable(state, LUA_REGISTRYINDEX);
-	}
-
-	LuaFunction::LuaFunction(std::string name, int funcIdx) : MethodBase(name) {
-		lua_State* state = LuaScriptEngine::getInstance()->state;
-		lua_pushlightuserdata(state, this);
-		lua_pushvalue(state, funcIdx);
 		lua_settable(state, LUA_REGISTRYINDEX);
 	}
 
