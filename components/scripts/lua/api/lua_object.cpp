@@ -39,7 +39,7 @@ namespace VoidEngine::Scripts::Lua::API {
 			return 1;
 		}
 
-		LuaFunctionWrapper* funcWrapper = lua_pushfunctionwrapper(state);
+		LuaFunctionWrapper* funcWrapper = lua_pushFunctionWrapper(state);
 		funcWrapper->method = function;
 		return 1;
 	}

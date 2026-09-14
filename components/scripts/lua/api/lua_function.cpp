@@ -56,18 +56,22 @@ namespace VoidEngine::Scripts::Lua::API {
 		return luaEngine->objectToVariant(&retVal);
 	}
 
-	LuaFunctionWrapper* lua_pushfunctionwrapper(lua_State* state) {
+	LuaFunctionWrapper* lua_pushFunctionWrapper(lua_State* state) {
 		LuaFunctionWrapper* function = static_cast<LuaFunctionWrapper*>(lua_newuserdata(state, sizeof(LuaFunctionWrapper)));
 		luaL_getmetatable(state, "Function");
 		lua_setmetatable(state, -2);
 		return function;
 	}
 
+	LuaFunctionWrapper* lua_checkFunction(lua_State* state, int idx) {
+		return static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, idx, "Function"));
+	}
+
 	int lua_FunctionNew(lua_State* state) {
 		const std::string name = luaL_checkstring(state, 1);
 		luaL_checktype(state, 2, LUA_TFUNCTION);
 
-		LuaFunctionWrapper* function = lua_pushfunctionwrapper(state);
+		LuaFunctionWrapper* function = lua_pushFunctionWrapper(state);
 		function->method = new LuaFunction(name, 2);
 
 		return 1;

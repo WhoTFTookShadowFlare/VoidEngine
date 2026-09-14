@@ -111,11 +111,15 @@ namespace VoidEngine::Scripts::Lua::API {
 		return readOnly;
 	}
 
-	LuaPropertyWrapper* lua_pushpropertywrapper(lua_State* state) {
+	LuaPropertyWrapper* lua_pushPropertyWrapper(lua_State* state) {
 		LuaPropertyWrapper* property = static_cast<LuaPropertyWrapper*>(lua_newuserdata(state, sizeof(LuaPropertyWrapper)));
 		luaL_getmetatable(state, "Property");
 		lua_setmetatable(state, -2);
 		return property;
+	}
+
+	LuaPropertyWrapper* lua_checkProperty(lua_State* state, int idx) {
+		return static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, idx, "Property"));
 	}
 
 	int lua_PropertyNew(lua_State* state) {
@@ -127,14 +131,14 @@ namespace VoidEngine::Scripts::Lua::API {
 			luaL_checktype(state, 3, LUA_TFUNCTION);
 		}
 
-		LuaPropertyWrapper* property = lua_pushpropertywrapper(state);
+		LuaPropertyWrapper* property = lua_pushPropertyWrapper(state);
 		property->property = new LuaProperty(name, 2, hasSetter ? 0 : 3);
 
 		return 1;
 	}
 
 	int lua_Property__index(lua_State* state) {
-		LuaPropertyWrapper* prop = static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, 1, "Property"));
+		LuaPropertyWrapper* prop = lua_checkProperty(state, 1);
 
 		std::string idxName = lua_tostring(state, 2);
 		lua_getmetatable(state, 1);
@@ -143,26 +147,26 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_Property__tostring(lua_State* state) {
-		LuaPropertyWrapper* prop = static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, 1, "Property"));
+		LuaPropertyWrapper* prop = lua_checkProperty(state, 1);
 		lua_pushstring(state, prop->property->getName().c_str());
 		return 1;
 	}
 
 	int lua_Property__eq(lua_State* state) {
-		LuaPropertyWrapper* LHS = static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, 1, "Property"));
-		LuaPropertyWrapper* RHS = static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, 1, "Property"));
+		LuaPropertyWrapper* LHS = lua_checkProperty(state, 1);
+		LuaPropertyWrapper* RHS = lua_checkProperty(state, 2);
 		lua_pushboolean(state, LHS->property == RHS->property);
 		return 1;
 	}
 
 	int lua_PropertyGetName(lua_State* state) {
-		LuaPropertyWrapper* prop = static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, 1, "Property"));
+		LuaPropertyWrapper* prop = lua_checkProperty(state, 1);
 		lua_pushstring(state, prop->property->getName().c_str());
 		return 1;
 	}
 
 	int lua_PropertyIsReadOnly(lua_State* state) {
-		LuaPropertyWrapper* prop = static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, 1, "Property"));
+		LuaPropertyWrapper* prop = lua_checkProperty(state, 1);
 		lua_pushboolean(state, prop->property->isReadOnly());
 		return 1;
 	}

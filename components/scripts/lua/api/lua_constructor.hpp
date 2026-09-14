@@ -24,11 +24,15 @@ namespace VoidEngine::Scripts::Lua::API {
 		const ConstructorBase* ctor;
 	};
 
+	LuaConstructorWrapper* lua_pushConstructorWrapper(lua_State*);
+	LuaConstructorWrapper* lua_checkConstructor(lua_State*, int);
+
 	int lua_ConstructorNew(lua_State*);
 
 	int lua_Constructor__tostring(lua_State*);
 	int lua_Constructor__index(lua_State*);
 	int lua_Constructor__eq(lua_State*);
+	int lua_Constructor__call(lua_State*);
 
 	static luaL_Reg constructorLib[] = {
 		{ "new", lua_ConstructorNew },
@@ -36,6 +40,8 @@ namespace VoidEngine::Scripts::Lua::API {
 		{ "__tostring", lua_Constructor__tostring },
 		{ "__index", lua_Constructor__index },
 		{ "__eq", lua_Constructor__eq },
+		{ "__call", lua_Constructor__call },
+
 		{ nullptr, nullptr }
 	};
 

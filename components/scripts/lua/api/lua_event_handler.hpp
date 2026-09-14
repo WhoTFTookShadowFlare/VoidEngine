@@ -29,7 +29,8 @@ namespace VoidEngine::Scripts::Lua::API {
 		const EventHandlerBase* handler;
 	};
 
-	LuaEventHandlerWrapper* lua_pusheventhandlerwrapper(lua_State*);
+	LuaEventHandlerWrapper* lua_pushEventHandlerWrapper(lua_State*);
+	LuaEventHandlerWrapper* lua_checkEventHandler(lua_State*, int);
 
 	int lua_EventHandlerNew(lua_State*);
 

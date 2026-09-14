@@ -13,7 +13,8 @@ namespace VoidEngine::Scripts::Lua::API {
 		const Class* cls;
 	};
 
-	LuaClassWrapper* lua_pushclasswrapper(lua_State*);
+	LuaClassWrapper* lua_pushClassWrapper(lua_State*);
+	LuaClassWrapper* lua_checkClass(lua_State*, int);
 
 	int lua_ClassNew(lua_State*);
 	int lua_ClassGet(lua_State*);
@@ -23,6 +24,7 @@ namespace VoidEngine::Scripts::Lua::API {
 	int lua_Class__eq(lua_State*);
 	
 	int lua_ClassRegister(lua_State*);
+	int lua_ClassCreate(lua_State*);
 	int lua_ClassIsAbstract(lua_State*);
 	int lua_ClassSetConstructor(lua_State*);
 	int lua_ClassGetConstructor(lua_State*);
@@ -51,6 +53,7 @@ namespace VoidEngine::Scripts::Lua::API {
 		{ "__eq", lua_Class__eq },
 
 		{ "register", lua_ClassRegister },
+		{ "create", lua_ClassCreate },
 		{ "isAbstract", lua_ClassIsAbstract },
 		{ "setConstructor", lua_ClassSetConstructor },
 		{ "getConstructor", lua_ClassGetConstructor },

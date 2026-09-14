@@ -26,7 +26,8 @@ namespace VoidEngine::Scripts::Lua::API {
 		const MethodBase* method;
 	};
 
-	LuaFunctionWrapper* lua_pushfunctionwrapper(lua_State*);
+	LuaFunctionWrapper* lua_pushFunctionWrapper(lua_State*);
+	LuaFunctionWrapper* lua_checkFunction(lua_State*, int);
 
 	int lua_FunctionNew(lua_State*);
 

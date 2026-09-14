@@ -31,7 +31,7 @@ namespace VoidEngine::Scripts::Lua::API {
 		}
 	}
 
-	LuaEventHandlerWrapper* lua_pusheventhandlerwrapper(lua_State* state) {
+	LuaEventHandlerWrapper* lua_pushEventHandlerWrapper(lua_State* state) {
 		LuaEventHandlerWrapper* handler = static_cast<LuaEventHandlerWrapper*>(
 			lua_newuserdata(state, sizeof(LuaEventHandlerWrapper))
 		);
@@ -40,19 +40,21 @@ namespace VoidEngine::Scripts::Lua::API {
 		return handler;
 	}
 
+	LuaEventHandlerWrapper* lua_checkEventHandler(lua_State* state, int idx) {
+		return static_cast<LuaEventHandlerWrapper*>(luaL_checkudata(state, idx, "EventHandler"));
+	}
+
 	int lua_EventHandlerNew(lua_State* state) {
-		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* cls = lua_checkClass(state, 1);
 		luaL_checktype(state, 2, LUA_TFUNCTION);
 
-		LuaEventHandlerWrapper* handler = lua_pusheventhandlerwrapper(state);
+		LuaEventHandlerWrapper* handler = lua_pushEventHandlerWrapper(state);
 		handler->handler = new LuaEventHandler(cls->cls, 2);
 		return 1;
 	}
 
 	int lua_EventHandler__index(lua_State* state) {
-		LuaEventHandlerWrapper* handler = static_cast<LuaEventHandlerWrapper*>(
-			luaL_checkudata(state, 1, "EventHandler")
-		);
+		LuaEventHandlerWrapper* handler = lua_checkEventHandler(state, 1);
 
 		std::string idxName = lua_tostring(state, 2);
 		lua_getmetatable(state, 1);
@@ -65,7 +67,7 @@ namespace VoidEngine::Scripts::Lua::API {
 			luaL_checkudata(state, 1, "EventHandler")
 		);
 
-		LuaClassWrapper* cls = lua_pushclasswrapper(state);
+		LuaClassWrapper* cls = lua_pushClassWrapper(state);
 		cls->cls = handler->handler->getEventClass();
 		return 1;
 	}

@@ -1,6 +1,7 @@
 #include <api/lua_constructor.hpp>
 #include <api/lua_object_script.hpp>
 #include <lua_script_engine.hpp>
+#include <api/lua_object.hpp>
 
 #include <ve/object.hpp>
 
@@ -41,6 +42,21 @@ namespace VoidEngine::Scripts::Lua::API {
 		return obj;
 	}
 
+	LuaConstructorWrapper* lua_pushConstructorWrapper(lua_State* state) {
+		LuaConstructorWrapper* wrapper = static_cast<LuaConstructorWrapper*>(
+			lua_newuserdata(state, sizeof(LuaConstructorWrapper))
+			);
+		luaL_getmetatable(state, "Constructor");
+		lua_setmetatable(state, -2);
+		return wrapper;
+	}
+	
+	LuaConstructorWrapper* lua_checkConstructor(lua_State* state, int idx) {
+		return static_cast<LuaConstructorWrapper*>(
+			luaL_checkudata(state, idx, "Constructor")
+		);
+	}
+
 	int lua_ConstructorNew(lua_State* state) {
 		if(!lua_isfunction(state, 1)) {
 			lua_pushstring(state, "Arg 0 of Constructor.new must be a lua function");
@@ -48,13 +64,8 @@ namespace VoidEngine::Scripts::Lua::API {
 			return 0;
 		}
 
-		LuaConstructorWrapper* wrapper = static_cast<LuaConstructorWrapper*>(
-			lua_newuserdata(state, sizeof(LuaConstructorWrapper))
-		);
+		LuaConstructorWrapper* wrapper = lua_pushConstructorWrapper(state);
 		wrapper->ctor = new LuaConstructor(1);
-
-		luaL_getmetatable(state, "Constructor");
-		lua_setmetatable(state, -2);
 
 		return 1;
 	}
@@ -69,23 +80,18 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_Constructor__eq(lua_State* state) {
-		LuaConstructorWrapper* RHS = static_cast<LuaConstructorWrapper*>(
-			luaL_testudata(state, 2, "Constructor")
-		);
-		if(RHS == nullptr) {
-			lua_pushboolean(state, false);
-			return 1;
-		}
-
-		LuaConstructorWrapper* LHS = static_cast<LuaConstructorWrapper*>(
-			luaL_testudata(state, 1, "Constructor")
-		);
-		if(LHS == nullptr) {
-			lua_pushboolean(state, false);
-			return 1;
-		}
+		LuaConstructorWrapper* LHS = lua_checkConstructor(state, 1);
+		LuaConstructorWrapper* RHS = lua_checkConstructor(state, 2);
 
 		lua_pushboolean(state, LHS->ctor == RHS->ctor);
+		return 1;
+	}
+
+	int lua_Constructor__call(lua_State* state) {
+		LuaConstructorWrapper* ctor = lua_checkConstructor(state, 1);
+
+		LuaObjectWrapper* object = lua_pushObjectWrapper(state);
+		object->object = ctor->ctor->create();
 		return 1;
 	}
 

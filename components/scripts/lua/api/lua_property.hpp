@@ -27,7 +27,8 @@ namespace VoidEngine::Scripts::Lua::API {
 		const PropertyBase* property;
 	};
 
-	LuaPropertyWrapper* lua_pushpropertywrapper(lua_State*);
+	LuaPropertyWrapper* lua_pushPropertyWrapper(lua_State*);
+	LuaPropertyWrapper* lua_checkProperty(lua_State*, int);
 
 	int lua_PropertyNew(lua_State*);
 
