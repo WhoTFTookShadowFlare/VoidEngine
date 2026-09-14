@@ -132,7 +132,7 @@ namespace VoidEngine::Scripts::Lua::API {
 		}
 
 		LuaPropertyWrapper* property = lua_pushPropertyWrapper(state);
-		property->property = new LuaProperty(name, 2, hasSetter ? 0 : 3);
+		property->property = new LuaProperty(name, 2, hasSetter ? 3 : 0);
 
 		return 1;
 	}

@@ -24,7 +24,7 @@ namespace VoidEngine::Scripts::Lua::API {
 
 	static luaL_Reg objectLib[] = {
 		{ "__index", lua_Object__index },
-		{ "__newinex", lua_Object__newindex },
+		{ "__newindex", lua_Object__newindex },
 		{ "__tostring", lua_Object__tostring },
 		{ "__eq", lua_Object__eq },
 		{ "__gc", lua_Object__gc },
