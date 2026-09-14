@@ -15,6 +15,7 @@ namespace VoidEngine::Scripts::Lua {
 		class LuaObjectScript;
 		struct LuaFunction;
 		struct LuaProperty;
+		struct LuaEventHandler;
 	}
 
 	class LuaScriptEngine final : public AScriptEngine {
@@ -25,6 +26,7 @@ namespace VoidEngine::Scripts::Lua {
 		friend class API::LuaObjectScript;
 		friend struct API::LuaFunction;
 		friend struct API::LuaProperty;
+		friend struct API::LuaEventHandler;
 	private:
 		static std::shared_ptr<LuaScriptEngine> instance;
 

@@ -58,7 +58,9 @@ namespace VoidEngine::Scripts::Lua::API {
 		}
 
 		int top = -1;
-		return LuaScriptEngine::getInstance()->objectToVariant(&top);
+		Variant retVal = LuaScriptEngine::getInstance()->objectToVariant(&top);
+		lua_pop(state, 1);
+		return retVal;
 	}
 
 	void LuaProperty::set(std::shared_ptr<Object> object, Variant value) const {

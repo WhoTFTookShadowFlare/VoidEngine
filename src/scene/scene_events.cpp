@@ -1,4 +1,5 @@
 #include "ve/class_db.hpp"
+#include "ve/class_property.hpp"
 #include "ve/scene/events.hpp"
 #include <memory>
 
@@ -6,11 +7,18 @@ namespace VoidEngine::Scene::Events {
 	const Class EComponentUpdate::ClassData = {
 		.name = "EComponentUpdate",
 		.super = &Event::AEvent::ClassData,
+		.properties = {
+			new NativeProperty("delta", &EComponentUpdate::getDelta)
+		},
 		.constructor = new NativeConstructor(&EComponentUpdate::create)
 	};
 
 	std::shared_ptr<EComponentUpdate> EComponentUpdate::create() {
 		return std::shared_ptr<EComponentUpdate>(new EComponentUpdate);
+	}
+
+	Variant EComponentUpdate::getDelta() const {
+		return (float) delta;
 	}
 
 	const Class ESceneDraw::ClassData = {

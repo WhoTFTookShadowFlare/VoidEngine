@@ -1,5 +1,6 @@
 #include "api/lua_function.hpp"
 #include "api/lua_object_script.hpp"
+#include "api/lua_object.hpp"
 #include "lauxlib.h"
 #include "lua.h"
 #include "lua_script_engine.hpp"
@@ -92,6 +93,15 @@ namespace VoidEngine::Scripts::Lua::API {
 		LuaFunctionWrapper* RHS = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 1, "Function"));
 		lua_pushboolean(state, LHS->method == RHS->method);
 		return 1;
+	}
+
+	int lua_Function__call(lua_State* state) {
+		LuaFunctionWrapper* function = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 1, "Function"));
+		LuaObjectWrapper* object = static_cast<LuaObjectWrapper*>(luaL_checkudata(state, 2, "Object"));
+
+		std::println("Function __call NYI");
+
+		return 0;
 	}
 
 	int luaopen_Function(lua_State* state) {

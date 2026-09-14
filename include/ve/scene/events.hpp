@@ -26,6 +26,8 @@ namespace VoidEngine::Scene::Events {
 	public:
 		static std::shared_ptr<EComponentUpdate> create();
 
+		Variant getDelta() const;
+
 		const double delta;
 	};
 

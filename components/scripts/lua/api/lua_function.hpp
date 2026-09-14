@@ -28,11 +28,12 @@ namespace VoidEngine::Scripts::Lua::API {
 
 	LuaFunctionWrapper* lua_pushfunctionwrapper(lua_State*);
 
-	int lua_FunctionNew(lua_State* state);
+	int lua_FunctionNew(lua_State*);
 
-	int lua_Function__index(lua_State* state);
-	int lua_Function__tostring(lua_State* state);
-	int lua_Function__eq(lua_State* state);
+	int lua_Function__index(lua_State*);
+	int lua_Function__tostring(lua_State*);
+	int lua_Function__eq(lua_State*);
+	int lua_Function__call(lua_State*);
 
 	static luaL_Reg functionLib[] = {
 		{ "new", lua_FunctionNew },
@@ -40,6 +41,7 @@ namespace VoidEngine::Scripts::Lua::API {
 		{ "__index", lua_Function__index },
 		{ "__tostring", lua_Function__tostring },
 		{ "__eq", lua_Function__eq },
+		{ "__call", lua_Function__call },
 
 		{ nullptr, nullptr }
 	};

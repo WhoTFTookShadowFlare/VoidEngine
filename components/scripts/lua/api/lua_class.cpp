@@ -1,7 +1,6 @@
 #include "api/lua_function.hpp"
 #include "api/lua_property.hpp"
-#include "lauxlib.h"
-#include "lua.h"
+#include "api/lua_event_handler.hpp"
 #include "ve/class_db.hpp"
 #include <api/lua_class.hpp>
 #include <api/lua_constructor.hpp>
@@ -11,7 +10,20 @@
 #include <print>
 #include <vector>
 
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
 namespace VoidEngine::Scripts::Lua::API {
+	LuaClassWrapper* lua_pushclasswrapper(lua_State* state) {
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(lua_newuserdata(state, sizeof(LuaClassWrapper)));
+		luaL_getmetatable(state, "Class");
+		lua_setmetatable(state, -2);
+		return cls;
+	}
+
 	int lua_ClassNew(lua_State* state) {
 		if(!lua_isstring(state, 1)) {
 			lua_pushstring(state, "Arg 0 of Class.new must be a string");
@@ -21,9 +33,7 @@ namespace VoidEngine::Scripts::Lua::API {
 
 		LuaClassWrapper* super = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 2, "Class"));
 
-		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(lua_newuserdata(state, sizeof(LuaClassWrapper)));
-		luaL_getmetatable(state, "Class");
-		lua_setmetatable(state, -2);
+		LuaClassWrapper* cls = lua_pushclasswrapper(state);
 
 		cls->cls = new Class;
 		const_cast<Class*>(cls->cls)->name = luaL_checkstring(state, 1);
@@ -125,7 +135,13 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	int lua_ClassAddEventHandler(lua_State* state) {
-		std::println("[WARN] [Lua] NYI");
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		LuaEventHandlerWrapper* handler = static_cast<LuaEventHandlerWrapper*>(
+			luaL_checkudata(state, 2, "EventHandler")
+		);
+
+		auto handlers = const_cast<std::vector<const EventHandlerBase*>*>(&self->cls->eventHandlers);
+		handlers->push_back(handler->handler);
 		return 0;
 	}
 

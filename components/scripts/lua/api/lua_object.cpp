@@ -13,6 +13,9 @@ extern "C" {
 namespace VoidEngine::Scripts::Lua::API {
 	LuaObjectWrapper* lua_pushObjectWrapper(lua_State* state) {
 		LuaObjectWrapper* object = static_cast<LuaObjectWrapper*>(lua_newuserdata(state, sizeof(LuaObjectWrapper)));
+		luaL_getmetatable(state, "Object");
+		lua_setmetatable(state, -2);
+		new (object) LuaObjectWrapper;
 		return object;
 	}
 
@@ -32,8 +35,7 @@ namespace VoidEngine::Scripts::Lua::API {
 				return 1;
 			}
 
-			LuaPropertyWrapper* propWrapper = lua_pushpropertywrapper(state);
-			propWrapper->property = property;
+			LuaScriptEngine::getInstance()->objectFromVariant(property->get(object->object));
 			return 1;
 		}
 
@@ -79,7 +81,7 @@ namespace VoidEngine::Scripts::Lua::API {
 
 	int lua_Object__gc(lua_State* state) {
 		LuaObjectWrapper* object = static_cast<LuaObjectWrapper*>(luaL_checkudata(state, 1, "Object"));
-		object->object = nullptr;
+		//object->object = nullptr; // TODO: properly delete the object
 		return 0;
 	}
 

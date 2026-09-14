@@ -14,9 +14,9 @@ namespace VoidEngine::Scripts::Lua::API {
 	
 	LuaObjectScript::~LuaObjectScript() {
 		lua_State* state = LuaScriptEngine::getInstance()->state;
-		lua_pushlightuserdata(state, this);
-		lua_pushnil(state);
-		lua_settable(state, LUA_REGISTRYINDEX);
+		//lua_pushlightuserdata(state, this);
+		//lua_pushnil(state);
+		//lua_settable(state, LUA_REGISTRYINDEX);
 	}
 
 	std::shared_ptr<AScriptEngine> LuaObjectScript::getScriptEngine() {
@@ -51,6 +51,5 @@ namespace VoidEngine::Scripts::Lua::API {
 	void LuaObjectScript::pushObject(lua_State* state) {
 		lua_pushlightuserdata(state, this);
 		lua_gettable(state, LUA_REGISTRYINDEX);
-		std::println("PUSHED TYPE: {}", lua_typename(state, lua_type(state, -1)));
 	}
 }

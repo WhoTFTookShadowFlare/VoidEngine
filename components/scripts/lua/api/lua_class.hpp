@@ -13,6 +13,8 @@ namespace VoidEngine::Scripts::Lua::API {
 		const Class* cls;
 	};
 
+	LuaClassWrapper* lua_pushclasswrapper(lua_State*);
+
 	int lua_ClassNew(lua_State*);
 	int lua_ClassGet(lua_State*);
 

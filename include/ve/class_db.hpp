@@ -61,10 +61,11 @@ namespace VoidEngine {
 	struct EventHandlerBase {
 	protected:
 		EventHandlerBase(const Class* event) : event(event) {}
+		const Class* event;
 	public:
 		virtual ~EventHandlerBase() = default;
 
-		const Class* event;
+		const Class* getEventClass() const { return event; }
 		virtual void handleEvent(std::shared_ptr<Object> obj, std::shared_ptr<Object> event) const = 0;
 	};
 
@@ -152,7 +153,7 @@ namespace VoidEngine {
 			const Class* cls = this;
 			while(cls != nullptr) {
 				const auto idx = std::find_if(cls->eventHandlers.cbegin(), cls->eventHandlers.cend(), [&eventClass](const auto handler) {
-					return handler->event == eventClass;
+					return handler->getEventClass() == eventClass;
 				});
 				if(idx == cls->eventHandlers.cend()) {
 					cls = cls->super;
