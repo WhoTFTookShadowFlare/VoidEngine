@@ -55,26 +55,42 @@ namespace VoidEngine::Scripts::Lua::API {
 		return luaEngine->objectToVariant(&retVal);
 	}
 
+	LuaFunctionWrapper* lua_pushfunctionwrapper(lua_State* state) {
+		LuaFunctionWrapper* function = static_cast<LuaFunctionWrapper*>(lua_newuserdata(state, sizeof(LuaFunctionWrapper)));
+		luaL_getmetatable(state, "Function");
+		lua_setmetatable(state, -2);
+		return function;
+	}
+
 	int lua_FunctionNew(lua_State* state) {
 		const std::string name = luaL_checkstring(state, 1);
 		luaL_checktype(state, 2, LUA_TFUNCTION);
 
-		LuaFunctionWrapper* function = static_cast<LuaFunctionWrapper*>(lua_newuserdata(state, sizeof(LuaFunctionWrapper)));
-		luaL_getmetatable(state, "Function");
-		lua_setmetatable(state, -2);
-
+		LuaFunctionWrapper* function = lua_pushfunctionwrapper(state);
 		function->method = new LuaFunction(name, 2);
 
 		return 1;
 	}
 
+	int lua_Function__index(lua_State* state) {
+		LuaFunctionWrapper* func = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 1, "Function"));
+
+		std::string idxName = lua_tostring(state, 2);
+		lua_getmetatable(state, 1);
+		lua_getfield(state, -1, idxName.c_str());
+		return 1;
+	}
+
 	int lua_Function__tostring(lua_State* state) {
-		lua_pushstring(state, "NYI");
+		LuaFunctionWrapper* function = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 1, "Function"));
+		lua_pushstring(state, function->method->getName().c_str());
 		return 1;
 	}
 	
 	int lua_Function__eq(lua_State* state) {
-		lua_pushboolean(state, false);
+		LuaFunctionWrapper* LHS = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 1, "Function"));
+		LuaFunctionWrapper* RHS = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 1, "Function"));
+		lua_pushboolean(state, LHS->method == RHS->method);
 		return 1;
 	}
 

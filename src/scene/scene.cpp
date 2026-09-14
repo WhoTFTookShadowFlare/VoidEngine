@@ -148,8 +148,8 @@ namespace VoidEngine::Scene {
 						GameObject::ClassData.properties.cbegin(), GameObject::ClassData.properties.cend(),
 						[&obj, objTable](const auto prop) {
 							if(prop->isReadOnly()) return;
-							if(!objTable->contains(prop->name)) return;
-							toml::node* node = objTable->get(prop->name);
+							if(!objTable->contains(prop->getName())) return;
+							toml::node* node = objTable->get(prop->getName());
 							if(!node->is_array()) return;
 
 							toml::array* arr = node->as_array();

@@ -1,5 +1,7 @@
 #include "api/lua_function.hpp"
+#include "api/lua_property.hpp"
 #include "lauxlib.h"
+#include "lua.h"
 #include "ve/class_db.hpp"
 #include <api/lua_class.hpp>
 #include <api/lua_constructor.hpp>
@@ -110,20 +112,106 @@ namespace VoidEngine::Scripts::Lua::API {
 
 		auto methods = const_cast<std::vector<const MethodBase*>*>(&self->cls->methods);
 		methods->push_back(function->method);
-
-		std::println("Added function");
-
 		return 0;
 	}
 
 	int lua_ClassAddProperty(lua_State* state) {
-		std::println("[WARN] [Lua] NYI");
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		LuaPropertyWrapper* property = static_cast<LuaPropertyWrapper*>(luaL_checkudata(state, 2, "Property"));
+
+		auto properties = const_cast<std::vector<const PropertyBase*>*>(&self->cls->properties);
+		properties->push_back(property->property);
 		return 0;
 	}
 
 	int lua_ClassAddEventHandler(lua_State* state) {
 		std::println("[WARN] [Lua] NYI");
 		return 0;
+	}
+
+	int lua_ClassGetProperties(lua_State* state) {
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		auto props = self->cls->getProperties();
+
+		lua_createtable(state, props.size(), 0);
+		// TODO: add all properties to the array
+		return 1;
+	}
+
+	int lua_ClassGetFunctions(lua_State* state) {
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		auto funcs = self->cls->getMethods();
+
+		lua_createtable(state, funcs.size(), 0);
+		for(size_t idx = 0; idx < funcs.size(); idx++) {
+			LuaFunctionWrapper* funcWrapper = lua_pushfunctionwrapper(state);
+			funcWrapper->method = funcs[idx];
+			lua_rawseti(state, -2, idx + 1);
+		}
+		return 1;
+	}
+
+	int lua_ClassGetEventHandlers(lua_State* state) {
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		auto handlers = self->cls->getEventHandlers();
+
+		lua_createtable(state, handlers.size(), 0);
+		// TODO: add all handlers to the array
+		return 1;
+	}
+
+	int lua_ClassFindProperty(lua_State* state) {
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		std::string name = luaL_checkstring(state, 2);
+
+		const auto prop = self->cls->findProperty(name);
+		if(prop == nullptr) {
+			lua_pushnil(state);
+			return 1;
+		}
+
+		LuaPropertyWrapper* wrapper = lua_pushpropertywrapper(state);
+		wrapper->property = prop;
+		return 1;
+	}
+
+	int lua_ClassFindFunction(lua_State* state) {
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		std::string name = luaL_checkstring(state, 2);
+
+		const auto func = self->cls->findMethod(name);
+		if(func == nullptr) {
+			lua_pushnil(state);
+			return 1;
+		}
+
+		LuaFunctionWrapper* wrapper = lua_pushfunctionwrapper(state);
+		wrapper->method = func;
+		return 1;
+	}
+
+	int lua_ClassFindEventHandler(lua_State* state) {
+		LuaClassWrapper* self = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+		LuaClassWrapper* evtCls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 2, "Class"));
+
+		const auto handler = self->cls->findEventHandler(evtCls->cls);
+		if(handler == nullptr) {
+			lua_pushnil(state);
+			return 1;
+		}
+
+		// TODO: push the handler
+		lua_pushnil(state);
+		return 1;
+	}
+
+	int lua_Class__index(lua_State* state) {
+		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_checkudata(state, 1, "Class"));
+
+		std::string idxName = lua_tostring(state, 2);
+		lua_getmetatable(state, 1);
+		lua_getfield(state, -1, idxName.c_str());
+		return 1;
 	}
 
 	int lua_Class__tostring(lua_State* state) {
@@ -135,34 +223,6 @@ namespace VoidEngine::Scripts::Lua::API {
 		}
 
 		lua_pushstring(state, std::format("Class: {}", cls->cls->getName()).c_str());
-		return 1;
-	}
-
-	int lua_Class__index(lua_State* state) {
-		LuaClassWrapper* cls = static_cast<LuaClassWrapper*>(luaL_testudata(state, 1, "Class"));
-		if (cls == nullptr) {
-			lua_pushstring(state, "how?");
-			lua_error(state);
-			return 0;
-		}
-
-		std::string idxName = lua_tostring(state, 2);
-		if(idxName == "register") lua_pushcfunction(state, lua_ClassRegister);
-		else if(idxName == "isAbstract") lua_pushcfunction(state, lua_ClassIsAbstract);
-		else if(idxName == "setConstructor") lua_pushcfunction(state, lua_ClassSetConstructor);
-		else if(idxName == "getConstructor") lua_pushcfunction(state, lua_ClassGetConstructor);
-		else if(idxName == "instanceOf") lua_pushcfunction(state, lua_ClassInstanceOf);
-		else if(idxName == "getSuper") lua_pushcfunction(state, lua_ClassGetSuper);
-		else if(idxName == "getName") lua_pushcfunction(state, lua_ClassGetName);
-		else if(idxName == "addProperty") lua_pushcfunction(state, lua_ClassAddProperty);
-		else if(idxName == "addFunction") lua_pushcfunction(state, lua_ClassAddFunction);
-		else if(idxName == "addEventHandler") lua_pushcfunction(state, lua_ClassAddEventHandler);
-		else {
-			lua_pushstring(state, std::format("Class does not have entry: {}", idxName).c_str());
-			lua_error(state);
-			return 0;
-		}
-
 		return 1;
 	}
 

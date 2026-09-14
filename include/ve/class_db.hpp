@@ -32,12 +32,14 @@ namespace VoidEngine {
 		};
 	
 	struct PropertyBase {
+	private:
+		const std::string name;
 	protected:
 		PropertyBase(std::string name) : name(name) {}
 	public:
 		virtual ~PropertyBase() = default;
 
-		const std::string name;
+		const std::string getName() const { return name; }
 
 		virtual Variant get(std::shared_ptr<Object>) const = 0;
 		virtual void set(std::shared_ptr<Object>, Variant) const = 0;
@@ -120,7 +122,7 @@ namespace VoidEngine {
 			const Class* cls = this;
 			while(cls != nullptr) {
 				const auto idx = std::find_if(cls->properties.cbegin(), cls->properties.cend(), [&name](const auto prop) {
-					return prop->name == name;
+					return prop->getName() == name;
 				});
 				if(idx == cls->properties.cend()) {
 					cls = cls->super;

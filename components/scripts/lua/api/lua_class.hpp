@@ -16,28 +16,54 @@ namespace VoidEngine::Scripts::Lua::API {
 	int lua_ClassNew(lua_State*);
 	int lua_ClassGet(lua_State*);
 
-	int lua_Class__tostring(lua_State*);
 	int lua_Class__index(lua_State*);
+	int lua_Class__tostring(lua_State*);
 	int lua_Class__eq(lua_State*);
 	
-	int lua_ClassRegister(lua_State* state);
-	int lua_ClassIsAbstract(lua_State* state);
-	int lua_ClassSetConstructor(lua_State* state);
-	int lua_ClassInstanceOf(lua_State* state);
-	int lua_ClassGetSuper(lua_State* state);
-	int lua_ClassGetName(lua_State* state);
+	int lua_ClassRegister(lua_State*);
+	int lua_ClassIsAbstract(lua_State*);
+	int lua_ClassSetConstructor(lua_State*);
+	int lua_ClassGetConstructor(lua_State*);
+	int lua_ClassInstanceOf(lua_State*);
+	int lua_ClassGetSuper(lua_State*);
+	int lua_ClassGetName(lua_State*);
 
-	int lua_ClassAddFunction(lua_State* state);
-	int lua_ClassAddProperty(lua_State* state);
-	int lua_ClassAddEventHandler(lua_State* state);
+	int lua_ClassGetProperties(lua_State*);
+	int lua_ClassGetFunctions(lua_State*);
+	int lua_ClassGetEventHandlers(lua_State*);
+
+	int lua_ClassFindProperty(lua_State*);
+	int lua_ClassFindFunction(lua_State*);
+	int lua_ClassFindEventHandler(lua_State*);
+
+	int lua_ClassAddProperty(lua_State*);
+	int lua_ClassAddFunction(lua_State*);
+	int lua_ClassAddEventHandler(lua_State*);
 
 	static luaL_Reg classLib[] = {
 		{ "new", lua_ClassNew },
 		{ "get", lua_ClassGet },
 
-		{ "__tostring", lua_Class__tostring },
 		{ "__index", lua_Class__index },
+		{ "__tostring", lua_Class__tostring },
 		{ "__eq", lua_Class__eq },
+
+		{ "register", lua_ClassRegister },
+		{ "isAbstract", lua_ClassIsAbstract },
+		{ "setConstructor", lua_ClassSetConstructor },
+		{ "getConstructor", lua_ClassGetConstructor },
+		{ "instanceOf", lua_ClassInstanceOf },
+		{ "getSuper", lua_ClassGetSuper },
+		{ "getName", lua_ClassGetName },
+		{ "getProperties", lua_ClassGetProperties },
+		{ "getFunctions", lua_ClassGetProperties },
+		{ "getEventHandlers", lua_ClassGetEventHandlers },
+		{ "findProperty", lua_ClassFindProperty },
+		{ "findFunction", lua_ClassFindFunction },
+		{ "findEventHandler", lua_ClassFindEventHandler },
+		{ "addProperty", lua_ClassAddProperty },
+		{ "addFunction", lua_ClassAddFunction },
+		{ "addEventHandler", lua_ClassAddEventHandler },
 
 		{ nullptr, nullptr }
 	};

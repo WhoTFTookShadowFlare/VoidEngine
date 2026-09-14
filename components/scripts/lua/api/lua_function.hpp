@@ -26,12 +26,18 @@ namespace VoidEngine::Scripts::Lua::API {
 		const MethodBase* method;
 	};
 
+	LuaFunctionWrapper* lua_pushfunctionwrapper(lua_State*);
+
 	int lua_FunctionNew(lua_State* state);
+
+	int lua_Function__index(lua_State* state);
 	int lua_Function__tostring(lua_State* state);
 	int lua_Function__eq(lua_State* state);
 
 	static luaL_Reg functionLib[] = {
 		{ "new", lua_FunctionNew },
+
+		{ "__index", lua_Function__index },
 		{ "__tostring", lua_Function__tostring },
 		{ "__eq", lua_Function__eq },
 
