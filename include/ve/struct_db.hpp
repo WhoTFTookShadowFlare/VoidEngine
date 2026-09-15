@@ -31,6 +31,9 @@ namespace VoidEngine {
 		std::shared_ptr<void> data;
 	public:
 		Struct(const StructData* strData, std::shared_ptr<void> data);
+		Struct(const StructData* strData, void* data);
+
+		const StructData* getData() const;
 		
 		void set(std::string member, Variant data);
 		Variant get(std::string member) const;

@@ -64,7 +64,7 @@ namespace VoidEngine {
 		Variant(std::map<std::string, Variant>);
 		Variant(std::shared_ptr<Object>);
 		Variant(Event::EventBus*);
-		Variant(Struct);
+		Variant(std::shared_ptr<Struct>);
 
 		// Deprecated
 		Variant(glm::vec2);
@@ -99,7 +99,7 @@ namespace VoidEngine {
 		std::expected<std::map<std::string, Variant>*, TypeError> asMap() const;
 		std::expected<std::shared_ptr<Object>, TypeError> asObject() const;
 		std::expected<Event::EventBus*, TypeError> asEventBus() const;
-		std::expected<Struct, TypeError> asStruct() const;
+		std::expected<std::shared_ptr<Struct>, TypeError> asStruct() const;
 
 		std::expected<glm::vec2, TypeError> asVec2() const;
 		std::expected<glm::vec3, TypeError> asVec3() const;

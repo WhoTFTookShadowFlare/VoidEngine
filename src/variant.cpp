@@ -89,8 +89,8 @@ namespace VoidEngine {
 		data = std::shared_ptr<Event::EventBus>(value, [](void*) {});
 	}
 
-	Variant::Variant(Struct value) : type(VariantType::STRUCT) {
-		data = std::shared_ptr<Struct>(&value, [](void*) {});
+	Variant::Variant(std::shared_ptr<Struct> value) : type(VariantType::STRUCT) {
+		data = value;
 	}
 
 	Variant::Variant(glm::vec2 value) : type(VariantType::VEC2) { data = std::make_shared<glm::vec2>(value); }
@@ -157,9 +157,9 @@ namespace VoidEngine {
 		return (Event::EventBus*) data.get();
 	}
 
-	std::expected<Struct, TypeError> Variant::asStruct() const {
+	std::expected<std::shared_ptr<Struct>, TypeError> Variant::asStruct() const {
 		if(!isStruct()) { return std::unexpected(TypeError(VariantType::STRUCT, type)); }
-		return (Struct) *std::static_pointer_cast<Struct>(data);
+		return std::static_pointer_cast<Struct>(data);
 	}
 
 	std::expected<glm::vec2, TypeError> Variant::asVec2() const {

@@ -45,13 +45,54 @@ namespace VoidEngine {
 		this->data = data;
 	}
 
-	void Struct::set(std::string member, Variant data) {
-	
+	Struct::Struct(const StructData* strData, void* data) {
+		this->strData = strData;
+		this->data = std::shared_ptr<void>(data, [](void*) {});
+	}
+
+	const StructData* Struct::getData() const {
+		return strData;
+	}
+
+	void Struct::set(std::string member, Variant value) {
+		const StructMember* strMember = strData->getMember(member);
+		if (strMember == nullptr) {
+			std::println("[ERR] struct {} has no member {}", strData->name, member);
+			return;
+		}
+
+		size_t offset = strData->offsetOf(member);
+		VariantType type = strMember->type;
+		if(value.getType() != type) {
+			std::println("[ERR] Struct expected type {}, got {}", (uint8_t) type, (uint8_t) value.getType());
+			return;
+		}
+
+		void* addr = static_cast<void*>(static_cast<int8_t*>(data.get()) + offset);
+		switch(type) {
+		case VariantType::INT: {
+			*static_cast<int32_t*>(addr) = value.asInt().value();
+			return;
+		} break;
+		case VariantType::FLOAT: {
+			*static_cast<float*>(addr) = value.asFloat().value();
+			return;
+		} break;
+		case VariantType::BOOL: {
+			*static_cast<bool*>(addr) = value.asBool().value();
+			return;
+		} break;
+		}
+
+		std::println("[ERR] Cannot set struct member of type {}", (int) type);
 	}
 
 	Variant Struct::get(std::string member) const {
 		const StructMember* strMember = strData->getMember(member);
-		if(strMember == nullptr) return nullptr;
+		if(strMember == nullptr) {
+			std::println("[ERR] struct {} has no member {}", strData->name, member);
+			return nullptr;
+		}
 
 		size_t offset = strData->offsetOf(member);
 		VariantType type = strMember->type;
@@ -68,7 +109,7 @@ namespace VoidEngine {
 			return *static_cast<bool*>(addr);
 		} break;
 		case VariantType::STRUCT: {
-			return Struct(strMember->data, std::shared_ptr<void>(addr, [](void*) {}));
+			return std::make_shared<Struct>(strMember->data, std::shared_ptr<void>(addr, [](void*) {}));
 		} break;
 		}
 
