@@ -97,7 +97,15 @@ namespace VoidEngine::Scripts::Lua {
 		case VariantType::STRING:
 			lua_pushstring(state, value.asString().value().c_str());
 			break;
-			//ARRAY,
+		case VariantType::ARRAY: {
+			std::vector<Variant>* arr = value.asArray().value();
+			lua_createtable(state, arr->size(), 0);
+			for(size_t idx = 0; idx < arr->size(); idx++) {
+				lua_pushnumber(state, idx);
+				objectFromVariant((*arr)[idx]);
+				lua_settable(state, -3);
+			}
+		}; break;
 			//MAP,
 		case VariantType::OBJECT: {
 			API::LuaObjectWrapper* wrapper = API::lua_pushObjectWrapper(state);

@@ -6,6 +6,7 @@
 
 #include "ve/class_db.hpp"
 #include "ve/class_methods.hpp"
+#include "ve/class_property.hpp"
 #include "ve/scene/game_object.hpp"
 #include "ve/variant.hpp"
 

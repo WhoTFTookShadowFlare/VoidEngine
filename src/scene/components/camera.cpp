@@ -17,8 +17,8 @@ namespace VoidEngine::Scene::Components {
 	glm::mat4 ACamera::getView(std::shared_ptr<GameObject> obj) {
 		if(obj == nullptr) return glm::mat4(1.0f);
 
-		glm::vec3 position = obj->getPosition().asVec3().value();
-		glm::vec3 rotation = obj->getRotation().asVec3().value();
+		glm::vec3 position = *static_cast<const glm::vec3*>(obj->getPosition().asStruct().value()->raw());
+		glm::vec3 rotation = *static_cast<const glm::vec3*>(obj->getPosition().asStruct().value()->raw());
 		glm::vec3 direction = 
 			glm::rotateZ(
 				glm::rotateY(

@@ -67,10 +67,6 @@ namespace VoidEngine::Scene {
 		std::shared_ptr<AObjectComponent> getFirstOfType(const Class* cls);
 		std::vector<std::shared_ptr<AObjectComponent>> gatherComponentsOfType(const Class* cls);
 
-		void setPosition(Variant);
-		void setRotation(Variant);
-		void setScale(Variant);
-
 		Variant getPosition() const;
 		Variant getRotation() const;
 		Variant getScale() const;

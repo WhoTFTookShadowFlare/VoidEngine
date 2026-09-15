@@ -34,6 +34,8 @@ namespace VoidEngine {
 		Struct(const StructData* strData, void* data);
 
 		const StructData* getData() const;
+
+		const void* raw() const;
 		
 		void set(std::string member, Variant data);
 		Variant get(std::string member) const;

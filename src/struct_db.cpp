@@ -54,6 +54,10 @@ namespace VoidEngine {
 		return strData;
 	}
 
+	const void* Struct::raw() const {
+		return data.get();
+	}
+
 	void Struct::set(std::string member, Variant value) {
 		const StructMember* strMember = strData->getMember(member);
 		if (strMember == nullptr) {
