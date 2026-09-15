@@ -85,6 +85,7 @@ namespace VoidEngine {
 		bool isMap() const;
 		bool isObject() const;
 		bool isEventBus() const;
+		bool isStruct() const;
 
 		bool isVec2() const;
 		bool isVec3() const;
@@ -98,6 +99,7 @@ namespace VoidEngine {
 		std::expected<std::map<std::string, Variant>*, TypeError> asMap() const;
 		std::expected<std::shared_ptr<Object>, TypeError> asObject() const;
 		std::expected<Event::EventBus*, TypeError> asEventBus() const;
+		std::expected<Struct, TypeError> asStruct() const;
 
 		std::expected<glm::vec2, TypeError> asVec2() const;
 		std::expected<glm::vec3, TypeError> asVec3() const;

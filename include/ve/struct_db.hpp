@@ -18,7 +18,10 @@ namespace VoidEngine {
 		const std::string name;
 		const std::vector<StructMember> members;
 
+		const StructMember* getMember(std::string memberName) const;
+
 		const size_t offsetOf(std::string memberName) const;
+		const VariantType typeOf(std::string memberName) const;
 		const size_t sizeOf() const;
 	};
 
