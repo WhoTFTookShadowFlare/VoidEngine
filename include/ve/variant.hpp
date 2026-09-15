@@ -14,6 +14,7 @@
 
 namespace VoidEngine {
 	class Object;
+	struct Struct;
 	namespace Event {
 		class EventBus;
 	}
@@ -28,11 +29,15 @@ namespace VoidEngine {
 		MAP,
 		OBJECT,
 		EVENT_BUS,
+		STRUCT,
 
+		// Deprecated varint types
 		VEC2,
 		VEC3,
 		VEC4
 	};
+
+	const size_t getVariantTypeSize(VariantType);
 
 	class TypeError final : public std::exception {
 	private:
@@ -59,7 +64,9 @@ namespace VoidEngine {
 		Variant(std::map<std::string, Variant>);
 		Variant(std::shared_ptr<Object>);
 		Variant(Event::EventBus*);
+		Variant(Struct);
 
+		// Deprecated
 		Variant(glm::vec2);
 		Variant(glm::vec3);
 		Variant(glm::vec4);

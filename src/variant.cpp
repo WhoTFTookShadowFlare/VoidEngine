@@ -7,10 +7,38 @@
 #include <format>
 #include <map>
 #include <memory>
+#include <print>
 #include <string>
 #include <vector>
 
 namespace VoidEngine {
+	const size_t getVariantTypeSize(VariantType type) {
+		switch(type) {
+		case INT:
+			return sizeof(int32_t);
+		case FLOAT:
+			return sizeof(float);
+		case BOOL:
+			return sizeof(bool);
+
+		// Can be placed in structs
+		case STRUCT:
+			return -1;
+		
+		// Size varies too much, or has none.
+		case NIL:
+		case ARRAY:
+		case MAP:
+		case OBJECT:
+		case EVENT_BUS:
+		case STRING:
+			std::println("[ERR] Cannot get the size of VariantType {}", (int) type);
+			return 0;
+		}
+
+		return 0;
+	}
+
 	TypeError::TypeError(VariantType expected, VariantType got) : expected(expected), got(got)
 	{}
 

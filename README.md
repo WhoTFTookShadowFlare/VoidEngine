@@ -4,13 +4,30 @@ A game engine made specifically for desktop platforms.
 
 ## Build instructions
 
-Install:
-- cmake
+Dependencies:
 - git
-- assimp (if on non-windows system)
+- premake5
+- cmake
 
 Building:
-1. Clone the repository recursivly to get all dependencies.
-1. Create and enter a build directory
-1. Run ```cmake ..```
-1. Run ```cmake --build .``` and wait
+1. Run in your project: 
+```bash
+git submodule add https://github.com/WhoTFTookShadowFlare/VoidEngine VoidEngine --recurse-submodules
+```
+
+2. In your premake5.lua add the following:
+```lua
+-- At the start of your file
+local VoidEngine = include("VoidEngine")
+
+-- In your workspace
+VoidEngine.addVoidEngine()
+
+-- In your project
+VoidEngine.useVoidEngine()
+```
+
+3. Run premake5 normally
+
+## Usage
+TODO: Make the example repo
