@@ -14,6 +14,7 @@
 
 namespace VoidEngine {
 	class Object;
+	struct Struct;
 	namespace Event {
 		class EventBus;
 	}
@@ -28,11 +29,15 @@ namespace VoidEngine {
 		MAP,
 		OBJECT,
 		EVENT_BUS,
+		STRUCT,
 
+		// Deprecated varint types
 		VEC2,
 		VEC3,
 		VEC4
 	};
+
+	const size_t getVariantTypeSize(VariantType);
 
 	class TypeError final : public std::exception {
 	private:
@@ -59,7 +64,9 @@ namespace VoidEngine {
 		Variant(std::map<std::string, Variant>);
 		Variant(std::shared_ptr<Object>);
 		Variant(Event::EventBus*);
+		Variant(std::shared_ptr<Struct>);
 
+		// Deprecated
 		Variant(glm::vec2);
 		Variant(glm::vec3);
 		Variant(glm::vec4);
@@ -78,6 +85,7 @@ namespace VoidEngine {
 		bool isMap() const;
 		bool isObject() const;
 		bool isEventBus() const;
+		bool isStruct() const;
 
 		bool isVec2() const;
 		bool isVec3() const;
@@ -91,6 +99,7 @@ namespace VoidEngine {
 		std::expected<std::map<std::string, Variant>*, TypeError> asMap() const;
 		std::expected<std::shared_ptr<Object>, TypeError> asObject() const;
 		std::expected<Event::EventBus*, TypeError> asEventBus() const;
+		std::expected<std::shared_ptr<Struct>, TypeError> asStruct() const;
 
 		std::expected<glm::vec2, TypeError> asVec2() const;
 		std::expected<glm::vec3, TypeError> asVec3() const;

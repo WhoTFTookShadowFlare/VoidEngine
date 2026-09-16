@@ -1,16 +1,45 @@
 #include "ve/variant.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "ve/event/event_bus.hpp"
+#include "ve/struct_db.hpp"
 #include "ve/object.hpp"
 #include <cstdint>
 #include <expected>
 #include <format>
 #include <map>
 #include <memory>
+#include <print>
 #include <string>
 #include <vector>
 
 namespace VoidEngine {
+	const size_t getVariantTypeSize(VariantType type) {
+		switch(type) {
+		case INT:
+			return sizeof(int32_t);
+		case FLOAT:
+			return sizeof(float);
+		case BOOL:
+			return sizeof(bool);
+
+		// Can be placed in structs
+		case STRUCT:
+			return -1;
+		
+		// Size varies too much, or has none.
+		case NIL:
+		case ARRAY:
+		case MAP:
+		case OBJECT:
+		case EVENT_BUS:
+		case STRING:
+			std::println("[ERR] Cannot get the size of VariantType {}", (int) type);
+			return 0;
+		}
+
+		return 0;
+	}
+
 	TypeError::TypeError(VariantType expected, VariantType got) : expected(expected), got(got)
 	{}
 
@@ -60,6 +89,10 @@ namespace VoidEngine {
 		data = std::shared_ptr<Event::EventBus>(value, [](void*) {});
 	}
 
+	Variant::Variant(std::shared_ptr<Struct> value) : type(VariantType::STRUCT) {
+		data = value;
+	}
+
 	Variant::Variant(glm::vec2 value) : type(VariantType::VEC2) { data = std::make_shared<glm::vec2>(value); }
 	Variant::Variant(glm::vec3 value) : type(VariantType::VEC3) { data = std::make_shared<glm::vec3>(value); }
 	Variant::Variant(glm::vec4 value) : type(VariantType::VEC4) { data = std::make_shared<glm::vec4>(value); }
@@ -78,6 +111,7 @@ namespace VoidEngine {
 	bool Variant::isMap() const { return type == VariantType::MAP; }
 	bool Variant::isObject() const { return type == VariantType::OBJECT; }
 	bool Variant::isEventBus() const { return type == VariantType::EVENT_BUS; }
+	bool Variant::isStruct() const { return type == VariantType::STRUCT; }
 
 	bool Variant::isVec2() const { return type == VariantType::VEC2; }
 	bool Variant::isVec3() const { return type == VariantType::VEC3; }
@@ -121,6 +155,11 @@ namespace VoidEngine {
 	std::expected<Event::EventBus*, TypeError> Variant::asEventBus() const {
 		if(!isEventBus()) { return std::unexpected(TypeError(VariantType::EVENT_BUS, type)); }
 		return (Event::EventBus*) data.get();
+	}
+
+	std::expected<std::shared_ptr<Struct>, TypeError> Variant::asStruct() const {
+		if(!isStruct()) { return std::unexpected(TypeError(VariantType::STRUCT, type)); }
+		return std::static_pointer_cast<Struct>(data);
 	}
 
 	std::expected<glm::vec2, TypeError> Variant::asVec2() const {

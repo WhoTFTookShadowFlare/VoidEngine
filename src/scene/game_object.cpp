@@ -18,9 +18,9 @@ namespace VoidEngine::Scene {
 		.name = "GameObject",
 		.super = &Object::ClassData,
 		.properties = {
-			new NativeProperty<GameObject>("position", &GameObject::getPosition, &GameObject::setPosition),
-			new NativeProperty<GameObject>("rotation", &GameObject::getRotation, &GameObject::setRotation),
-			new NativeProperty<GameObject>("scale", &GameObject::getScale, &GameObject::setScale),
+			new NativeProperty<GameObject>("position", &GameObject::getPosition),
+			new NativeProperty<GameObject>("rotation", &GameObject::getRotation),
+			new NativeProperty<GameObject>("scale", &GameObject::getScale),
 		}
 	};
 
@@ -162,30 +162,15 @@ namespace VoidEngine::Scene {
 		return components;
 	}
 
-	void GameObject::setPosition(Variant value) {
-		if(!value.isVec3()) return;
-		position = value.asVec3().value();
-	}
-
-	void GameObject::setRotation(Variant value) {
-		if(!value.isVec3()) return;
-		rotation = value.asVec3().value();
-	}
-
-	void GameObject::setScale(Variant value) {
-		if(!value.isVec3()) return;
-		scale = value.asVec3().value();
-	}
-
 	Variant GameObject::getPosition() const {
-		return position;
+		return std::make_shared<Struct>(&Vec3Data, const_cast<glm::vec3*>(&position));
 	}
 
 	Variant GameObject::getRotation() const {
-		return rotation;
+		return std::make_shared<Struct>(&Vec3Data, const_cast<glm::vec3*>(&rotation));
 	}
 
 	Variant GameObject::getScale() const {
-		return scale;
+		return std::make_shared<Struct>(&Vec3Data, const_cast<glm::vec3*>(&scale));
 	}	
 }

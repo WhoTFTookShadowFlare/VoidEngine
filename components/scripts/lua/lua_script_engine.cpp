@@ -2,6 +2,7 @@
 #include "api/lua_object.hpp"
 #include "api/lua_property.hpp"
 #include <api/lua_event_handler.hpp>
+#include <api/lua_struct.hpp>
 #include <lua_script_engine.hpp>
 
 #include <print>
@@ -42,6 +43,7 @@ namespace VoidEngine::Scripts::Lua {
 		API::luaopen_Property(state);
 		API::luaopen_Object(state);
 		API::luaopen_EventHandler(state);
+		API::luaopen_Struct(state);
 	}
 
 	std::string LuaScriptEngine::getLanguage() { return "lua"; }
@@ -95,11 +97,23 @@ namespace VoidEngine::Scripts::Lua {
 		case VariantType::STRING:
 			lua_pushstring(state, value.asString().value().c_str());
 			break;
-			//ARRAY,
+		case VariantType::ARRAY: {
+			std::vector<Variant>* arr = value.asArray().value();
+			lua_createtable(state, arr->size(), 0);
+			for(size_t idx = 0; idx < arr->size(); idx++) {
+				lua_pushnumber(state, idx);
+				objectFromVariant((*arr)[idx]);
+				lua_settable(state, -3);
+			}
+		}; break;
 			//MAP,
 		case VariantType::OBJECT: {
 			API::LuaObjectWrapper* wrapper = API::lua_pushObjectWrapper(state);
 			wrapper->object = value.asObject().value();
+		} break;
+		case VariantType::STRUCT: {
+			API::LuaStructWrapper* wrapper = API::lua_pushStructWrapper(state);
+			wrapper->struc = value.asStruct().value();
 		} break;
 		default:
 			std::println("[ERR] [Lua] Cannot convert Variant type {}, pushing nil", (int) value.getType());

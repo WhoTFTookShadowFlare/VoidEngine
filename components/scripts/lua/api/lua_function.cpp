@@ -103,9 +103,15 @@ namespace VoidEngine::Scripts::Lua::API {
 		LuaFunctionWrapper* function = static_cast<LuaFunctionWrapper*>(luaL_checkudata(state, 1, "Function"));
 		LuaObjectWrapper* object = static_cast<LuaObjectWrapper*>(luaL_checkudata(state, 2, "Object"));
 
-		std::println("Function __call NYI");
+		std::vector<Variant> args = {};
+		auto luaEngine = LuaScriptEngine::getInstance();
+		for(size_t idx = 2; idx < lua_gettop(state); idx++) {
+			args.push_back(luaEngine->objectToVariant(&idx));
+		}
 
-		return 0;
+		Variant retVal = function->method->call(object->object, args);
+		luaEngine->objectFromVariant(retVal);
+		return 1;
 	}
 
 	int luaopen_Function(lua_State* state) {
