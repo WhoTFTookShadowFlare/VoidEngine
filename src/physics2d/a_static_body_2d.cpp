@@ -1,0 +1,1 @@
+#include <ve/physics2d/a_static_body_2d.hpp>

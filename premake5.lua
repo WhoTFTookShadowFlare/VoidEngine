@@ -2,6 +2,7 @@ local module = {}
 
 workspace "VoidEngine"
 	configurations { "Debug", "Release" }
+	platforms { "Linux", "Windows", "OSX" }
 	cppdialect "C++23"
 	targetdir "bin/%{cfg.buildcfg}"
 	location(path.join(_MAIN_SCRIPT_DIR, "VoidEngine"))
@@ -9,8 +10,6 @@ workspace "VoidEngine"
 	rtti "Off"
 
 	architecture "amd64"
-
-	-- fatalwarnings "On"
 
 local libs = include("libs")
 local components = include("components")
