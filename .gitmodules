@@ -22,3 +22,6 @@
 [submodule "components/scripts/lua/lua"]
 	path = components/scripts/lua/lua
 	url = https://github.com/lua/lua
+[submodule "components/physics2D/box2d/box2d"]
+	path = components/physics2D/box2d/box2d
+	url = https://github.com/erincatto/box2d

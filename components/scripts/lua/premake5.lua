@@ -23,6 +23,7 @@ function module.setupProject()
 	project "Lua"
 		kind "SharedLib"
 		targetdir(path.join(_MAIN_SCRIPT_DIR, "bin/%{cfg.buildcfg}"))
+        objdir(path.join(_MAIN_SCRIPT_DIR, "obj/%{cfg.platform}/%{cfg.buildcfg}/box2d"))
 		location(module.libPath)
 		language "C"
 		if utils.isVS() then

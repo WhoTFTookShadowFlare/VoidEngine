@@ -1,6 +1,7 @@
 #include "ve/engine.hpp"
 #include "ve/engine_events.hpp"
 #include "ve/event/event_handler.hpp"
+#include "ve/physics2d/physics_2d.hpp"
 #include "ve/io/window.hpp"
 #include "ve/io/window_events.hpp"
 #include "ve/io/input.hpp"
@@ -53,6 +54,7 @@ namespace VoidEngine {
 		onQuit.fireEvent(evt);
 		mainWindow = nullptr;
 		renderer = nullptr;
+		Physics2D::Physics2D::getInstance()->finalize();
 		SDL_Quit();
 	}
 
@@ -76,6 +78,8 @@ namespace VoidEngine {
 		IO::Window::CreationOptions options {
 			.visible = false
 		};
+
+		Physics2D::Physics2D::initialize();
 		
 		instance->audio = IO::SFX::Audio::getInstance();
 		instance->renderer = IO::GFX::Renderer::getInstance();
