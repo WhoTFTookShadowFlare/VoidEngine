@@ -10,7 +10,6 @@
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/math/rect2.hpp"
 #include "ve/class_db.hpp"
-#include "ve/scene/component_updater.hpp"
 #include "ve/script/script_engines.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_hints.h>
@@ -88,8 +87,7 @@ namespace VoidEngine {
 
 		instance->winDefaultClose = std::make_shared<IO::Events::WindowCloseRequestedDefaultHandler>();
 
-		Scene::ComponentUpdater::ensureSetup();
-		auto compDB = ClassDB::getInstance();
+		auto classDB = ClassDB::getInstance();
 	}
 
 	std::shared_ptr<Engine> Engine::getInstance() {
