@@ -7,6 +7,9 @@
 #include "ve/io/window_events.hpp"
 #include "ve/object.hpp"
 
+#include "ve/scene/scene.hpp"
+#include "ve/scene/game_object.hpp"
+
 namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
 
@@ -25,7 +28,7 @@ namespace VoidEngine {
 		registerClass(&Events::EQuitEvent::ClassData);
 		registerClass(&Events::EScreenLayoutChangedEvent::ClassData);
 
-		registerClass(&IO::Events::BasicWindowEvent::ClassData);
+		registerClass(&IO::Events::AWindowEvent::ClassData);
 		registerClass(&IO::Events::EWindowMinimized::ClassData);
 		registerClass(&IO::Events::EWindowRestored::ClassData);
 		registerClass(&IO::Events::EWindowMaximized::ClassData);
@@ -36,6 +39,10 @@ namespace VoidEngine {
 		registerClass(&IO::Events::EWindowFocus::ClassData);
 
 		registerClass(&IO::Events::WindowCloseRequestedDefaultHandler::ClassData);
+
+		// registerClass(&Scene::EObjectRenamed::ClassData);
+		// registerClass(&Scene::Scene::ClassData);
+		// registerClass(&Scene::GameObject::ClassData);
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {
@@ -54,7 +61,17 @@ namespace VoidEngine {
 		}
 
 		if(cls->super == nullptr && cls != &Object::ClassData) [[unlikely]] {
-			std::println("[WARN] {} did not setup ClassData::super", cls->getName());
+			std::println("[ERR] {} did not setup ClassData::super", cls->getName());
+			return;
+		}
+
+		if(cls->super != nullptr && cls->super->isFinal()) {
+			std::println("[FATAL] {} inherits a class ({}) flagged as final", cls->getName(), cls->super->getName());
+			assert(false);
+		}
+
+		if(cls->isFinal() && cls->constructor == nullptr) {
+			std::println("[WARN] Class {}, is final with no constructor", cls->getName());
 		}
 
 		componentClasses[cls->name] = cls;

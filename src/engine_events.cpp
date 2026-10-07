@@ -4,11 +4,13 @@
 namespace VoidEngine::Events {
 	const Class EQuitEvent::ClassData = {
 		.name = "EQuitEvent",
-		.super = &Event::AEvent::ClassData
+		.super = &Event::AEvent::ClassData,
+		.flags = ClassFlags::FINAL
 	};
 
 	const Class EScreenLayoutChangedEvent::ClassData = {
 		.name = "EScreenLayoutChanged",
-		.super = &Event::AEvent::ClassData
+		.super = &Event::AEvent::ClassData,
+		.flags = ClassFlags::FINAL
 	};
 }

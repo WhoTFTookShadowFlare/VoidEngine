@@ -46,6 +46,10 @@ namespace VoidEngine::Event {
 			std::println("[ERR] Provided event ({}) is not of type {}", event->getClass()->getName(), eventClass->getName());
 			return;
 		}
+
+		if(!event->isSetup()) {
+			std::println("[WARN -> ERR] Event of type {} was not setup properly", event->getClass()->getName());
+		}
 		
 		std::for_each(handlers.cbegin(), handlers.cend(), [&](const auto& handler) {
 			handler.handle(event);

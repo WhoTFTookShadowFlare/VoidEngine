@@ -89,6 +89,11 @@ namespace VoidEngine {
 		std::shared_ptr<Object> create() const override { return fn(); }
 	};
 
+	enum ClassFlags : uint8_t {
+		NONE = 0,
+		FINAL = 1 << 0
+	};
+
 	struct Class {
 		const char* name;
 
@@ -97,6 +102,7 @@ namespace VoidEngine {
 		std::vector<const MethodBase*> methods;
 		std::vector<const EventHandlerBase*> eventHandlers;
 		const ConstructorBase* constructor = nullptr;
+		const ClassFlags flags = ClassFlags::NONE;
 
 		const char* getName() const { return name; }
 		const Class* getSuper() const { return super; }
@@ -117,6 +123,10 @@ namespace VoidEngine {
 
 		bool isAbstract() const {
 			return constructor == nullptr;
+		}
+
+		bool isFinal() const {
+			return (flags & ClassFlags::FINAL) != 0;
 		}
 
 		const PropertyBase* findProperty(std::string name) const {
