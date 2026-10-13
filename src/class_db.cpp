@@ -40,9 +40,15 @@ namespace VoidEngine {
 
 		registerClass(&IO::Events::WindowCloseRequestedDefaultHandler::ClassData);
 
-		// registerClass(&Scene::EObjectRenamed::ClassData);
-		// registerClass(&Scene::Scene::ClassData);
-		// registerClass(&Scene::GameObject::ClassData);
+		registerClass(&Scene::EObjectRenamed::ClassData);
+		registerClass(&Scene::EChildAdded::ClassData);
+		registerClass(&Scene::EParented::ClassData);
+		registerClass(&Scene::EChildRemoved::ClassData);
+		registerClass(&Scene::EAddedToScene::ClassData);
+		registerClass(&Scene::ERemovedFromScene::ClassData);
+
+		registerClass(&Scene::Scene::ClassData);
+		registerClass(&Scene::GameObject::ClassData);
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {
