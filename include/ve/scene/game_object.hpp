@@ -7,6 +7,12 @@
 namespace VoidEngine::Scene {
 	class Scene;
 
+	namespace Components {
+		class AObjectComponent;
+		class AMonoObjectComponent;
+		class APolyObjectComponent;
+	}
+
 	class GameObject final : public Object, public std::enable_shared_from_this<GameObject> {
 		friend class Scene;
 		VE_CLASS(GameObject);
@@ -19,6 +25,9 @@ namespace VoidEngine::Scene {
 		std::weak_ptr<GameObject> parent;
 
 		std::map<std::string, std::shared_ptr<GameObject>> children;
+
+		std::map<const Class*, std::shared_ptr<Components::AMonoObjectComponent>> monoComponents;
+		std::map<const Class*, std::shared_ptr<Components::APolyObjectComponent>> polyComponents;
 
 		void handleOnRename(std::shared_ptr<Object> evt);
 		void handleOnChildAdded(std::shared_ptr<Object> evt);
@@ -45,5 +54,13 @@ namespace VoidEngine::Scene {
 		std::shared_ptr<GameObject> getChild(std::string);
 		void addChild(std::shared_ptr<GameObject>);
 		void removeChild(std::string name);
+
+		std::vector<std::shared_ptr<Components::AMonoObjectComponent>> getMonoComponents() const;
+		std::vector<std::shared_ptr<Components::APolyObjectComponent>> getPolyComponents() const;
+
+		std::shared_ptr<Components::AMonoObjectComponent> getMonoComponent(const Class* compCls);
+		std::shared_ptr<Components::APolyObjectComponent> getPolyComponent(const Class* compCls);
+		void addComponent(std::shared_ptr<Components::AObjectComponent>);
+		void removeComponent(const Class* compCls);
 	};
 }

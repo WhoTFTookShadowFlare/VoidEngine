@@ -9,6 +9,9 @@
 
 #include "ve/scene/scene.hpp"
 #include "ve/scene/game_object.hpp"
+#include "ve/scene/components/a_object_component.hpp"
+#include "ve/scene/components/a_mono_object_component.hpp"
+#include "ve/scene/components/a_poly_object_component.hpp"
 
 namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
@@ -49,6 +52,10 @@ namespace VoidEngine {
 
 		registerClass(&Scene::Scene::ClassData);
 		registerClass(&Scene::GameObject::ClassData);
+
+		registerClass(&Scene::Components::AObjectComponent::ClassData);
+		registerClass(&Scene::Components::AMonoObjectComponent::ClassData);
+		registerClass(&Scene::Components::APolyObjectComponent::ClassData);
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {

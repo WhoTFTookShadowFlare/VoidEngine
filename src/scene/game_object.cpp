@@ -1,6 +1,9 @@
 #include <ve/scene/game_object.hpp>
 #include <ve/scene/scene.hpp>
 
+#include <ve/scene/components/a_mono_object_component.hpp>
+#include <ve/scene/components/a_poly_object_component.hpp>
+
 #include <ve/class_event_handler.hpp>
 
 namespace VoidEngine::Scene {
@@ -140,5 +143,78 @@ namespace VoidEngine::Scene {
 
 	std::shared_ptr<Scene> GameObject::getScene() const {
 		return scene.lock();
+	}
+
+	std::vector<std::shared_ptr<Components::AMonoObjectComponent>> GameObject::getMonoComponents() const {
+		std::vector<std::shared_ptr<Components::AMonoObjectComponent>> comps(monoComponents.size());
+		for(const auto& iter : monoComponents)
+			comps.emplace_back(iter.second);
+		return comps;
+	}
+	
+	std::vector<std::shared_ptr<Components::APolyObjectComponent>> GameObject::getPolyComponents() const {
+		std::vector<std::shared_ptr<Components::APolyObjectComponent>> comps(polyComponents.size());
+		for(const auto& iter : polyComponents)
+			comps.emplace_back(iter.second);
+		return comps;
+	}
+
+	std::shared_ptr<Components::AMonoObjectComponent> GameObject::getMonoComponent(const Class* compCls) {
+		if(!compCls->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+			std::println("[ERR] Class {} is not an AMonoObjectComponent", compCls->getName());
+			return nullptr;
+		}
+
+		if(!monoComponents.contains(compCls)) return nullptr;
+		return monoComponents[compCls];
+	}
+
+	std::shared_ptr<Components::APolyObjectComponent> GameObject::getPolyComponent(const Class* compCls) {
+		if(!compCls->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+			std::println("[ERR] Class {} is not an APolyObjectComponent", compCls->getName());
+			return nullptr;
+		}
+
+		if(!polyComponents.contains(compCls)) return nullptr;
+		return polyComponents[compCls];
+	}
+
+	void GameObject::addComponent(std::shared_ptr<Components::AObjectComponent> comp) {
+		if(getMonoComponent(comp->getClass()) != nullptr || getPolyComponent(comp->getClass()) != nullptr) return;
+
+		if (comp->getClass()->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+			auto mono = std::static_pointer_cast<Components::AMonoObjectComponent>(comp);
+			monoComponents[comp->getClass()] = mono;
+			mono->object = weak_from_this();
+			return;
+		}
+		else if (comp->getClass()->instanceOf(&Components::APolyObjectComponent::ClassData)) {
+			auto poly = std::static_pointer_cast<Components::APolyObjectComponent>(comp);
+			polyComponents[comp->getClass()] = poly;
+			poly->objects.emplace_back(shared_from_this());
+			return;
+		}
+		std::println("[FATAL] Could not determine how to add component {} to a GameObject", comp->getClass()->getName());
+		assert(false);
+	}
+
+	void GameObject::removeComponent(const Class* compCls) {
+		if (compCls->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+			auto comp = getMonoComponent(compCls);
+			comp->object = std::weak_ptr<GameObject>();
+			monoComponents.erase(compCls);
+			return;
+		}
+		else if (compCls->instanceOf(&Components::APolyObjectComponent::ClassData)) {
+			auto comp = getPolyComponent(compCls);
+			auto self = shared_from_this();
+			comp->objects.erase(std::find_if(comp->objects.cbegin(), comp->objects.cend(), [&self](const auto& iterWeak) {
+				return iterWeak.lock() == self;
+			}));
+			polyComponents.erase(compCls);
+			return;
+		}
+		std::println("[FATAL] Could not determine how to remove component {} from a GameObject", compCls->getName());
+		assert(false);
 	}
 }
