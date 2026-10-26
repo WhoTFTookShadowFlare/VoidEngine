@@ -1,5 +1,6 @@
 #include <ve/scene/events.hpp>
 #include <ve/scene/game_object.hpp>
+#include <ve/scene/components/a_object_component.hpp>
 #include <ve/scene/scene.hpp>
 #include <ve/class_property.hpp>
 
@@ -180,6 +181,10 @@ namespace VoidEngine::Scene {
 		return Variant(getObject());
 	}
 
+	Variant ERemovedFromScene::scr_getScene(void) const {
+		return Variant(getScene());
+	}
+
 	std::shared_ptr<ERemovedFromScene> ERemovedFromScene::create() {
 		return std::shared_ptr<ERemovedFromScene>(new ERemovedFromScene);
 	}
@@ -188,7 +193,107 @@ namespace VoidEngine::Scene {
 		return object;
 	}
 
+	std::shared_ptr<Scene> ERemovedFromScene::getScene() const {
+		return scene;
+	}
+
 	bool ERemovedFromScene::isSetup() const {
 		return object != nullptr;
+	}
+
+	const ::VoidEngine::Class EDraw::ClassData = {
+		.name = "EDraw",
+		.super = &Event::AEvent::ClassData,
+		.properties = {
+			new NativeProperty("frame", &EDraw::scr_getFrame)
+		},
+		.constructor = new NativeConstructor(&EDraw::create),
+		.flags = ClassFlags::FINAL
+	};
+
+	Variant EDraw::scr_getFrame(void) const {
+		return Variant(getFrame());
+	}
+
+	std::shared_ptr<EDraw> EDraw::create() {
+		return std::shared_ptr<EDraw>(new EDraw);
+	}
+
+	std::shared_ptr<IO::GFX::RenderFrame> EDraw::getFrame() const {
+		return frame;
+	}
+
+	bool EDraw::isSetup() const {
+		return frame != nullptr;
+	}
+
+	const ::VoidEngine::Class EComponentAdded::ClassData = {
+		.name = "EComponentAdded",
+		.super = &Event::AEvent::ClassData,
+		.properties = {
+			new NativeProperty("component", &EComponentAdded::scr_getComponent),
+			new NativeProperty("object", &EComponentAdded::scr_getObject)
+		},
+		.constructor = new NativeConstructor(&EComponentAdded::create),
+		.flags = ClassFlags::FINAL
+	};
+
+	std::shared_ptr<EComponentAdded> EComponentAdded::create() {
+		return std::shared_ptr<EComponentAdded>(new EComponentAdded);
+	}
+
+	Variant EComponentAdded::scr_getObject(void) const {
+		return Variant(getObject());
+	}
+	
+	Variant EComponentAdded::scr_getComponent(void) const {
+		return Variant(getComponent());
+	}
+
+	std::shared_ptr<GameObject> EComponentAdded::getObject() const {
+		return object;
+	}
+
+	std::shared_ptr<Components::AObjectComponent> EComponentAdded::getComponent() const {
+		return component;
+	}
+	
+	bool EComponentAdded::isSetup() const {
+		return object != nullptr && component != nullptr;
+	}
+
+	const ::VoidEngine::Class EComponentRemoved::ClassData = {
+		.name = "EComponentRemoved",
+		.super = &Event::AEvent::ClassData,
+		.properties = {
+			new NativeProperty("component", &EComponentRemoved::scr_getComponent),
+			new NativeProperty("object", &EComponentRemoved::scr_getObject)
+		},
+		.constructor = new NativeConstructor(&EComponentRemoved::create),
+		.flags = ClassFlags::FINAL
+	};
+
+	std::shared_ptr<EComponentRemoved> EComponentRemoved::create() {
+		return std::shared_ptr<EComponentRemoved>(new EComponentRemoved);
+	}
+
+	Variant EComponentRemoved::scr_getObject(void) const {
+		return Variant(getObject());
+	}
+
+	Variant EComponentRemoved::scr_getComponent(void) const {
+		return Variant(getComponent());
+	}
+
+	std::shared_ptr<GameObject> EComponentRemoved::getObject() const {
+		return object;
+	}
+
+	std::shared_ptr<Components::AObjectComponent> EComponentRemoved::getComponent() const {
+		return component;
+	}
+
+	bool EComponentRemoved::isSetup() const {
+		return object != nullptr && component != nullptr;
 	}
 }

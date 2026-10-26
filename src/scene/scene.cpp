@@ -58,7 +58,16 @@ namespace VoidEngine::Scene {
 		objects.erase(name);
 
 		auto evt = ERemovedFromScene::create();
+		evt->scene = shared_from_this();
 		evt->object = object;
 		object->onRemovedFromScene.fireEvent(evt);
+	}
+
+	void Scene::draw(double delta) {
+
+	}
+
+	std::shared_ptr<IO::GFX::RenderFrame> Scene::getRenderFrame() {
+		return renderFrame;
 	}
 }

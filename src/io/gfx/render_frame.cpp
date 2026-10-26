@@ -9,23 +9,29 @@
 #include <memory>
 
 namespace VoidEngine::IO::GFX {
-	FrameDrawEntry::FrameDrawEntry(std::shared_ptr<Mesh> mesh, std::shared_ptr<GraphicsProgram> program, glm::mat4 modelMatrix)
-		: mesh(mesh), program(program), modelMatrix(modelMatrix)
-	{}
+	const ::VoidEngine::Class AFrameDrawCall::ClassData = {
+		.name = "AFrameDrawCall",
+		.super = &Object::ClassData,
+		.flags = ClassFlags::NONE
+	};
 
-	std::shared_ptr<Mesh> FrameDrawEntry::getMesh() const {
-		return mesh;
-	}
-
-	std::shared_ptr<GraphicsProgram> FrameDrawEntry::getProgram() const {
+	std::shared_ptr<GraphicsProgram> AFrameDrawCall::getProgram() const {
 		return program;
 	}
 
-	glm::mat4 FrameDrawEntry::getModelMatrix() const {
-		return modelMatrix;
+	void AFrameDrawCall::setProgram(std::shared_ptr<GraphicsProgram> value) {
+		program = value;
 	}
 
-	RenderFrame::RenderFrame() {}
+	void AFrameDrawCall::draw() {
+		assert(false);
+	}
+
+	const ::VoidEngine::Class RenderFrame::ClassData = {
+		.name = "RenderFrame",
+		.super = &Object::ClassData,
+		.flags = ClassFlags::FINAL
+	};
 
 	std::shared_ptr<RenderFrame> RenderFrame::create() {
 		return std::shared_ptr<RenderFrame>(new RenderFrame);
@@ -75,8 +81,14 @@ namespace VoidEngine::IO::GFX {
 		spotLights.push_back(light);
 	}
 
-	void RenderFrame::addDraw(std::shared_ptr<Mesh> mesh, std::shared_ptr<GraphicsProgram> program, glm::mat4 modelMatrix) {
-		draws.push_back({ mesh, program, modelMatrix });
+	void RenderFrame::addDraw(std::shared_ptr<AFrameDrawCall> drawCall) {
+		draws.push_back(drawCall);
+	}
+
+	void RenderFrame::removeDraw(std::shared_ptr<AFrameDrawCall> drawCall) {
+		draws.erase(std::remove_if(draws.begin(), draws.end(), [&drawCall](const std::weak_ptr<AFrameDrawCall> iter) {
+			return iter.lock() == nullptr || iter.lock() == drawCall;
+		}));
 	}
 
 	void RenderFrame::render() const {
@@ -87,7 +99,23 @@ namespace VoidEngine::IO::GFX {
 		auto renderer = Renderer::getInstance();
 		renderer->bindRenderTarget(target);
 
-		std::for_each(draws.cbegin(), draws.cend(), [&](const auto& draw) {
+		std::for_each(draws.cbegin(), draws.cend(), [](const std::weak_ptr<AFrameDrawCall>& weakDrawCall) {
+			const std::shared_ptr<AFrameDrawCall> drawCall = weakDrawCall.lock();
+			if(drawCall == nullptr) return;
+			if(drawCall->getProgram() == nullptr) return;
+
+			std::shared_ptr<GraphicsProgram> program = drawCall->getProgram();
+
+			std::optional<Uniform> uView = program->queryUniform("uView");
+			std::optional<Uniform> uProjection = program->queryUniform("uProjection");
+
+			if(uView.has_value()) program->setUniform(uView.value(), glm::mat4(1.0f));
+			if(uProjection.has_value()) program->setUniform(uProjection.value(), glm::mat4(1.0f));
+
+			drawCall->draw();
+		});
+
+		/*std::for_each(draws.cbegin(), draws.cend(), [&](const auto& draw) {
 			if(draw.getProgram() == nullptr || draw.getMesh() == nullptr) return;
 
 			auto program = draw.getProgram();
@@ -168,6 +196,6 @@ namespace VoidEngine::IO::GFX {
 			}
 
 			program->draw(draw.getMesh());
-		});
+		});*/
 	}
 }

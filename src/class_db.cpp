@@ -13,6 +13,8 @@
 #include "ve/scene/components/a_mono_object_component.hpp"
 #include "ve/scene/components/a_poly_object_component.hpp"
 
+#include "ve/scene/components/gfx/mesh_component.hpp"
+
 namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
 
@@ -22,6 +24,9 @@ namespace VoidEngine {
 
 	ClassDB::ClassDB() {
 		registerClass(&Object::ClassData);
+
+		registerClass(&IO::GFX::RenderFrame::ClassData);
+		registerClass(&IO::GFX::AFrameDrawCall::ClassData);
 
 		registerClass(&Event::AEvent::ClassData);
 
@@ -49,6 +54,9 @@ namespace VoidEngine {
 		registerClass(&Scene::EChildRemoved::ClassData);
 		registerClass(&Scene::EAddedToScene::ClassData);
 		registerClass(&Scene::ERemovedFromScene::ClassData);
+		registerClass(&Scene::EDraw::ClassData);
+		registerClass(&Scene::EComponentAdded::ClassData);
+		registerClass(&Scene::EComponentRemoved::ClassData);
 
 		registerClass(&Scene::Scene::ClassData);
 		registerClass(&Scene::GameObject::ClassData);
@@ -56,6 +64,9 @@ namespace VoidEngine {
 		registerClass(&Scene::Components::AObjectComponent::ClassData);
 		registerClass(&Scene::Components::AMonoObjectComponent::ClassData);
 		registerClass(&Scene::Components::APolyObjectComponent::ClassData);
+
+		registerClass(&Scene::Components::GFX::MeshComponentDrawCall::ClassData);
+		registerClass(&Scene::Components::GFX::MeshComponent::ClassData);
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {

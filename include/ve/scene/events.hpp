@@ -1,10 +1,14 @@
 #pragma once
 
 #include <ve/event/event.hpp>
+#include <ve/io/gfx/render_frame.hpp>
 
 namespace VoidEngine::Scene {
 	class Scene;
 	class GameObject;
+	namespace Components {
+		class AObjectComponent;
+	}
 
 	class EObjectRenamed final : public Event::AEvent {
 		friend class GameObject;
@@ -108,15 +112,75 @@ namespace VoidEngine::Scene {
 		friend class Scene;
 		VE_CLASS(ERemovedFromScene);
 	private:
+		std::shared_ptr<Scene> scene = nullptr;
 		std::shared_ptr<GameObject> object = nullptr;
 
 		Variant scr_getObject(void) const;
+		Variant scr_getScene(void) const;
 
 		ERemovedFromScene() = default;
 	public:
 		static std::shared_ptr<ERemovedFromScene> create();
 
 		std::shared_ptr<GameObject> getObject() const;
+		std::shared_ptr<Scene> getScene() const;
+
+		bool isSetup() const override;
+	};
+
+	class EDraw final : public Event::AEvent {
+		friend class Scene;
+		VE_CLASS(EDraw);
+	private:
+		std::shared_ptr<IO::GFX::RenderFrame> frame = nullptr;
+
+		EDraw() = default;
+
+		Variant scr_getFrame(void) const;
+	public:
+		static std::shared_ptr<EDraw> create();
+
+		std::shared_ptr<IO::GFX::RenderFrame> getFrame() const;
+
+		bool isSetup() const override;
+	};
+
+	class EComponentAdded final : public Event::AEvent {
+		friend class GameObject;
+		VE_CLASS(EComponentAdded);
+	private:
+		std::shared_ptr<GameObject> object = nullptr;
+		std::shared_ptr<Components::AObjectComponent> component = nullptr;
+
+		EComponentAdded() = default;
+
+		Variant scr_getObject(void) const;
+		Variant scr_getComponent(void) const;
+	public:
+		static std::shared_ptr<EComponentAdded> create();
+
+		std::shared_ptr<GameObject> getObject() const;
+		std::shared_ptr<Components::AObjectComponent> getComponent() const;
+
+		bool isSetup() const override;
+	};
+	
+	class EComponentRemoved final : public Event::AEvent {
+		friend class GameObject;
+		VE_CLASS(EComponentRemoved);
+	private:
+		std::shared_ptr<GameObject> object = nullptr;
+		std::shared_ptr<Components::AObjectComponent> component = nullptr;
+
+		EComponentRemoved() = default;
+
+		Variant scr_getObject(void) const;
+		Variant scr_getComponent(void) const;
+	public:
+		static std::shared_ptr<EComponentRemoved> create();
+
+		std::shared_ptr<GameObject> getObject() const;
+		std::shared_ptr<Components::AObjectComponent> getComponent() const;
 
 		bool isSetup() const override;
 	};

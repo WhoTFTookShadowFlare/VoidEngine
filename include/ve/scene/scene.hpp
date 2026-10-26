@@ -4,6 +4,8 @@
 
 #include <ve/physics2d/a_world_2d.hpp>
 
+#include <ve/io/gfx/render_frame.hpp>
+
 namespace VoidEngine::Scene {
     class GameObject;
 
@@ -15,6 +17,8 @@ namespace VoidEngine::Scene {
 
         std::map<std::string, std::shared_ptr<GameObject>> objects;
 
+        std::shared_ptr<IO::GFX::RenderFrame> renderFrame = IO::GFX::RenderFrame::create();
+
     public:
         static std::shared_ptr<Scene> create();
         ~Scene();
@@ -24,5 +28,8 @@ namespace VoidEngine::Scene {
         std::shared_ptr<GameObject> getObject(std::string);
         void addObject(std::shared_ptr<GameObject>);
         void removeObject(std::string name);
+
+        void draw(double delta);
+        std::shared_ptr<IO::GFX::RenderFrame> getRenderFrame();
     };
 }

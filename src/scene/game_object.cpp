@@ -6,6 +6,8 @@
 
 #include <ve/class_event_handler.hpp>
 
+#include <glm/gtx/transform.hpp>
+
 namespace VoidEngine::Scene {
 	const ::VoidEngine::Class GameObject::ClassData = {
 		.name = "GameObject",
@@ -54,6 +56,21 @@ namespace VoidEngine::Scene {
 		onRename.fireEvent(evt);
 	}
 
+	glm::mat4 GameObject::calculateModelMatrix() const {
+		glm::mat4 model = glm::mat4(1.0f);
+
+		std::shared_ptr<GameObject> parent = getParent();
+		if(parent != nullptr) model = parent->calculateModelMatrix();
+
+		model = glm::translate(model, position);
+		model = glm::rotate(model, rotation.x, { 1, 0, 0 });
+		model = glm::rotate(model, rotation.y, { 0, 1, 0 });
+		model = glm::rotate(model, rotation.z, { 0, 0, 1 });
+		model = glm::scale(model, scale);
+
+		return model;
+	}
+
 	void GameObject::handleOnRename(std::shared_ptr<Object> evtObj) {
 		auto evt = std::static_pointer_cast<EObjectRenamed>(evtObj);
 		
@@ -85,6 +102,14 @@ namespace VoidEngine::Scene {
 		std::for_each(children.begin(), children.end(), [&evt](const auto& iter) {
 			iter.second->onAddedToScene.fireEvent(evt);
 		});
+
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto& iter) {
+			iter.second->onAddedToScene.fireEvent(evt);
+		});
+
+		std::for_each(polyComponents.begin(), polyComponents.end(), [&evt](const auto& iter) {
+			iter.second->onAddedToScene.fireEvent(evt);
+		});
 	}
 
 	void GameObject::handleOnRemovedFromScene(std::shared_ptr<Object> evtObj) {
@@ -92,6 +117,14 @@ namespace VoidEngine::Scene {
 		scene = std::weak_ptr<Scene>();
 
 		std::for_each(children.begin(), children.end(), [&evt](const auto& iter) {
+			iter.second->onRemovedFromScene.fireEvent(evt);
+		});
+
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto& iter) {
+			iter.second->onRemovedFromScene.fireEvent(evt);
+		});
+
+		std::for_each(polyComponents.begin(), polyComponents.end(), [&evt](const auto& iter) {
 			iter.second->onRemovedFromScene.fireEvent(evt);
 		});
 	}
@@ -145,6 +178,10 @@ namespace VoidEngine::Scene {
 		return scene.lock();
 	}
 
+	std::shared_ptr<GameObject> GameObject::getParent() const {
+		return parent.lock();
+	}
+
 	std::vector<std::shared_ptr<Components::AMonoObjectComponent>> GameObject::getMonoComponents() const {
 		std::vector<std::shared_ptr<Components::AMonoObjectComponent>> comps(monoComponents.size());
 		for(const auto& iter : monoComponents)
@@ -186,12 +223,26 @@ namespace VoidEngine::Scene {
 			auto mono = std::static_pointer_cast<Components::AMonoObjectComponent>(comp);
 			monoComponents[comp->getClass()] = mono;
 			mono->object = weak_from_this();
+
+			auto evt = EComponentAdded::create();
+			evt->object = shared_from_this();
+			evt->component = mono;
+			mono->onAddedToObject.fireEvent(evt);
+			onComponentAdded.fireEvent(evt);
+
 			return;
 		}
 		else if (comp->getClass()->instanceOf(&Components::APolyObjectComponent::ClassData)) {
 			auto poly = std::static_pointer_cast<Components::APolyObjectComponent>(comp);
 			polyComponents[comp->getClass()] = poly;
 			poly->objects.emplace_back(shared_from_this());
+
+			auto evt = EComponentAdded::create();
+			evt->object = shared_from_this();
+			evt->component = poly;
+			poly->onAddedToObject.fireEvent(evt);
+			onComponentAdded.fireEvent(evt);
+
 			return;
 		}
 		std::println("[FATAL] Could not determine how to add component {} to a GameObject", comp->getClass()->getName());
@@ -203,6 +254,13 @@ namespace VoidEngine::Scene {
 			auto comp = getMonoComponent(compCls);
 			comp->object = std::weak_ptr<GameObject>();
 			monoComponents.erase(compCls);
+
+			auto evt = EComponentRemoved::create();
+			evt->object = shared_from_this();
+			evt->component = comp;
+			comp->onRemovedFromObject.fireEvent(evt);
+			onComponentRemoved.fireEvent(evt);
+
 			return;
 		}
 		else if (compCls->instanceOf(&Components::APolyObjectComponent::ClassData)) {
@@ -212,6 +270,13 @@ namespace VoidEngine::Scene {
 				return iterWeak.lock() == self;
 			}));
 			polyComponents.erase(compCls);
+
+			auto evt = EComponentRemoved::create();
+			evt->object = shared_from_this();
+			evt->component = comp;
+			comp->onRemovedFromObject.fireEvent(evt);
+			onComponentRemoved.fireEvent(evt);
+
 			return;
 		}
 		std::println("[FATAL] Could not determine how to remove component {} from a GameObject", compCls->getName());
