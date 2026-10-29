@@ -19,7 +19,7 @@ namespace VoidEngine::Scene::Components::GFX {
 		return std::shared_ptr<MeshComponentDrawCall>(new MeshComponentDrawCall);
 	}
 	
-	void MeshComponentDrawCall::draw() {
+	void MeshComponentDrawCall::draw(std::shared_ptr<const IO::GFX::RenderFrame>) {
 		if(getMesh() == nullptr || getProgram() == nullptr) return;
 		auto program = getProgram();
 

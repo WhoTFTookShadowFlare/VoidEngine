@@ -4,13 +4,15 @@
 #include <ve/class_event_handler.hpp>
 
 #include <ve/physics2d/physics_2d.hpp>
+#include <ve/scene/components/gfx/a_camera_component.hpp>
 
 namespace VoidEngine::Scene {
 	const ::VoidEngine::Class Scene::ClassData = {
 		.name = "Scene",
 		.super = &Object::ClassData,
 		.eventHandlers = {
-			new NativeEventHandler(&EObjectRenamed::ClassData, &Scene::handleObjectRenamed)
+			new NativeEventHandler(&EObjectRenamed::ClassData, &Scene::handleObjectRenamed),
+			new NativeEventHandler(&Components::GFX::ECameraValueChanged::ClassData, &Scene::handleCameraValueChanged)
 		},
 		.constructor = new NativeConstructor(&Scene::create),
 		.flags = ClassFlags::FINAL
@@ -26,11 +28,21 @@ namespace VoidEngine::Scene {
 		return std::shared_ptr<Scene>(new Scene);
 	}
 
+	void Scene::updateCameraValues() {
+		if(renderTarget == nullptr) return;
+		renderFrame->setView(currentCamera->getView());
+		renderFrame->setProjection(currentCamera->getProjection(renderTarget->getSize()));
+	}
+
 	void Scene::handleObjectRenamed(std::shared_ptr<Object> evtObj) {
 		std::shared_ptr<EObjectRenamed> evt = std::static_pointer_cast<EObjectRenamed>(evtObj);
 		
 		objects[evt->getObject()->getName()] = objects[evt->getOldName()];
 		objects.erase(evt->getOldName());
+	}
+
+	void Scene::handleCameraValueChanged(std::shared_ptr<Object>) {
+		updateCameraValues();
 	}
 
 	std::shared_ptr<GameObject> Scene::getObject(std::string name) {
@@ -67,7 +79,27 @@ namespace VoidEngine::Scene {
 
 	}
 
-	std::shared_ptr<IO::GFX::RenderFrame> Scene::getRenderFrame() {
+	std::shared_ptr<IO::GFX::IRenderTarget> Scene::getRenderTarget() const {
+		return renderTarget;
+	}
+	
+	void Scene::setRenderTarget(std::shared_ptr<IO::GFX::IRenderTarget> value) {
+		renderTarget = value;
+		renderFrame->setTarget(value);
+	}
+
+	std::shared_ptr<IO::GFX::RenderFrame> Scene::getRenderFrame() const {
 		return renderFrame;
+	}
+
+	void Scene::setCurrentCamera(std::shared_ptr<Components::GFX::ACameraComponent> camera) {
+		if(currentCamera != nullptr) currentCamera->onCameraValueChanged.removeHandler(shared_from_this());
+		currentCamera = camera;
+		if(currentCamera != nullptr) currentCamera->onCameraValueChanged.addHandler(shared_from_this());
+		updateCameraValues();
+	}
+
+	std::shared_ptr<Components::GFX::ACameraComponent> Scene::getCurrentCamera() const {
+		return currentCamera;
 	}
 }

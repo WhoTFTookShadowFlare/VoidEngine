@@ -20,7 +20,7 @@ namespace VoidEngine::Scene::Components::GFX {
 	public:
 		static std::shared_ptr<MeshComponentDrawCall> create();
 
-		void draw() override;
+		void draw(std::shared_ptr<const IO::GFX::RenderFrame>) override;
 
 		std::shared_ptr<IO::GFX::Mesh> getMesh() const;
 		void setMesh(std::shared_ptr<IO::GFX::Mesh>);

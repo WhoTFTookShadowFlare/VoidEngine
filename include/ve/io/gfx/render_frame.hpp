@@ -8,18 +8,7 @@
 #include <vector>
 
 namespace VoidEngine::IO::GFX {
-	/*struct FrameDrawEntry final {
-	private:
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<GraphicsProgram> program;
-		glm::mat4 modelMatrix;
-	public:
-		FrameDrawEntry(std::shared_ptr<Mesh>, std::shared_ptr<GraphicsProgram>, glm::mat4 modelMatrix);
-
-		std::shared_ptr<Mesh> getMesh() const;
-		std::shared_ptr<GraphicsProgram> getProgram() const;
-		glm::mat4 getModelMatrix() const;
-	};*/
+	class RenderFrame;
 
 	class AFrameDrawCall : public Object {
 		VE_CLASS(AFrameDrawCall);
@@ -30,10 +19,10 @@ namespace VoidEngine::IO::GFX {
 		std::shared_ptr<GraphicsProgram> getProgram() const;
 		void setProgram(std::shared_ptr<GraphicsProgram>);
 
-		virtual void draw();
+		virtual void draw(std::shared_ptr<const RenderFrame>);
 	};
 
-	class RenderFrame final : public Object {
+	class RenderFrame final : public Object, public std::enable_shared_from_this<RenderFrame> {
 		VE_CLASS(RenderFrame);
 	private:
 		std::vector<std::shared_ptr<RenderFrame>> dependancies = {};

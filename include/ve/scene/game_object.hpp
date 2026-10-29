@@ -21,10 +21,6 @@ namespace VoidEngine::Scene {
 
 		std::string name = "GameObject";
 
-		glm::vec3 position = { 0, 0, 0 };
-		glm::vec3 rotation = { 0, 0 ,0 };
-		glm::vec3 scale = { 1, 1, 1 };
-
 		std::weak_ptr<Scene> scene;
 		std::weak_ptr<GameObject> parent;
 
@@ -52,6 +48,10 @@ namespace VoidEngine::Scene {
 		Event::EventBus onComponentAdded = &EComponentAdded::ClassData;
 		Event::EventBus onComponentRemoved = &EComponentRemoved::ClassData;
 		Event::EventBus onDraw = &EDraw::ClassData;
+
+		glm::vec3 position = { 0, 0, 0 };
+		glm::vec3 rotation = { 0, 0 ,0 };
+		glm::vec3 scale = { 1, 1, 1 };
 		
 		std::string getName() const;
 		void setName(std::string);
