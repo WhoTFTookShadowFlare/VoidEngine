@@ -3,9 +3,13 @@
 #include <memory>
 #include <ve/physics2d/a_2d_physics_engine.hpp>
 
+namespace VoidEngine {
+	class Engine;
+}
+
 namespace VoidEngine::Physics2D {
 	class Physics2D final {
-		friend class Engine;
+		friend class ::VoidEngine::Engine;
 	private:
 		static Physics2D* instance;
 		A2DPhysicsEngine* engine = nullptr;
