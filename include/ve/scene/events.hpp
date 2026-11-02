@@ -128,19 +128,38 @@ namespace VoidEngine::Scene {
 		bool isSetup() const override;
 	};
 
-	class EDraw final : public Event::AEvent {
+	class ESceneUpdate final : public Event::AEvent {
 		friend class Scene;
-		VE_CLASS(EDraw);
+		VE_CLASS(ESceneUpdate);
+	private:
+		ESceneUpdate() = default;
+
+		double delta;
+
+		Variant scr_getDelta(void) const;
+	public:
+		static std::shared_ptr<ESceneUpdate> create();
+
+		double getDelta() const;
+		bool isSetup() const override;
+	};
+
+	class ESceneDraw final : public Event::AEvent {
+		friend class Scene;
+		VE_CLASS(ESceneDraw);
 	private:
 		std::shared_ptr<IO::GFX::RenderFrame> frame = nullptr;
+		double delta;
 
-		EDraw() = default;
+		ESceneDraw() = default;
 
 		Variant scr_getFrame(void) const;
+		Variant scr_getDelta(void) const;
 	public:
-		static std::shared_ptr<EDraw> create();
+		static std::shared_ptr<ESceneDraw> create();
 
 		std::shared_ptr<IO::GFX::RenderFrame> getFrame() const;
+		double getDelta() const;
 
 		bool isSetup() const override;
 	};

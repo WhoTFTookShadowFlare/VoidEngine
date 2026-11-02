@@ -75,8 +75,22 @@ namespace VoidEngine::Scene {
 		object->onRemovedFromScene.fireEvent(evt);
 	}
 
-	void Scene::draw(double delta) {
+	void Scene::update(double delta) {
+		world2d->stepSimulation(delta);
+		auto evt = ESceneUpdate::create();
+		evt->delta = delta;
+		std::for_each(objects.begin(), objects.end(), [&evt](const auto iter) {
+			iter.second->onSceneUpdate.fireEvent(evt);
+		});
+	}
 
+	void Scene::draw(double delta) {
+		auto evt = ESceneDraw::create();
+		evt->delta = delta;
+		evt->frame = getRenderFrame();
+		std::for_each(objects.begin(), objects.end(), [&evt](const auto iter) {
+			iter.second->onSceneDraw.fireEvent(evt);
+			});
 	}
 
 	std::shared_ptr<IO::GFX::IRenderTarget> Scene::getRenderTarget() const {

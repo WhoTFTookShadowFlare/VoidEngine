@@ -201,29 +201,64 @@ namespace VoidEngine::Scene {
 		return object != nullptr;
 	}
 
-	const ::VoidEngine::Class EDraw::ClassData = {
-		.name = "EDraw",
+	const ::VoidEngine::Class ESceneUpdate::ClassData = {
+		.name = "ESceneUpdate",
 		.super = &Event::AEvent::ClassData,
 		.properties = {
-			new NativeProperty("frame", &EDraw::scr_getFrame)
+			new NativeProperty("delta", &ESceneUpdate::scr_getDelta)
 		},
-		.constructor = new NativeConstructor(&EDraw::create),
+		.constructor = new NativeConstructor(&ESceneUpdate::create),
 		.flags = ClassFlags::FINAL
 	};
 
-	Variant EDraw::scr_getFrame(void) const {
+	Variant ESceneUpdate::scr_getDelta(void) const {
+		return Variant((float) getDelta());
+	}
+
+	std::shared_ptr<ESceneUpdate> ESceneUpdate::create() {
+		return std::shared_ptr<ESceneUpdate>(new ESceneUpdate);
+	}
+
+	double ESceneUpdate::getDelta() const {
+		return delta;
+	}
+
+	bool ESceneUpdate::isSetup() const {
+		return true;
+	}
+
+	const ::VoidEngine::Class ESceneDraw::ClassData = {
+		.name = "ESceneDraw",
+		.super = &Event::AEvent::ClassData,
+		.properties = {
+			new NativeProperty("frame", &ESceneDraw::scr_getFrame),
+			new NativeProperty("delta", &ESceneDraw::scr_getDelta)
+		},
+		.constructor = new NativeConstructor(&ESceneDraw::create),
+		.flags = ClassFlags::FINAL
+	};
+
+	Variant ESceneDraw::scr_getFrame(void) const {
 		return Variant(getFrame());
 	}
 
-	std::shared_ptr<EDraw> EDraw::create() {
-		return std::shared_ptr<EDraw>(new EDraw);
+	Variant ESceneDraw::scr_getDelta(void) const {
+		return (float) getDelta();
 	}
 
-	std::shared_ptr<IO::GFX::RenderFrame> EDraw::getFrame() const {
+	std::shared_ptr<ESceneDraw> ESceneDraw::create() {
+		return std::shared_ptr<ESceneDraw>(new ESceneDraw);
+	}
+
+	std::shared_ptr<IO::GFX::RenderFrame> ESceneDraw::getFrame() const {
 		return frame;
 	}
 
-	bool EDraw::isSetup() const {
+	double ESceneDraw::getDelta() const {
+		return delta;
+	}
+
+	bool ESceneDraw::isSetup() const {
 		return frame != nullptr;
 	}
 

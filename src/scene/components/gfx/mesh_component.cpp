@@ -55,7 +55,7 @@ namespace VoidEngine::Scene::Components::GFX {
 			new NativeEventHandler(&EComponentRemoved::ClassData, &MeshComponent::handleRemovedFromObject),
 			new NativeEventHandler(&EAddedToScene::ClassData, &MeshComponent::handleAddedToScene),
 			new NativeEventHandler(&ERemovedFromScene::ClassData, &MeshComponent::handleRemovedFromScene),
-			new NativeEventHandler(&EDraw::ClassData, &MeshComponent::handleDraw)
+			new NativeEventHandler(&ESceneDraw::ClassData, &MeshComponent::handleDraw)
 		},
 		.constructor = new NativeConstructor(&MeshComponent::create),
 		.flags = ClassFlags::FINAL
@@ -67,6 +67,7 @@ namespace VoidEngine::Scene::Components::GFX {
 		self->onRemovedFromScene.addHandler(self);
 		self->onAddedToObject.addHandler(self);
 		self->onRemovedFromObject.addHandler(self);
+		self->onSceneDraw.addHandler(self);
 		return self;
 	}
 

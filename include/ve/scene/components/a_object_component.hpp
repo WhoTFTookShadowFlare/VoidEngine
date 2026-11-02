@@ -15,5 +15,8 @@ namespace VoidEngine::Scene::Components {
 
         Event::EventBus onAddedToObject = &EComponentAdded::ClassData;
         Event::EventBus onRemovedFromObject = &EComponentRemoved::ClassData;
+
+        Event::EventBus onSceneUpdate = &ESceneUpdate::ClassData;
+        Event::EventBus onSceneDraw = &ESceneDraw::ClassData;
     };
 }

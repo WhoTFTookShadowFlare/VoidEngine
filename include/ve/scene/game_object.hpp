@@ -34,6 +34,8 @@ namespace VoidEngine::Scene {
 		void handleOnParented(std::shared_ptr<Object> evt);
 		void handleOnAddedToScene(std::shared_ptr<Object> evt);
 		void handleOnRemovedFromScene(std::shared_ptr<Object> evt);
+		void handleOnUpdate(std::shared_ptr<Object> evt);
+		void handleOnDraw(std::shared_ptr<Object> evt);
 
 	public:
 		~GameObject();
@@ -47,7 +49,8 @@ namespace VoidEngine::Scene {
 		Event::EventBus onRemovedFromScene = &ERemovedFromScene::ClassData;
 		Event::EventBus onComponentAdded = &EComponentAdded::ClassData;
 		Event::EventBus onComponentRemoved = &EComponentRemoved::ClassData;
-		Event::EventBus onDraw = &EDraw::ClassData;
+		Event::EventBus onSceneUpdate = &ESceneUpdate::ClassData;
+		Event::EventBus onSceneDraw = &ESceneDraw::ClassData;
 
 		glm::vec3 position = { 0, 0, 0 };
 		glm::vec3 rotation = { 0, 0 ,0 };

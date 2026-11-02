@@ -14,6 +14,7 @@ namespace VoidEngine::Scene::Components {
 		std::weak_ptr<GameObject> object;
 
 		Variant scr_getObject(void) const;
+		static std::shared_ptr<AMonoObjectComponent> create();
 	public:
 		std::shared_ptr<GameObject> getObject() const;
 	};

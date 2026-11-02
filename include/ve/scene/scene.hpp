@@ -37,6 +37,7 @@ namespace VoidEngine::Scene {
         void addObject(std::shared_ptr<GameObject>);
         void removeObject(std::string name);
 
+        void update(double delta);
         void draw(double delta);
         
         std::shared_ptr<IO::GFX::IRenderTarget> getRenderTarget() const;

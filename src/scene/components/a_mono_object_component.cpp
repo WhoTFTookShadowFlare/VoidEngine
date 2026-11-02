@@ -9,11 +9,16 @@ namespace VoidEngine::Scene::Components {
 		.super = &AObjectComponent::ClassData,
 		.properties = {
 			new NativeProperty("object", &AMonoObjectComponent::scr_getObject)
-		}
+		},
+		.constructor = new NativeConstructor(&AMonoObjectComponent::create)
 	};
 
 	Variant AMonoObjectComponent::scr_getObject(void) const {
 		return Variant(getObject());
+	}
+
+	std::shared_ptr<AMonoObjectComponent> AMonoObjectComponent::create() {
+		return std::shared_ptr<AMonoObjectComponent>(new AMonoObjectComponent);
 	}
 
 	std::shared_ptr<GameObject> AMonoObjectComponent::getObject() const {

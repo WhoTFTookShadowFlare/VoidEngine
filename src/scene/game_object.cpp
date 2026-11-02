@@ -17,7 +17,9 @@ namespace VoidEngine::Scene {
 			new NativeEventHandler(&EChildAdded::ClassData, &GameObject::handleOnChildAdded),
 			new NativeEventHandler(&EParented::ClassData, &GameObject::handleOnParented),
 			new NativeEventHandler(&EAddedToScene::ClassData, &GameObject::handleOnAddedToScene),
-			new NativeEventHandler(&ERemovedFromScene::ClassData, &GameObject::handleOnRemovedFromScene)
+			new NativeEventHandler(&ERemovedFromScene::ClassData, &GameObject::handleOnRemovedFromScene),
+			new NativeEventHandler(&ESceneUpdate::ClassData, &GameObject::handleOnUpdate),
+			new NativeEventHandler(&ESceneDraw::ClassData, &GameObject::handleOnDraw),
 		},
 		.constructor = new NativeConstructor(&GameObject::create),
 		.flags = ClassFlags::FINAL
@@ -32,6 +34,8 @@ namespace VoidEngine::Scene {
 		self->onChildAdded.addHandler(self);
 		self->onAddedToScene.addHandler(self);
 		self->onRemovedFromScene.addHandler(self);
+		self->onSceneUpdate.addHandler(self);
+		self->onSceneDraw.addHandler(self);
 		return self;
 	}
 
@@ -129,6 +133,28 @@ namespace VoidEngine::Scene {
 		});
 	}
 
+	void GameObject::handleOnUpdate(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<ESceneUpdate>(evtObj);
+		std::for_each(children.begin(), children.end(), [&evt](const auto iter) {
+			iter.second->onSceneUpdate.fireEvent(evt);
+		});
+
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto iter) {
+			iter.second->onSceneUpdate.fireEvent(evt);
+		});
+	}
+
+	void GameObject::handleOnDraw(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<ESceneDraw>(evtObj);
+		std::for_each(children.begin(), children.end(), [&evt](const auto iter) {
+			iter.second->onSceneDraw.fireEvent(evt);
+			});
+
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto iter) {
+			iter.second->onSceneDraw.fireEvent(evt);
+			});
+	}
+
 	std::shared_ptr<GameObject> GameObject::getChild(std::string name) {
 		if(!children.contains(name)) return nullptr;
 		return children[name];
@@ -217,10 +243,15 @@ namespace VoidEngine::Scene {
 	}
 
 	void GameObject::addComponent(std::shared_ptr<Components::AObjectComponent> comp) {
+		if(comp == nullptr) return;
 		if(getMonoComponent(comp->getClass()) != nullptr || getPolyComponent(comp->getClass()) != nullptr) return;
 
 		if (comp->getClass()->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
 			auto mono = std::static_pointer_cast<Components::AMonoObjectComponent>(comp);
+			if(mono->getObject() != nullptr) {
+				std::println("[ERR] [Scene] Cannot add AMonoObjectComponent to multiple objects");
+				return;
+			}
 			monoComponents[comp->getClass()] = mono;
 			mono->object = weak_from_this();
 
