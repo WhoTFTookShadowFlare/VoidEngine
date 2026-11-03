@@ -7,6 +7,9 @@
 #include <ve/io/gfx/render_frame.hpp>
 
 namespace VoidEngine::Scene {
+    namespace Components {
+        class APolyObjectComponent;
+    }
     namespace Components::GFX {
         class ACameraComponent;
     }
@@ -19,6 +22,7 @@ namespace VoidEngine::Scene {
         Scene();
 
         std::map<std::string, std::shared_ptr<GameObject>> objects;
+        std::vector<std::shared_ptr<Components::APolyObjectComponent>> polyComponents;
 
         std::shared_ptr<IO::GFX::IRenderTarget> renderTarget = nullptr;
         std::shared_ptr<IO::GFX::RenderFrame> renderFrame = IO::GFX::RenderFrame::create();
@@ -39,6 +43,8 @@ namespace VoidEngine::Scene {
 
         void update(double delta);
         void draw(double delta);
+
+        void bindPolyObjectComponent(std::shared_ptr<Components::APolyObjectComponent>);
         
         std::shared_ptr<IO::GFX::IRenderTarget> getRenderTarget() const;
         void setRenderTarget(std::shared_ptr<IO::GFX::IRenderTarget>);

@@ -233,7 +233,7 @@ namespace VoidEngine::Scene {
 	}
 
 	std::shared_ptr<Components::APolyObjectComponent> GameObject::getPolyComponent(const Class* compCls) {
-		if(!compCls->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+		if(!compCls->instanceOf(&Components::APolyObjectComponent::ClassData)) {
 			std::println("[ERR] Class {} is not an APolyObjectComponent", compCls->getName());
 			return nullptr;
 		}
@@ -244,7 +244,9 @@ namespace VoidEngine::Scene {
 
 	void GameObject::addComponent(std::shared_ptr<Components::AObjectComponent> comp) {
 		if(comp == nullptr) return;
-		if(getMonoComponent(comp->getClass()) != nullptr || getPolyComponent(comp->getClass()) != nullptr) return;
+		const Class* compCls = comp->getClass();
+		if(compCls->instanceOf(&Components::AMonoObjectComponent::ClassData) && getMonoComponent(compCls) != nullptr) return;
+		if(compCls->instanceOf(&Components::APolyObjectComponent::ClassData) && getPolyComponent(compCls) != nullptr) return;
 
 		if (comp->getClass()->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
 			auto mono = std::static_pointer_cast<Components::AMonoObjectComponent>(comp);
@@ -265,6 +267,14 @@ namespace VoidEngine::Scene {
 		}
 		else if (comp->getClass()->instanceOf(&Components::APolyObjectComponent::ClassData)) {
 			auto poly = std::static_pointer_cast<Components::APolyObjectComponent>(comp);
+			if(!poly->isBoundToScene(getScene())) {
+				if(poly->isBoundToAnyScene()) {
+					std::println("[ERR] [Scene] Cannot add APolyObjectComponent to multiple scenes");
+				} else {
+					std::println("[ERR] [Scene] Cannot add APolyObjectComponent to objects untill it is bound to a scene");
+				}
+				return;
+			}
 			polyComponents[comp->getClass()] = poly;
 			poly->objects.emplace_back(shared_from_this());
 

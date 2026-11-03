@@ -6,6 +6,9 @@
 #include <ve/physics2d/physics_2d.hpp>
 #include <ve/scene/components/gfx/a_camera_component.hpp>
 
+#include <ve/scene/components/a_mono_object_component.hpp>
+#include <ve/scene/components/a_poly_object_component.hpp>
+
 namespace VoidEngine::Scene {
 	const ::VoidEngine::Class Scene::ClassData = {
 		.name = "Scene",
@@ -82,6 +85,10 @@ namespace VoidEngine::Scene {
 		std::for_each(objects.begin(), objects.end(), [&evt](const auto iter) {
 			iter.second->onSceneUpdate.fireEvent(evt);
 		});
+
+		std::for_each(polyComponents.begin(), polyComponents.end(), [&evt](const auto iter) {
+			iter->onSceneUpdate.fireEvent(evt);
+		});
 	}
 
 	void Scene::draw(double delta) {
@@ -90,7 +97,21 @@ namespace VoidEngine::Scene {
 		evt->frame = getRenderFrame();
 		std::for_each(objects.begin(), objects.end(), [&evt](const auto iter) {
 			iter.second->onSceneDraw.fireEvent(evt);
-			});
+		});
+
+		std::for_each(polyComponents.begin(), polyComponents.end(), [&evt](const auto iter) {
+			iter->onSceneDraw.fireEvent(evt);
+		});
+	}
+
+	void Scene::bindPolyObjectComponent(std::shared_ptr<Components::APolyObjectComponent> comp) {
+		if(comp->isBoundToAnyScene()) {
+			std::println("Cannot change the scene binding of an APolyObjectComponent");
+			return;
+		}
+
+		polyComponents.push_back(comp);
+		comp->scene = shared_from_this();
 	}
 
 	std::shared_ptr<IO::GFX::IRenderTarget> Scene::getRenderTarget() const {

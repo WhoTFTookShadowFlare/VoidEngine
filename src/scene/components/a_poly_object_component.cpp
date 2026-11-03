@@ -25,12 +25,20 @@ namespace VoidEngine::Scene::Components {
 	}
 	
 	std::vector<std::shared_ptr<GameObject>> APolyObjectComponent::getObjects() const {
-		std::vector<std::shared_ptr<GameObject>> objectLocks(objects.size());
+		std::vector<std::shared_ptr<GameObject>> objectLocks;
 
 		for(const std::weak_ptr<GameObject>& objRef : objects) {
 			if(!objRef.expired()) objectLocks.push_back(objRef.lock());
 		}
 
 		return objectLocks;
+	}
+
+	bool APolyObjectComponent::isBoundToScene(std::shared_ptr<Scene> scene) const {
+		return this->scene.lock() == scene;
+	}
+
+	bool APolyObjectComponent::isBoundToAnyScene() const {
+		return !isBoundToScene(nullptr);
 	}
 }
