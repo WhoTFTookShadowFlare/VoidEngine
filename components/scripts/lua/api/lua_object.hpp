@@ -15,6 +15,7 @@ namespace VoidEngine::Scripts::Lua::API {
 	};
 
 	LuaObjectWrapper* lua_pushObjectWrapper(lua_State*);
+	LuaObjectWrapper* lua_checkObject(lua_State*, int idx);
 
 	int lua_Object__index(lua_State*);
 	int lua_Object__newindex(lua_State*);

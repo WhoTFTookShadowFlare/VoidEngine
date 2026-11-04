@@ -2,6 +2,7 @@
 #include <ve/scene/game_object.hpp>
 
 #include <ve/class_event_handler.hpp>
+#include <ve/class_constructor.hpp>
 
 #include <ve/physics2d/physics_2d.hpp>
 #include <ve/scene/components/gfx/a_camera_component.hpp>

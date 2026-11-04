@@ -50,6 +50,14 @@ namespace VoidEngine {
 		this->data = std::shared_ptr<void>(data, [](void*) {});
 	}
 
+	std::shared_ptr<Struct> Struct::create(const StructData* strData, std::shared_ptr<void> data) {
+		return std::shared_ptr<Struct>(new Struct(strData, data));
+	}
+
+	std::shared_ptr<Struct> Struct::create(const StructData* strData, void* data) {
+		return std::shared_ptr<Struct>(new Struct(strData, data));
+	}
+
 	const StructData* Struct::getData() const {
 		return strData;
 	}
@@ -113,7 +121,7 @@ namespace VoidEngine {
 			return *static_cast<bool*>(addr);
 		} break;
 		case VariantType::STRUCT: {
-			return std::make_shared<Struct>(strMember->data, std::shared_ptr<void>(addr, [](void*) {}));
+			return Struct::create(strMember->data, std::shared_ptr<void>(addr, [](void*) {}));
 		} break;
 		}
 

@@ -1,6 +1,7 @@
 #include <ve/scene/components/gfx/ortho_camera_component.hpp>
 
 #include <ve/class_property.hpp>
+#include <ve/class_constructor.hpp>
 #include <ve/struct_db.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>

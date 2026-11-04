@@ -3,6 +3,7 @@
 #include <ve/scene/components/a_object_component.hpp>
 #include <ve/scene/scene.hpp>
 #include <ve/class_property.hpp>
+#include <ve/class_constructor.hpp>
 
 namespace VoidEngine::Scene {
 	const ::VoidEngine::Class EObjectRenamed::ClassData = {

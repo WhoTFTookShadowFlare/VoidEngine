@@ -9,15 +9,6 @@ extern "C" {
 }
 
 namespace VoidEngine::Scripts::Lua::API {
-	/*struct EventHandlerBase {
-	protected:
-		EventHandlerBase(const Class* event) : event(event) {}
-	public:
-		virtual ~EventHandlerBase() = default;
-
-		const Class* event;
-		virtual void handleEvent(std::shared_ptr<Object> obj, std::shared_ptr<Object> event) const = 0;
-	};*/
 	struct LuaEventHandler final : public EventHandlerBase {
 	public:
 		LuaEventHandler(const Class* event, int handlerFuncIdx);

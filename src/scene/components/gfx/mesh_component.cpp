@@ -3,6 +3,7 @@
 #include <ve/scene/scene.hpp>
 #include <ve/scene/game_object.hpp>
 #include <ve/class_event_handler.hpp>
+#include <ve/class_constructor.hpp>
 #include <ve/scene/events.hpp>
 
 #include <ve/io/gfx/graphics_program.hpp>

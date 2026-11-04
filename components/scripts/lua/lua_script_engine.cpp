@@ -3,6 +3,8 @@
 #include "api/lua_property.hpp"
 #include <api/lua_event_handler.hpp>
 #include <api/lua_struct.hpp>
+#include <api/lua_event_bus.hpp>
+#include <api/lua_ve.hpp>
 #include <lua_script_engine.hpp>
 
 #include <print>
@@ -44,6 +46,8 @@ namespace VoidEngine::Scripts::Lua {
 		API::luaopen_Object(state);
 		API::luaopen_EventHandler(state);
 		API::luaopen_Struct(state);
+		API::luaopen_EventBus(state);
+		API::luaopen_VE(state);
 	}
 
 	std::string LuaScriptEngine::getLanguage() { return "lua"; }

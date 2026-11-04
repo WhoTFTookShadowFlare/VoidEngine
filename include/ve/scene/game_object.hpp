@@ -37,6 +37,14 @@ namespace VoidEngine::Scene {
 		void handleOnUpdate(std::shared_ptr<Object> evt);
 		void handleOnDraw(std::shared_ptr<Object> evt);
 
+		Variant scr_getPosition(void) const;
+		Variant scr_getRotation(void) const;
+		Variant scr_getScale(void) const;
+
+		void scr_setPosition(Variant);
+		void scr_setRotation(Variant);
+		void scr_setScale(Variant);
+
 	public:
 		~GameObject();
 		static std::shared_ptr<GameObject> create();

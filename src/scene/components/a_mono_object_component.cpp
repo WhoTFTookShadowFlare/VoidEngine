@@ -2,6 +2,7 @@
 
 #include <ve/scene/game_object.hpp>
 #include <ve/class_property.hpp>
+#include <ve/class_constructor.hpp>
 
 namespace VoidEngine::Scene::Components {
 	const ::VoidEngine::Class AMonoObjectComponent::ClassData = {

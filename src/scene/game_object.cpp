@@ -5,6 +5,9 @@
 #include <ve/scene/components/a_poly_object_component.hpp>
 
 #include <ve/class_event_handler.hpp>
+#include <ve/class_constructor.hpp>
+#include <ve/class_event_bus.hpp>
+#include <ve/class_property.hpp>
 
 #include <glm/gtx/transform.hpp>
 
@@ -12,6 +15,11 @@ namespace VoidEngine::Scene {
 	const ::VoidEngine::Class GameObject::ClassData = {
 		.name = "GameObject",
 		.super = &Object::ClassData,
+		.properties = {
+			new NativeProperty("position", &GameObject::scr_getPosition, &GameObject::scr_setPosition),
+			new NativeProperty("rotation", &GameObject::scr_getRotation, &GameObject::scr_setRotation),
+			new NativeProperty("scale", &GameObject::scr_getScale, &GameObject::scr_setScale),
+		},
 		.eventHandlers = {
 			new NativeEventHandler(&EObjectRenamed::ClassData, &GameObject::handleOnRename),
 			new NativeEventHandler(&EChildAdded::ClassData, &GameObject::handleOnChildAdded),
@@ -21,9 +29,63 @@ namespace VoidEngine::Scene {
 			new NativeEventHandler(&ESceneUpdate::ClassData, &GameObject::handleOnUpdate),
 			new NativeEventHandler(&ESceneDraw::ClassData, &GameObject::handleOnDraw),
 		},
+		.eventBusses = {
+			new NativeEventBus(&EObjectRenamed::ClassData, &GameObject::onRename),
+			new NativeEventBus(&EChildAdded::ClassData, &GameObject::onChildAdded),
+			new NativeEventBus(&EParented::ClassData, &GameObject::onParented),
+			new NativeEventBus(&EChildRemoved::ClassData, &GameObject::onChildRemoved),
+			new NativeEventBus(&EAddedToScene::ClassData, &GameObject::onAddedToScene),
+			new NativeEventBus(&ERemovedFromScene::ClassData, &GameObject::onRemovedFromScene),
+			new NativeEventBus(&EComponentAdded::ClassData, &GameObject::onComponentAdded),
+			new NativeEventBus(&EComponentRemoved::ClassData, &GameObject::onComponentRemoved),
+			new NativeEventBus(&ESceneDraw::ClassData, &GameObject::onSceneDraw),
+			new NativeEventBus(&ESceneUpdate::ClassData, &GameObject::onSceneUpdate),
+		},
 		.constructor = new NativeConstructor(&GameObject::create),
 		.flags = ClassFlags::FINAL
 	};
+
+	Variant GameObject::scr_getPosition(void) const {
+		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&position));
+	}
+
+	Variant GameObject::scr_getRotation(void) const {
+		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&rotation));
+	}
+
+	Variant GameObject::scr_getScale(void) const {
+		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&scale));
+	}
+
+	void GameObject::scr_setPosition(Variant value) {
+		auto strct = value.asStruct().value();
+		if(strct->getData() != &Vec3Data) {
+			std::println("[ERR] GameObject.position must be a Vec3");
+			return;
+		}
+
+		position = *reinterpret_cast<const glm::vec3*>(strct->raw());
+	}
+	
+	void GameObject::scr_setRotation(Variant value) {
+		auto strct = value.asStruct().value();
+		if (strct->getData() != &Vec3Data) {
+			std::println("[ERR] GameObject.position must be a Vec3");
+			return;
+		}
+
+		rotation = *reinterpret_cast<const glm::vec3*>(strct->raw());
+	}
+
+	void GameObject::scr_setScale(Variant value) {
+		auto strct = value.asStruct().value();
+		if (strct->getData() != &Vec3Data) {
+			std::println("[ERR] GameObject.position must be a Vec3");
+			return;
+		}
+
+		scale = *reinterpret_cast<const glm::vec3*>(strct->raw());
+	}
 
 	GameObject::GameObject() {}
 

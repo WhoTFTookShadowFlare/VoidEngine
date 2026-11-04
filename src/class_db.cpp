@@ -54,6 +54,7 @@ namespace VoidEngine {
 		registerClass(&Scene::EChildRemoved::ClassData);
 		registerClass(&Scene::EAddedToScene::ClassData);
 		registerClass(&Scene::ERemovedFromScene::ClassData);
+		registerClass(&Scene::ESceneUpdate::ClassData);
 		registerClass(&Scene::ESceneDraw::ClassData);
 		registerClass(&Scene::EComponentAdded::ClassData);
 		registerClass(&Scene::EComponentRemoved::ClassData);

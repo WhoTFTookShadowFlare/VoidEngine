@@ -55,4 +55,8 @@ namespace VoidEngine::Event {
 			handler.handle(event);
 		});
 	}
+
+	const Class* EventBus::getEventClass() const {
+		return eventClass;
+	}
 }
