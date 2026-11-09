@@ -9,8 +9,8 @@ namespace VoidEngine::Scene {
 
 namespace VoidEngine::Scene::Components {
 	class APolyObjectComponent : public AObjectComponent {
-		friend class GameObject;
-		friend class Scene;
+		friend class ::VoidEngine::Scene::GameObject;
+		friend class ::VoidEngine::Scene::Scene;
 		VE_CLASS(APolyObjectComponent);
 	private:
 		std::vector<std::weak_ptr<GameObject>> objects;

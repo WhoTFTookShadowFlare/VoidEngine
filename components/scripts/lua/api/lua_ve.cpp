@@ -20,7 +20,7 @@ namespace VoidEngine::Scripts::Lua::API {
 		std::shared_ptr<Object> obj = cls->getSuper()->constructor->create();
 		LuaObjectWrapper* objWrap = lua_pushObjectWrapper(state);
 		objWrap->object = obj;
-		obj->setScript(std::shared_ptr<LuaObjectScript>(new LuaObjectScript(-1, cls)));
+		obj->setScript(std::shared_ptr<LuaObjectScript>(new LuaObjectScript(1, cls)));
 
 		return 1;
 	}
