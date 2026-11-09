@@ -8,7 +8,7 @@ namespace VoidEngine::Scene {
 
 namespace VoidEngine::Scene::Components {
 	class AMonoObjectComponent : public AObjectComponent {
-		friend class GameObject;
+		friend class ::VoidEngine::Scene::GameObject;
 		VE_CLASS(AMonoObjectComponent);
 	private:
 		std::weak_ptr<GameObject> object;
