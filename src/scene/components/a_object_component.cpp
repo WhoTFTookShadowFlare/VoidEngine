@@ -7,7 +7,12 @@ namespace VoidEngine::Scene::Components {
 		.name = "AObjectComponent",
 		.super = &Object::ClassData,
 		.eventBusses = {
-			new NativeEventBus(&ESceneUpdate::ClassData, &AObjectComponent::onSceneUpdate)
+			new NativeEventBus(&EAddedToScene::ClassData, &AObjectComponent::onAddedToScene),
+			new NativeEventBus(&ERemovedFromScene::ClassData, &AObjectComponent::onRemovedFromScene),
+			new NativeEventBus(&EComponentAdded::ClassData, &AObjectComponent::onAddedToObject),
+			new NativeEventBus(&EComponentRemoved::ClassData, &AObjectComponent::onRemovedFromObject),
+			new NativeEventBus(&ESceneUpdate::ClassData, &AObjectComponent::onSceneUpdate),
+			new NativeEventBus(&ESceneDraw::ClassData, &AObjectComponent::onSceneDraw)
 		}
 	};
 }

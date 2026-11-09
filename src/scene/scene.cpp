@@ -3,6 +3,7 @@
 
 #include <ve/class_event_handler.hpp>
 #include <ve/class_constructor.hpp>
+#include <ve/class_property.hpp>
 
 #include <ve/physics2d/physics_2d.hpp>
 #include <ve/scene/components/gfx/a_camera_component.hpp>
@@ -14,6 +15,9 @@ namespace VoidEngine::Scene {
 	const ::VoidEngine::Class Scene::ClassData = {
 		.name = "Scene",
 		.super = &Object::ClassData,
+		.properties = {
+			new NativeProperty("currentCamera", &Scene::scr_getCurrentCamera, &Scene::scr_setCurrentCamera)
+		},
 		.eventHandlers = {
 			new NativeEventHandler(&EObjectRenamed::ClassData, &Scene::handleObjectRenamed),
 			new NativeEventHandler(&Components::GFX::ECameraValueChanged::ClassData, &Scene::handleCameraValueChanged)
@@ -30,6 +34,78 @@ namespace VoidEngine::Scene {
 
 	std::shared_ptr<Scene> Scene::create() {
 		return std::shared_ptr<Scene>(new Scene);
+	}
+
+	void Scene::scr_setCurrentCamera(Variant value) {
+		if(!value.isObject()) {
+			std::println("[ERR] Scene.currentCamera must be of type ACameraComponent");
+			return;
+		}
+
+		auto obj = value.asObject().value();
+		if(!obj->getClass()->instanceOf(&Components::GFX::ACameraComponent::ClassData)) {
+			std::println("[ERR] Scene.currentCamera must be of type ACameraComponent");
+			return;
+		}
+
+		setCurrentCamera(std::static_pointer_cast<Components::GFX::ACameraComponent>(obj));
+	}
+
+	Variant Scene::scr_getCurrentCamera(void) const {
+		return Variant(getCurrentCamera());
+	}
+
+	Variant Scene::scr_getObject(std::vector<Variant> args) {
+		if (args.size() != 1) {
+			std::println("[ERR] Scene.getObject takes 1 arg (string)");
+			return nullptr;
+		}
+
+		auto arg0 = args[0];
+		if (!arg0.isString()) {
+			std::println("[ERR] Scene.getObject takes 1 arg (string)");
+		}
+
+		return Variant(getObject(arg0.asString().value()));
+	}
+
+	Variant Scene::scr_addObject(std::vector<Variant> args) {
+		if(args.size() != 1) {
+			std::println("[ERR] Scene.addObject takes 1 arg (GameObject)");
+			return nullptr;
+		}
+
+		auto arg0 = args[0];
+		if(!arg0.isObject()) {
+			std::println("[ERR] Scene.addObject takes 1 arg (GameObject)");
+			return nullptr;
+		}
+
+		auto obj = arg0.asObject().value();
+		if(!obj->getClass()->instanceOf(&GameObject::ClassData)) {
+			std::println("[ERR] Scene.addObject takes 1 arg (GameObject)");
+			return nullptr;
+		}
+
+		addObject(std::static_pointer_cast<GameObject>(obj));
+
+		return nullptr;
+	}
+
+	Variant Scene::scr_removeObject(std::vector<Variant> args) {
+		if(args.size() != 1) {
+			std::println("[ERR] Scene.removeObject takes 1 arg (string)");
+			return nullptr;
+		}
+
+		auto arg0 = args[0];
+		if(!arg0.isString()) {
+			std::println("[ERR] Scene.removeObject takes 1 arg (string)");
+		}
+
+		removeObject(arg0.asString().value());
+
+		return nullptr;
 	}
 
 	void Scene::updateCameraValues() {

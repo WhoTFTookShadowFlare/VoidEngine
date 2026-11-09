@@ -37,13 +37,20 @@ namespace VoidEngine::Scene {
 		void handleOnUpdate(std::shared_ptr<Object> evt);
 		void handleOnDraw(std::shared_ptr<Object> evt);
 
+		Variant scr_getName(void) const;
 		Variant scr_getPosition(void) const;
 		Variant scr_getRotation(void) const;
 		Variant scr_getScale(void) const;
 
+		void scr_setName(Variant);
 		void scr_setPosition(Variant);
 		void scr_setRotation(Variant);
 		void scr_setScale(Variant);
+
+		// TODO: glm::mat4 struct def
+
+		Variant scr_getScene(std::vector<Variant>) const;
+		Variant scr_getParent(std::vector<Variant>) const;
 
 	public:
 		~GameObject();

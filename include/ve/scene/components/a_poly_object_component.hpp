@@ -17,11 +17,13 @@ namespace VoidEngine::Scene::Components {
 		std::weak_ptr<Scene> scene;
 
 		Variant scr_getObjects(void) const;
+
+		Variant scr_isBoundToScene(std::vector<Variant>);
+		Variant scr_isBoundToAnyScene(std::vector<Variant>);
 	public:
 		std::vector<std::shared_ptr<GameObject>> getObjects() const;
 
 		bool isBoundToScene(std::shared_ptr<Scene>) const;
 		bool isBoundToAnyScene() const;
-		void bindToScene(std::shared_ptr<Scene>);
 	};
 }

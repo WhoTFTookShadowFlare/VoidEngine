@@ -16,6 +16,7 @@ namespace VoidEngine::Scene {
 		.name = "GameObject",
 		.super = &Object::ClassData,
 		.properties = {
+			new NativeProperty("name", &GameObject::scr_getName, &GameObject::scr_setName),
 			new NativeProperty("position", &GameObject::scr_getPosition, &GameObject::scr_setPosition),
 			new NativeProperty("rotation", &GameObject::scr_getRotation, &GameObject::scr_setRotation),
 			new NativeProperty("scale", &GameObject::scr_getScale, &GameObject::scr_setScale),
@@ -45,6 +46,10 @@ namespace VoidEngine::Scene {
 		.flags = ClassFlags::FINAL
 	};
 
+	Variant GameObject::scr_getName(void) const {
+		return getName();
+	}
+
 	Variant GameObject::scr_getPosition(void) const {
 		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&position));
 	}
@@ -55,6 +60,15 @@ namespace VoidEngine::Scene {
 
 	Variant GameObject::scr_getScale(void) const {
 		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&scale));
+	}
+
+	void GameObject::scr_setName(Variant value) {
+		if(!value.isString()) {
+			std::println("[ERR] GameObject.name must be a string");
+			return;
+		}
+
+		setName(value.asString().value());
 	}
 
 	void GameObject::scr_setPosition(Variant value) {
@@ -85,6 +99,14 @@ namespace VoidEngine::Scene {
 		}
 
 		scale = *reinterpret_cast<const glm::vec3*>(strct->raw());
+	}
+
+	Variant GameObject::scr_getScene(std::vector<Variant>) const {
+		return Variant(getScene());
+	}
+	
+	Variant GameObject::scr_getParent(std::vector<Variant>) const {
+		return Variant(getParent());
 	}
 
 	GameObject::GameObject() {}
