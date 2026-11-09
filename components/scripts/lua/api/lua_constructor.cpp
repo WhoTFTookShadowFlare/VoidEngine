@@ -4,6 +4,7 @@
 #include <api/lua_object.hpp>
 
 #include <ve/object.hpp>
+#include "lua_object.hpp"
 
 extern "C" {
 #include <lua.h>
@@ -20,26 +21,19 @@ namespace VoidEngine::Scripts::Lua::API {
 	}
 
 	std::shared_ptr<Object> LuaConstructor::create() const {
-		if(cls->getSuper()->isAbstract()) {
-			std::println("[ERR] Cannot instance object, script super type is abstract.");
-			return nullptr;
-		}
-		std::shared_ptr<Object> obj = cls->getSuper()->constructor->create();
-
 		lua_State* state = LuaScriptEngine::getInstance()->state;
 
 		lua_pushlightuserdata(state, const_cast<void*>(static_cast<const void*>(this)));
 		lua_gettable(state, LUA_REGISTRYINDEX);
-		if(lua_pcall(state, 0, 1, 0) != 0) {
+		if (lua_pcall(state, 0, 1, 0) != 0) {
 			std::println("[ERR] [Lua] {}", luaL_checkstring(state, -1));
 			lua_pop(state, 1);
 			return nullptr;
 		}
 
-		obj->setScript(std::shared_ptr<LuaObjectScript>(new LuaObjectScript(-1, cls)));
-		lua_pop(state, 1);
+		LuaObjectWrapper* wrapper = lua_checkObject(state, -1);
 
-		return obj;
+		return wrapper->object;
 	}
 
 	LuaConstructorWrapper* lua_pushConstructorWrapper(lua_State* state) {

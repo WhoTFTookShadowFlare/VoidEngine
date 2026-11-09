@@ -10,7 +10,13 @@
 #include <concepts>
 #include <cassert>
 
+//#include <ve/event/event_bus.hpp>
+
 namespace VoidEngine {
+	namespace Event {
+		class EventBus;
+		class AEvent;
+	}
 	class Object;
 	class Variant;
 	struct Class;
@@ -69,6 +75,19 @@ namespace VoidEngine {
 		virtual void handleEvent(std::shared_ptr<Object> obj, std::shared_ptr<Object> event) const = 0;
 	};
 
+	struct EventBusBase {
+	protected:
+		EventBusBase(const Class* event) : event(event) {}
+		const Class* event;
+	public:
+		virtual ~EventBusBase() = default;
+
+		const Class* getEventClass() const { return event; }
+
+		virtual Event::EventBus* getEventBus(std::shared_ptr<Object>) const = 0;
+		virtual void fireEvent(std::shared_ptr<Object> obj, std::shared_ptr<Event::AEvent> event) const = 0;
+	};
+
 	struct ConstructorBase {
 	protected:
 		ConstructorBase() {}
@@ -78,15 +97,9 @@ namespace VoidEngine {
 		virtual std::shared_ptr<Object> create() const = 0;
 	};
 
-	struct NativeConstructor final : public ConstructorBase {
-	private:
-		const std::function<std::shared_ptr<Object>()> fn;
-	public:
-		NativeConstructor(std::function<std::shared_ptr<Object>()> fn) 
-			: fn(fn)
-		{}
-
-		std::shared_ptr<Object> create() const override { return fn(); }
+	enum ClassFlags : uint8_t {
+		NONE = 0,
+		FINAL = 1 << 0
 	};
 
 	struct Class {
@@ -96,7 +109,9 @@ namespace VoidEngine {
 		std::vector<const PropertyBase*> properties;
 		std::vector<const MethodBase*> methods;
 		std::vector<const EventHandlerBase*> eventHandlers;
+		std::vector<const EventBusBase*> eventBusses;
 		const ConstructorBase* constructor = nullptr;
+		const ClassFlags flags = ClassFlags::NONE;
 
 		const char* getName() const { return name; }
 		const Class* getSuper() const { return super; }
@@ -117,6 +132,10 @@ namespace VoidEngine {
 
 		bool isAbstract() const {
 			return constructor == nullptr;
+		}
+
+		bool isFinal() const {
+			return (flags & ClassFlags::FINAL) != 0;
 		}
 
 		const PropertyBase* findProperty(std::string name) const {
@@ -156,6 +175,21 @@ namespace VoidEngine {
 					return handler->getEventClass() == eventClass;
 				});
 				if(idx == cls->eventHandlers.cend()) {
+					cls = cls->super;
+					continue;
+				}
+				return *idx;
+			}
+			return nullptr;
+		}
+
+		const EventBusBase* findEventBus(const Class* eventClass) const {
+			const Class* cls = this;
+			while(cls != nullptr) {
+				const auto idx = std::find_if(cls->eventBusses.cbegin(), cls->eventBusses.cend(), [&eventClass](const EventBusBase* bus) {
+					return bus->getEventClass() == eventClass;
+				});
+				if(idx == cls->eventBusses.cend()) {
 					cls = cls->super;
 					continue;
 				}

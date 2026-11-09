@@ -1,132 +1,206 @@
 #pragma once
 
-#include "ve/event/event.hpp"
-#include "ve/io/gfx/render_frame.hpp"
-#include "ve/object.hpp"
-#include <memory>
-
-namespace VoidEngine::IO {
-	class Window;
-}
+#include <ve/event/event.hpp>
+#include <ve/io/gfx/render_frame.hpp>
 
 namespace VoidEngine::Scene {
 	class Scene;
 	class GameObject;
-	class AObjectComponent;
-	class ComponentUpdater;
-}
+	namespace Components {
+		class AObjectComponent;
+	}
 
-namespace VoidEngine::Scene::Events {
-	class EComponentUpdate final : public Event::AEvent {
-		friend class VoidEngine::Scene::ComponentUpdater;
-		VE_CLASS(EComponentUpdate)
+	class EObjectRenamed final : public Event::AEvent {
+		friend class GameObject;
+		VE_CLASS(EObjectRenamed);
 	private:
-		EComponentUpdate(double delta) : delta(delta) {}
-		EComponentUpdate() : delta(0.0) {}
+		std::shared_ptr<GameObject> obj = nullptr;
+		std::string oldName = "";
+
+		EObjectRenamed() = default;
+
+		Variant scr_getObject(void) const;
+		Variant scr_getOldName(void) const;
 	public:
-		static std::shared_ptr<EComponentUpdate> create();
+		static std::shared_ptr<EObjectRenamed> create();
 
-		Variant getDelta() const;
+		std::shared_ptr<GameObject> getObject() const;
+		std::string getOldName() const;
 
-		const double delta;
-	};
-
-	class ESceneDraw final : public Event::AEvent {
-		friend class VoidEngine::Scene::Scene;
-		VE_CLASS(ESceneDraw)
-	private:
-		ESceneDraw(double delta, std::shared_ptr<IO::GFX::RenderFrame> frame, std::shared_ptr<Scene> scene)
-			: delta(delta), frame(frame), scene(scene)
-		{}
-	public:
-		const double delta;
-		const std::shared_ptr<IO::GFX::RenderFrame> frame;
-		const std::shared_ptr<Scene> scene;
-	};
-
-	class EComponentDraw final : public Event::AEvent {
-		friend class VoidEngine::Scene::GameObject;
-		VE_CLASS(EComponentDraw)
-	private:
-		EComponentDraw(ESceneDraw& sceneDraw, std::shared_ptr<GameObject> object)
-			: delta(sceneDraw.delta), frame(sceneDraw.frame), scene(sceneDraw.scene), object(object)
-		{}
-	public:
-		const double delta;
-		const std::shared_ptr<IO::GFX::RenderFrame> frame;
-		const std::shared_ptr<Scene> scene;
-		const std::shared_ptr<GameObject> object;
-	};
-
-	class EAddedToScene final : public Event::AEvent {
-		friend class VoidEngine::Scene::Scene;
-		VE_CLASS(EAddedToScene)
-	private:
-		EAddedToScene(std::shared_ptr<Scene> scene, std::shared_ptr<GameObject> object)
-			: scene(scene), object(object)
-		{}
-	public:
-		const std::shared_ptr<Scene> scene;
-		const std::shared_ptr<GameObject> object;
-	};
-
-	class ERemovedFromScene final : public Event::AEvent {
-		friend class VoidEngine::Scene::Scene;
-		VE_CLASS(ERemovedFromScene)
-	private:
-		ERemovedFromScene(std::shared_ptr<Scene> scene, std::shared_ptr<GameObject> object)
-			: scene(scene), object(object)
-		{}
-	public:
-		const std::shared_ptr<Scene> scene;
-		const std::shared_ptr<GameObject> object;
-	};
-
-	class EComponentAddedToObject final : public Event::AEvent {
-		friend class VoidEngine::Scene::GameObject;
-		VE_CLASS(EComponentAddedToObject)
-	private:
-		EComponentAddedToObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
-			: object(object), component(component)
-		{}
-	public:
-		const std::shared_ptr<GameObject> object;
-		const std::shared_ptr<AObjectComponent> component;
-	};
-
-	class EComponentRemovedFromObject final : public Event::AEvent {
-		friend class VoidEngine::Scene::GameObject;
-		VE_CLASS(EComponentRemovedFromObject)
-	private:
-		EComponentRemovedFromObject(std::shared_ptr<GameObject> object, std::shared_ptr<AObjectComponent> component)
-			: object(object), component(component)
-		{}
-	public:
-		const std::shared_ptr<GameObject> object;
-		const std::shared_ptr<AObjectComponent> component;
+		bool isSetup() const override;
 	};
 
 	class EChildAdded final : public Event::AEvent {
-		friend class VoidEngine::Scene::GameObject;
-		VE_CLASS(EChildAdded)
+		friend class GameObject;
+		VE_CLASS(EChildAdded);
 	private:
-		EChildAdded(std::shared_ptr<GameObject> parent, std::shared_ptr<GameObject> child)
-			: parent(parent), child(child)
-		{}
+		std::shared_ptr<GameObject> parent = nullptr;
+		std::shared_ptr<GameObject> child = nullptr;
+
+		EChildAdded() = default;
+
+		Variant scr_getParent(void) const;
+		Variant scr_getChild(void) const;
 	public:
-		const std::shared_ptr<GameObject> parent;
-		const std::shared_ptr<GameObject> child;
+		static std::shared_ptr<EChildAdded> create();
+
+		std::shared_ptr<GameObject> getParent() const;
+		std::shared_ptr<GameObject> getChild() const;
+
+		bool isSetup() const override;
+	};
+
+	class EParented final : public Event::AEvent {
+		friend class GameObject;
+		VE_CLASS(EParented);
+	private:
+		std::shared_ptr<GameObject> parent = nullptr;
+		std::shared_ptr<GameObject> child = nullptr;
+
+		EParented() = default;
+
+		Variant scr_getParent(void) const;
+		Variant scr_getChild(void) const;
+	public:
+		static std::shared_ptr<EParented> create();
+
+		std::shared_ptr<GameObject> getParent() const;
+		std::shared_ptr<GameObject> getChild() const;
+
+		bool isSetup() const override;
 	};
 
 	class EChildRemoved final : public Event::AEvent {
-		friend class VoidEngine::Scene::GameObject;
-		VE_CLASS(EChildRemoved)
+		friend class GameObject;
+		VE_CLASS(EChildRemoved);
 	private:
-		EChildRemoved(std::shared_ptr<GameObject> parent, std::shared_ptr<GameObject> child)
-			: parent(parent), child(child)
-		{}
+		std::shared_ptr<GameObject> parent = nullptr;
+		std::shared_ptr<GameObject> child = nullptr;
+
+		EChildRemoved() = default;
+
+		Variant scr_getParent(void) const;
+		Variant scr_getChild(void) const;
+
 	public:
-		const std::shared_ptr<GameObject> parent;
-		const std::shared_ptr<GameObject> child;
+		static std::shared_ptr<EChildRemoved> create();
+
+		std::shared_ptr<GameObject> getParent() const;
+		std::shared_ptr<GameObject> getChild() const;
+
+		bool isSetup() const override;
+	};
+
+	class EAddedToScene final : public Event::AEvent {
+		friend class Scene;
+		VE_CLASS(EAddedToScene);
+	private:
+		std::shared_ptr<Scene> scene = nullptr;
+
+		Variant scr_getScene(void) const;
+
+		EAddedToScene() = default;
+	public:
+		static std::shared_ptr<EAddedToScene> create();
+
+		std::shared_ptr<Scene> getScene() const;
+
+		bool isSetup() const override;
+	};
+
+	class ERemovedFromScene final : public Event::AEvent {
+		friend class Scene;
+		VE_CLASS(ERemovedFromScene);
+	private:
+		std::shared_ptr<Scene> scene = nullptr;
+		std::shared_ptr<GameObject> object = nullptr;
+
+		Variant scr_getObject(void) const;
+		Variant scr_getScene(void) const;
+
+		ERemovedFromScene() = default;
+	public:
+		static std::shared_ptr<ERemovedFromScene> create();
+
+		std::shared_ptr<GameObject> getObject() const;
+		std::shared_ptr<Scene> getScene() const;
+
+		bool isSetup() const override;
+	};
+
+	class ESceneUpdate final : public Event::AEvent {
+		friend class Scene;
+		VE_CLASS(ESceneUpdate);
+	private:
+		ESceneUpdate() = default;
+
+		double delta;
+
+		Variant scr_getDelta(void) const;
+	public:
+		static std::shared_ptr<ESceneUpdate> create();
+
+		double getDelta() const;
+		bool isSetup() const override;
+	};
+
+	class ESceneDraw final : public Event::AEvent {
+		friend class Scene;
+		VE_CLASS(ESceneDraw);
+	private:
+		std::shared_ptr<IO::GFX::RenderFrame> frame = nullptr;
+		double delta;
+
+		ESceneDraw() = default;
+
+		Variant scr_getFrame(void) const;
+		Variant scr_getDelta(void) const;
+	public:
+		static std::shared_ptr<ESceneDraw> create();
+
+		std::shared_ptr<IO::GFX::RenderFrame> getFrame() const;
+		double getDelta() const;
+
+		bool isSetup() const override;
+	};
+
+	class EComponentAdded final : public Event::AEvent {
+		friend class GameObject;
+		VE_CLASS(EComponentAdded);
+	private:
+		std::shared_ptr<GameObject> object = nullptr;
+		std::shared_ptr<Components::AObjectComponent> component = nullptr;
+
+		EComponentAdded() = default;
+
+		Variant scr_getObject(void) const;
+		Variant scr_getComponent(void) const;
+	public:
+		static std::shared_ptr<EComponentAdded> create();
+
+		std::shared_ptr<GameObject> getObject() const;
+		std::shared_ptr<Components::AObjectComponent> getComponent() const;
+
+		bool isSetup() const override;
+	};
+	
+	class EComponentRemoved final : public Event::AEvent {
+		friend class GameObject;
+		VE_CLASS(EComponentRemoved);
+	private:
+		std::shared_ptr<GameObject> object = nullptr;
+		std::shared_ptr<Components::AObjectComponent> component = nullptr;
+
+		EComponentRemoved() = default;
+
+		Variant scr_getObject(void) const;
+		Variant scr_getComponent(void) const;
+	public:
+		static std::shared_ptr<EComponentRemoved> create();
+
+		std::shared_ptr<GameObject> getObject() const;
+		std::shared_ptr<Components::AObjectComponent> getComponent() const;
+
+		bool isSetup() const override;
 	};
 }

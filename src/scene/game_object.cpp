@@ -1,105 +1,242 @@
-#include "ve/scene/game_object.hpp"
-#include "ve/class_property.hpp"
-#include "ve/scene/events.hpp"
-#include "ve/scene/object_component.hpp"
-#include <algorithm>
-#include <format>
-#include <memory>
+#include <ve/scene/game_object.hpp>
+#include <ve/scene/scene.hpp>
 
-#include <glm/ext/matrix_float4x4.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/trigonometric.hpp>
-#include <stdexcept>
-#include <vector>
+#include <ve/scene/components/a_mono_object_component.hpp>
+#include <ve/scene/components/a_poly_object_component.hpp>
+
+#include <ve/class_event_handler.hpp>
+#include <ve/class_constructor.hpp>
+#include <ve/class_event_bus.hpp>
+#include <ve/class_property.hpp>
+
+#include <glm/gtx/transform.hpp>
 
 namespace VoidEngine::Scene {
-	const Class GameObject::ClassData = {
+	const ::VoidEngine::Class GameObject::ClassData = {
 		.name = "GameObject",
 		.super = &Object::ClassData,
 		.properties = {
-			new NativeProperty<GameObject>("position", &GameObject::getPosition),
-			new NativeProperty<GameObject>("rotation", &GameObject::getRotation),
-			new NativeProperty<GameObject>("scale", &GameObject::getScale),
-		}
+			new NativeProperty("name", &GameObject::scr_getName, &GameObject::scr_setName),
+			new NativeProperty("position", &GameObject::scr_getPosition, &GameObject::scr_setPosition),
+			new NativeProperty("rotation", &GameObject::scr_getRotation, &GameObject::scr_setRotation),
+			new NativeProperty("scale", &GameObject::scr_getScale, &GameObject::scr_setScale),
+		},
+		.eventHandlers = {
+			new NativeEventHandler(&EObjectRenamed::ClassData, &GameObject::handleOnRename),
+			new NativeEventHandler(&EChildAdded::ClassData, &GameObject::handleOnChildAdded),
+			new NativeEventHandler(&EParented::ClassData, &GameObject::handleOnParented),
+			new NativeEventHandler(&EAddedToScene::ClassData, &GameObject::handleOnAddedToScene),
+			new NativeEventHandler(&ERemovedFromScene::ClassData, &GameObject::handleOnRemovedFromScene),
+			new NativeEventHandler(&ESceneUpdate::ClassData, &GameObject::handleOnUpdate),
+			new NativeEventHandler(&ESceneDraw::ClassData, &GameObject::handleOnDraw),
+		},
+		.eventBusses = {
+			new NativeEventBus(&EObjectRenamed::ClassData, &GameObject::onRename),
+			new NativeEventBus(&EChildAdded::ClassData, &GameObject::onChildAdded),
+			new NativeEventBus(&EParented::ClassData, &GameObject::onParented),
+			new NativeEventBus(&EChildRemoved::ClassData, &GameObject::onChildRemoved),
+			new NativeEventBus(&EAddedToScene::ClassData, &GameObject::onAddedToScene),
+			new NativeEventBus(&ERemovedFromScene::ClassData, &GameObject::onRemovedFromScene),
+			new NativeEventBus(&EComponentAdded::ClassData, &GameObject::onComponentAdded),
+			new NativeEventBus(&EComponentRemoved::ClassData, &GameObject::onComponentRemoved),
+			new NativeEventBus(&ESceneDraw::ClassData, &GameObject::onSceneDraw),
+			new NativeEventBus(&ESceneUpdate::ClassData, &GameObject::onSceneUpdate),
+		},
+		.constructor = new NativeConstructor(&GameObject::create),
+		.flags = ClassFlags::FINAL
 	};
 
-	GameObject::GameObject(std::string name)
-		: name(name)
-	{	}
+	Variant GameObject::scr_getName(void) const {
+		return getName();
+	}
 
-	std::shared_ptr<GameObject> GameObject::create(std::string name) {
-		return std::shared_ptr<GameObject>(new GameObject(name));
+	Variant GameObject::scr_getPosition(void) const {
+		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&position));
+	}
+
+	Variant GameObject::scr_getRotation(void) const {
+		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&rotation));
+	}
+
+	Variant GameObject::scr_getScale(void) const {
+		return Struct::create(&Vec3Data, const_cast<glm::vec3*>(&scale));
+	}
+
+	void GameObject::scr_setName(Variant value) {
+		if(!value.isString()) {
+			std::println("[ERR] GameObject.name must be a string");
+			return;
+		}
+
+		setName(value.asString().value());
+	}
+
+	void GameObject::scr_setPosition(Variant value) {
+		auto strct = value.asStruct().value();
+		if(strct->getData() != &Vec3Data) {
+			std::println("[ERR] GameObject.position must be a Vec3");
+			return;
+		}
+
+		position = *reinterpret_cast<const glm::vec3*>(strct->raw());
+	}
+	
+	void GameObject::scr_setRotation(Variant value) {
+		auto strct = value.asStruct().value();
+		if (strct->getData() != &Vec3Data) {
+			std::println("[ERR] GameObject.position must be a Vec3");
+			return;
+		}
+
+		rotation = *reinterpret_cast<const glm::vec3*>(strct->raw());
+	}
+
+	void GameObject::scr_setScale(Variant value) {
+		auto strct = value.asStruct().value();
+		if (strct->getData() != &Vec3Data) {
+			std::println("[ERR] GameObject.position must be a Vec3");
+			return;
+		}
+
+		scale = *reinterpret_cast<const glm::vec3*>(strct->raw());
+	}
+
+	Variant GameObject::scr_getScene(std::vector<Variant>) const {
+		return Variant(getScene());
+	}
+	
+	Variant GameObject::scr_getParent(std::vector<Variant>) const {
+		return Variant(getParent());
+	}
+
+	GameObject::GameObject() {}
+
+	GameObject::~GameObject() {}
+
+	std::shared_ptr<GameObject> GameObject::create() {
+		auto self = std::shared_ptr<GameObject>(new GameObject);
+		self->onChildAdded.addHandler(self);
+		self->onAddedToScene.addHandler(self);
+		self->onRemovedFromScene.addHandler(self);
+		self->onSceneUpdate.addHandler(self);
+		self->onSceneDraw.addHandler(self);
+		return self;
 	}
 
 	std::string GameObject::getName() const {
 		return name;
 	}
 
-	void GameObject::addComponent(std::shared_ptr<AObjectComponent> comp) {
-		if(comp == nullptr) return;
-		if(components[comp->getClass()] != nullptr) return;
+	void GameObject::setName(std::string value) {
+		std::shared_ptr<GameObject> obj = parent.lock();
+		std::shared_ptr<Scene> scn = scene.lock();
+
+		if((obj != nullptr && obj->getChild(value) != nullptr) || (scn != nullptr && scn->getObject(value))) {
+			std::println("[ERR] Failed to rename object {}, name already taken", getName());
+			return;
+		}
+
+		auto oldName = name;
+		name = value;
+		std::shared_ptr<EObjectRenamed> evt = EObjectRenamed::create();
+		evt->obj = shared_from_this();
+		evt->oldName = oldName;
+		onRename.fireEvent(evt);
+	}
+
+	glm::mat4 GameObject::calculateModelMatrix() const {
+		glm::mat4 model = glm::mat4(1.0f);
+
+		std::shared_ptr<GameObject> parent = getParent();
+		if(parent != nullptr) model = parent->calculateModelMatrix();
+
+		model = glm::translate(model, position);
+		model = glm::rotate(model, rotation.x, { 1, 0, 0 });
+		model = glm::rotate(model, rotation.y, { 0, 1, 0 });
+		model = glm::rotate(model, rotation.z, { 0, 0, 1 });
+		model = glm::scale(model, scale);
+
+		return model;
+	}
+
+	void GameObject::handleOnRename(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<EObjectRenamed>(evtObj);
 		
-		components[comp->getClass()] = comp;
-		comp->tiedTo.push_back(weak_from_this());
+		children[evt->getObject()->getName()] = children[evt->getOldName()];
+		children.erase(evt->getOldName());
+	}
+	
+	void GameObject::handleOnChildAdded(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<EAddedToScene>(evtObj);
 
-		auto evt = std::shared_ptr<Events::EComponentAddedToObject>(new Events::EComponentAddedToObject(shared_from_this(), comp));
-		comp->onComponentAdded.fireEvent(evt);
-		onComponentAdded.fireEvent(evt);
+		std::shared_ptr<GameObject> obj = parent.lock();
+		if(obj != nullptr) obj->onChildAdded.fireEvent(std::static_pointer_cast<Event::AEvent>(evt));
 	}
 
-	void GameObject::removeComponent(std::shared_ptr<AObjectComponent> comp) {
-		auto evt = std::shared_ptr<Events::EComponentRemovedFromObject>(new Events::EComponentRemovedFromObject(shared_from_this(), comp));
-		components[comp->getClass()]->onComponentRemoved.fireEvent(evt);
-		onComponentRemoved.fireEvent(evt);
-		components.erase(comp->getClass());
+	void GameObject::handleOnParented(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<EParented>(evtObj);
+
+		scene = evt->getParent()->getScene();
+
+		std::for_each(children.begin(), children.end(), [&evt](const auto& iter) {
+			iter.second->onParented.fireEvent(evt);
+		});
 	}
 
-	std::vector<std::shared_ptr<AObjectComponent>> GameObject::getComponents() {
-		std::vector<std::shared_ptr<AObjectComponent>> compList;
-		std::for_each(components.cbegin(), components.cend(), [&compList](const auto& iter) {
-			compList.emplace_back(iter.second);
+	void GameObject::handleOnAddedToScene(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<EAddedToScene>(evtObj);
+		scene = evt->getScene();
+		
+		std::for_each(children.begin(), children.end(), [&evt](const auto& iter) {
+			iter.second->onAddedToScene.fireEvent(evt);
+		});
+
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto& iter) {
+			iter.second->onAddedToScene.fireEvent(evt);
+		});
+
+		std::for_each(polyComponents.begin(), polyComponents.end(), [&evt](const auto& iter) {
+			iter.second->onAddedToScene.fireEvent(evt);
+		});
+	}
+
+	void GameObject::handleOnRemovedFromScene(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<ERemovedFromScene>(evtObj);
+		scene = std::weak_ptr<Scene>();
+
+		std::for_each(children.begin(), children.end(), [&evt](const auto& iter) {
+			iter.second->onRemovedFromScene.fireEvent(evt);
+		});
+
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto& iter) {
+			iter.second->onRemovedFromScene.fireEvent(evt);
+		});
+
+		std::for_each(polyComponents.begin(), polyComponents.end(), [&evt](const auto& iter) {
+			iter.second->onRemovedFromScene.fireEvent(evt);
+		});
+	}
+
+	void GameObject::handleOnUpdate(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<ESceneUpdate>(evtObj);
+		std::for_each(children.begin(), children.end(), [&evt](const auto iter) {
+			iter.second->onSceneUpdate.fireEvent(evt);
+		});
+
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto iter) {
+			iter.second->onSceneUpdate.fireEvent(evt);
+		});
+	}
+
+	void GameObject::handleOnDraw(std::shared_ptr<Object> evtObj) {
+		auto evt = std::static_pointer_cast<ESceneDraw>(evtObj);
+		std::for_each(children.begin(), children.end(), [&evt](const auto iter) {
+			iter.second->onSceneDraw.fireEvent(evt);
 			});
-		return compList;
-	}
 
-	glm::mat4 GameObject::getModelMatrix() const {
-		glm::mat4 matrix(1.0f);
-
-		matrix = glm::translate(matrix, position);
-		matrix = glm::rotate(matrix, glm::radians(rotation.x), { 1.0f, 0.0f, 0.0f });
-		matrix = glm::rotate(matrix, glm::radians(rotation.y), { 0.0f, 1.0f, 0.0f });
-		matrix = glm::rotate(matrix, glm::radians(rotation.z), { 0.0f, 0.0f, 1.0f });
-		matrix = glm::scale(matrix, scale);
-
-		if(auto parent = this->parent.lock())
-			return parent->getModelMatrix() * matrix;
-		return matrix;
-	}
-
-	void GameObject::addChild(std::shared_ptr<GameObject> child) {
-		if(children.contains(child->getName())) {
-			throw std::runtime_error(std::format("Duplicate name on child ({})", child->getName()));
-		}
-
-		if(!child->parent.expired()) {
-			throw std::runtime_error(std::format("An object cannot have multiple parents."));
-		}
-
-		child->parent = weak_from_this();
-
-		children[child->getName()] = child;
-		auto evt = std::shared_ptr<Events::EChildAdded>(new Events::EChildAdded(shared_from_this(), child));
-		onChildAdded.fireEvent(evt);
-	}
-
-	void GameObject::removeChild(std::string name) {
-		if(!children.contains(name)) return;
-
-		std::shared_ptr<GameObject> child = children[name];
-		children.erase(name);
-		auto evt = std::shared_ptr<Events::EChildRemoved>(new Events::EChildRemoved(shared_from_this(), child));
-		onChildRemoved.fireEvent(evt);
+		std::for_each(monoComponents.begin(), monoComponents.end(), [&evt](const auto iter) {
+			iter.second->onSceneDraw.fireEvent(evt);
+			});
 	}
 
 	std::shared_ptr<GameObject> GameObject::getChild(std::string name) {
@@ -107,70 +244,167 @@ namespace VoidEngine::Scene {
 		return children[name];
 	}
 
-	std::shared_ptr<GameObject> GameObject::getChildFromPath(std::string path) {
-		size_t split = path.find_first_of('/');
-		if(split == std::string::npos) {
-			return getChild(path);
+	void GameObject::addChild(std::shared_ptr<GameObject> child) {
+		if(child == nullptr) {
+			return;
 		}
 
-		std::string next = path.substr(0, split), remaining = path.substr(split + 1);
+		if(!child->parent.expired()) {
+			std::println("[ERR] Cannot add child to multiple objects");
+			return;
+		}
 
-		std::shared_ptr<GameObject> child = getChild(next);
-		if(child == nullptr) return nullptr;
-		return child->getChildFromPath(remaining);
+		if(getChild(child->getName()) != nullptr) {
+			std::println("[WARN] Object with name {} already in children, adding suffix", child->getName());
+			child->setName(std::format("{}{}", child->getName(), reinterpret_cast<size_t>(child.get())));
+		}
+
+		children[child->getName()] = child;
+		child->onRename.addHandler(shared_from_this());
+
+		auto childAddedEvt = EChildAdded::create();
+		childAddedEvt->parent = shared_from_this();
+		childAddedEvt->child = child;
+		onChildAdded.fireEvent(childAddedEvt);
+
+		auto parentedEvt = EParented::create();
+		parentedEvt->parent = shared_from_this();
+		parentedEvt->child = child;
+		onParented.fireEvent(parentedEvt);
 	}
 
-	std::vector<std::shared_ptr<GameObject>> GameObject::getChildren() {
-		std::vector<std::shared_ptr<GameObject>> children;
-		std::for_each(this->children.cbegin(), this->children.cend(), [&children](const auto& iter) {
-			children.emplace_back(iter.second);
-			});
-		return children;
+	void GameObject::removeChild(std::string name) {
+		std::shared_ptr<GameObject> child = getChild(name);
+		if(child == nullptr) return;
+		children.erase(name);
+
+		auto evt = EChildRemoved::create();
+		evt->child = child;
+		evt->parent = shared_from_this();
+		onChildRemoved.fireEvent(evt);
 	}
 
-	void GameObject::draw(Events::ESceneDraw& scnDraw) {
-		auto draw = std::shared_ptr<Events::EComponentDraw>(new Events::EComponentDraw(scnDraw, shared_from_this()));
-		for(auto& child : children) if(child.second != nullptr) child.second->draw(scnDraw);
-		for(auto& comp : components) if(comp.second != nullptr) comp.second->onDraw.fireEvent(draw);
+	std::shared_ptr<Scene> GameObject::getScene() const {
+		return scene.lock();
 	}
 
-	std::shared_ptr<AObjectComponent> GameObject::getComponent(const Class* cls) {
-		return components[cls];
+	std::shared_ptr<GameObject> GameObject::getParent() const {
+		return parent.lock();
 	}
 
-	std::shared_ptr<AObjectComponent> GameObject::getFirstOfType(const Class* cls) {
-		const auto idx = std::find_if(components.cbegin(), components.cend(), [&cls](const auto& iter) {
-			return iter.first->instanceOf(cls);
-			});
-		if(idx == components.cend()) return nullptr;
-		return idx->second;
+	std::vector<std::shared_ptr<Components::AMonoObjectComponent>> GameObject::getMonoComponents() const {
+		std::vector<std::shared_ptr<Components::AMonoObjectComponent>> comps(monoComponents.size());
+		for(const auto& iter : monoComponents)
+			comps.emplace_back(iter.second);
+		return comps;
+	}
+	
+	std::vector<std::shared_ptr<Components::APolyObjectComponent>> GameObject::getPolyComponents() const {
+		std::vector<std::shared_ptr<Components::APolyObjectComponent>> comps(polyComponents.size());
+		for(const auto& iter : polyComponents)
+			comps.emplace_back(iter.second);
+		return comps;
 	}
 
+	std::shared_ptr<Components::AMonoObjectComponent> GameObject::getMonoComponent(const Class* compCls) {
+		if(!compCls->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+			std::println("[ERR] Class {} is not an AMonoObjectComponent", compCls->getName());
+			return nullptr;
+		}
 
-	void find_component(const Class* cls, std::shared_ptr<GameObject> object, std::vector<std::shared_ptr<AObjectComponent>>& found) {
-		auto comp = object->getComponent(cls);
-		if(comp != nullptr) found.push_back(comp);
-		auto children = object->getChildren();
-		std::for_each(children.cbegin(), children.cend(), [&](const auto& child) {
-			find_component(cls, child, found);
-		});
+		if(!monoComponents.contains(compCls)) return nullptr;
+		return monoComponents[compCls];
 	}
 
-	std::vector<std::shared_ptr<AObjectComponent>> GameObject::gatherComponentsOfType(const Class* cls) {
-		std::vector<std::shared_ptr<AObjectComponent>> components;
-		find_component(cls, shared_from_this(), components);
-		return components;
+	std::shared_ptr<Components::APolyObjectComponent> GameObject::getPolyComponent(const Class* compCls) {
+		if(!compCls->instanceOf(&Components::APolyObjectComponent::ClassData)) {
+			std::println("[ERR] Class {} is not an APolyObjectComponent", compCls->getName());
+			return nullptr;
+		}
+
+		if(!polyComponents.contains(compCls)) return nullptr;
+		return polyComponents[compCls];
 	}
 
-	Variant GameObject::getPosition() const {
-		return std::make_shared<Struct>(&Vec3Data, const_cast<glm::vec3*>(&position));
+	void GameObject::addComponent(std::shared_ptr<Components::AObjectComponent> comp) {
+		if(comp == nullptr) return;
+		const Class* compCls = comp->getClass();
+		if(compCls->instanceOf(&Components::AMonoObjectComponent::ClassData) && getMonoComponent(compCls) != nullptr) return;
+		if(compCls->instanceOf(&Components::APolyObjectComponent::ClassData) && getPolyComponent(compCls) != nullptr) return;
+
+		if (comp->getClass()->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+			auto mono = std::static_pointer_cast<Components::AMonoObjectComponent>(comp);
+			if(mono->getObject() != nullptr) {
+				std::println("[ERR] [Scene] Cannot add AMonoObjectComponent to multiple objects");
+				return;
+			}
+			monoComponents[comp->getClass()] = mono;
+			mono->object = weak_from_this();
+
+			auto evt = EComponentAdded::create();
+			evt->object = shared_from_this();
+			evt->component = mono;
+			mono->onAddedToObject.fireEvent(evt);
+			onComponentAdded.fireEvent(evt);
+
+			return;
+		}
+		else if (comp->getClass()->instanceOf(&Components::APolyObjectComponent::ClassData)) {
+			auto poly = std::static_pointer_cast<Components::APolyObjectComponent>(comp);
+			if(!poly->isBoundToScene(getScene())) {
+				if(poly->isBoundToAnyScene()) {
+					std::println("[ERR] [Scene] Cannot add APolyObjectComponent to multiple scenes");
+				} else {
+					std::println("[ERR] [Scene] Cannot add APolyObjectComponent to objects untill it is bound to a scene");
+				}
+				return;
+			}
+			polyComponents[comp->getClass()] = poly;
+			poly->objects.emplace_back(shared_from_this());
+
+			auto evt = EComponentAdded::create();
+			evt->object = shared_from_this();
+			evt->component = poly;
+			poly->onAddedToObject.fireEvent(evt);
+			onComponentAdded.fireEvent(evt);
+
+			return;
+		}
+		std::println("[FATAL] Could not determine how to add component {} to a GameObject", comp->getClass()->getName());
+		assert(false);
 	}
 
-	Variant GameObject::getRotation() const {
-		return std::make_shared<Struct>(&Vec3Data, const_cast<glm::vec3*>(&rotation));
-	}
+	void GameObject::removeComponent(const Class* compCls) {
+		if (compCls->instanceOf(&Components::AMonoObjectComponent::ClassData)) {
+			auto comp = getMonoComponent(compCls);
+			comp->object = std::weak_ptr<GameObject>();
+			monoComponents.erase(compCls);
 
-	Variant GameObject::getScale() const {
-		return std::make_shared<Struct>(&Vec3Data, const_cast<glm::vec3*>(&scale));
-	}	
+			auto evt = EComponentRemoved::create();
+			evt->object = shared_from_this();
+			evt->component = comp;
+			comp->onRemovedFromObject.fireEvent(evt);
+			onComponentRemoved.fireEvent(evt);
+
+			return;
+		}
+		else if (compCls->instanceOf(&Components::APolyObjectComponent::ClassData)) {
+			auto comp = getPolyComponent(compCls);
+			auto self = shared_from_this();
+			comp->objects.erase(std::find_if(comp->objects.cbegin(), comp->objects.cend(), [&self](const auto& iterWeak) {
+				return iterWeak.lock() == self;
+			}));
+			polyComponents.erase(compCls);
+
+			auto evt = EComponentRemoved::create();
+			evt->object = shared_from_this();
+			evt->component = comp;
+			comp->onRemovedFromObject.fireEvent(evt);
+			onComponentRemoved.fireEvent(evt);
+
+			return;
+		}
+		std::println("[FATAL] Could not determine how to remove component {} from a GameObject", compCls->getName());
+		assert(false);
+	}
 }

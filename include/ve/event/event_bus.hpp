@@ -23,5 +23,7 @@ namespace VoidEngine::Event {
 
 		// fireEvent? What did they do?
 		void fireEvent(std::shared_ptr<AEvent>) const;
+
+		const Class* getEventClass() const;
 	};
 }

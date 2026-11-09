@@ -38,6 +38,10 @@ namespace VoidEngine::IO::GFX {
 
 	void Renderer::bindRenderTarget(std::shared_ptr<IRenderTarget> target) {
 		if(backend == nullptr) return;
+		if(target == nullptr) {
+			std::println("[ERR] [GFX] Failed to bind render target, got nullptr");
+			return;
+		}
 		backend->bindRenderTarget(target);
 	}
 

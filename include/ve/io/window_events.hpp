@@ -12,36 +12,38 @@ namespace VoidEngine::IO {
 }
 
 namespace VoidEngine::IO::Events {
-	class BasicWindowEvent : public Event::AEvent {
-		VE_CLASS(BasicWindowEvent)
+	class AWindowEvent : public Event::AEvent {
+		VE_CLASS(AWindowEvent)
 	protected:
-		BasicWindowEvent(std::shared_ptr<Window> window) : window(window) {}
+		AWindowEvent(std::shared_ptr<Window> window) : window(window) {}
 	public:
 		const std::shared_ptr<Window> window;
+
+		bool isSetup() const override;
 	};
 
-	class EWindowMinimized final : public BasicWindowEvent {
+	class EWindowMinimized final : public AWindowEvent {
 		VE_CLASS(EWindowMinimized)
 	public:
-		EWindowMinimized(std::shared_ptr<Window> window) : BasicWindowEvent(window) {}
+		EWindowMinimized(std::shared_ptr<Window> window) : AWindowEvent(window) {}
 	};
 
-	class EWindowRestored final : public BasicWindowEvent {
+	class EWindowRestored final : public AWindowEvent {
 		VE_CLASS(EWindowRestored)
 	public:
-		EWindowRestored(std::shared_ptr<Window> window) : BasicWindowEvent(window) {}
+		EWindowRestored(std::shared_ptr<Window> window) : AWindowEvent(window) {}
 	};
 
-	class EWindowMaximized final : public BasicWindowEvent {
+	class EWindowMaximized final : public AWindowEvent {
 		VE_CLASS(EWindowMaximized)
 	public:
-		EWindowMaximized(std::shared_ptr<Window> window) : BasicWindowEvent(window) {}
+		EWindowMaximized(std::shared_ptr<Window> window) : AWindowEvent(window) {}
 	};
 
-	class EWindowCloseRequested final : public BasicWindowEvent {
+	class EWindowCloseRequested final : public AWindowEvent {
 		VE_CLASS(EWindowCloseRequested)
 	public:
-		EWindowCloseRequested(std::shared_ptr<Window> window) : BasicWindowEvent (window) {}
+		EWindowCloseRequested(std::shared_ptr<Window> window) : AWindowEvent (window) {}
 	};
 
 	class WindowCloseRequestedDefaultHandler : public Object {
@@ -50,33 +52,29 @@ namespace VoidEngine::IO::Events {
 		void onCloseEvent(std::shared_ptr<Object> evt);
 	};
 
-	class EWindowSizeChanged final : public Event::AEvent {
+	class EWindowSizeChanged final : public AWindowEvent {
 		VE_CLASS(EWindowSizeChanged)
 	public:
-		EWindowSizeChanged(std::shared_ptr<Window> window) : window(window) {}
-		const std::shared_ptr<Window> window;
+		EWindowSizeChanged(std::shared_ptr<Window> window) : AWindowEvent(window) {}
 	};
 
-	class EWindowRepositioned final : public Event::AEvent {
+	class EWindowRepositioned final : public AWindowEvent {
 		VE_CLASS(EWindowRepositioned)
 	public:
-		EWindowRepositioned(std::shared_ptr<Window> window) : window(window) {}
-		const std::shared_ptr<Window> window;
+		EWindowRepositioned(std::shared_ptr<Window> window) : AWindowEvent(window) {}
 	};
 
-	class EMouseEnter final : public Event::AEvent {
+	class EMouseEnter final : public AWindowEvent {
 		VE_CLASS(EMouseEnter)
 	public:
-		EMouseEnter(std::shared_ptr<Window> window, bool entered) : window(window), entered(entered) {}
-		const std::shared_ptr<Window> window;
+		EMouseEnter(std::shared_ptr<Window> window, bool entered) : AWindowEvent(window), entered(entered) {}
 		const bool entered;
 	};
 
-	class EWindowFocus final : public Event::AEvent {
+	class EWindowFocus final : public AWindowEvent {
 		VE_CLASS(EWindowFocus)
 	public:
-		EWindowFocus(std::shared_ptr<Window> window, bool focused) : window(window), focused(focused) {}
-		const std::shared_ptr<Window> window;
+		EWindowFocus(std::shared_ptr<Window> window, bool focused) : AWindowEvent(window), focused(focused) {}
 		const bool focused;
 	};
 }

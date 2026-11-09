@@ -6,12 +6,14 @@
 #include "ve/io/res_providers/texture/a_provider.hpp"
 #include "ve/io/window_events.hpp"
 #include "ve/object.hpp"
-#include "ve/scene/components/light.hpp"
-#include "ve/scene/components/mesh.hpp"
-#include "ve/scene/components/sound.hpp"
-#include "ve/scene/components/camera.hpp"
-#include "ve/scene/object_component.hpp"
+
 #include "ve/scene/scene.hpp"
+#include "ve/scene/game_object.hpp"
+#include "ve/scene/components/a_object_component.hpp"
+#include "ve/scene/components/a_mono_object_component.hpp"
+#include "ve/scene/components/a_poly_object_component.hpp"
+
+#include "ve/scene/components/gfx/mesh_component.hpp"
 
 namespace VoidEngine {
 	std::shared_ptr<ClassDB> ClassDB::instance = nullptr;
@@ -23,6 +25,9 @@ namespace VoidEngine {
 	ClassDB::ClassDB() {
 		registerClass(&Object::ClassData);
 
+		registerClass(&IO::GFX::RenderFrame::ClassData);
+		registerClass(&IO::GFX::AFrameDrawCall::ClassData);
+
 		registerClass(&Event::AEvent::ClassData);
 
 		registerClass(&IO::ResourceProviders::EMeshProviderChanged::ClassData);
@@ -31,7 +36,7 @@ namespace VoidEngine {
 		registerClass(&Events::EQuitEvent::ClassData);
 		registerClass(&Events::EScreenLayoutChangedEvent::ClassData);
 
-		registerClass(&IO::Events::BasicWindowEvent::ClassData);
+		registerClass(&IO::Events::AWindowEvent::ClassData);
 		registerClass(&IO::Events::EWindowMinimized::ClassData);
 		registerClass(&IO::Events::EWindowRestored::ClassData);
 		registerClass(&IO::Events::EWindowMaximized::ClassData);
@@ -41,33 +46,28 @@ namespace VoidEngine {
 		registerClass(&IO::Events::EMouseEnter::ClassData);
 		registerClass(&IO::Events::EWindowFocus::ClassData);
 
-		registerClass(&Scene::Events::EComponentUpdate::ClassData);
-		registerClass(&Scene::Events::ESceneDraw::ClassData);
-		registerClass(&Scene::Events::EComponentDraw::ClassData);
-		registerClass(&Scene::Events::EAddedToScene::ClassData);
-		registerClass(&Scene::Events::ERemovedFromScene::ClassData);
-		registerClass(&Scene::Events::EComponentAddedToObject::ClassData);
-		registerClass(&Scene::Events::EComponentRemovedFromObject::ClassData);
-		registerClass(&Scene::Events::EChildAdded::ClassData);
-		registerClass(&Scene::Events::EChildRemoved::ClassData);
-
 		registerClass(&IO::Events::WindowCloseRequestedDefaultHandler::ClassData);
+
+		registerClass(&Scene::EObjectRenamed::ClassData);
+		registerClass(&Scene::EChildAdded::ClassData);
+		registerClass(&Scene::EParented::ClassData);
+		registerClass(&Scene::EChildRemoved::ClassData);
+		registerClass(&Scene::EAddedToScene::ClassData);
+		registerClass(&Scene::ERemovedFromScene::ClassData);
+		registerClass(&Scene::ESceneUpdate::ClassData);
+		registerClass(&Scene::ESceneDraw::ClassData);
+		registerClass(&Scene::EComponentAdded::ClassData);
+		registerClass(&Scene::EComponentRemoved::ClassData);
 
 		registerClass(&Scene::Scene::ClassData);
 		registerClass(&Scene::GameObject::ClassData);
 
-		registerClass(&Scene::AObjectComponent::ClassData);
+		registerClass(&Scene::Components::AObjectComponent::ClassData);
+		registerClass(&Scene::Components::AMonoObjectComponent::ClassData);
+		registerClass(&Scene::Components::APolyObjectComponent::ClassData);
 
-		registerClass(&Scene::Components::LightComponent::ClassData);
-		registerClass(&Scene::Components::PointLightComponent::ClassData);
-		registerClass(&Scene::Components::SpotLightComponent::ClassData);
-		registerClass(&Scene::Components::MeshComponent::ClassData);
-
-		registerClass(&Scene::Components::SoundComponent::ClassData);
-
-		registerClass(&Scene::Components::ACamera::ClassData);
-		registerClass(&Scene::Components::OrthoCamera::ClassData);
-		registerClass(&Scene::Components::PerspectiveCamera::ClassData);
+		registerClass(&Scene::Components::GFX::MeshComponentDrawCall::ClassData);
+		registerClass(&Scene::Components::GFX::MeshComponent::ClassData);
 	}
 
 	std::shared_ptr<ClassDB> ClassDB::getInstance() {
@@ -86,7 +86,17 @@ namespace VoidEngine {
 		}
 
 		if(cls->super == nullptr && cls != &Object::ClassData) [[unlikely]] {
-			std::println("[WARN] {} did not setup ClassData::super", cls->getName());
+			std::println("[ERR] {} did not setup ClassData::super", cls->getName());
+			return;
+		}
+
+		if(cls->super != nullptr && cls->super->isFinal()) {
+			std::println("[FATAL] {} inherits a class ({}) flagged as final", cls->getName(), cls->super->getName());
+			assert(false);
+		}
+
+		if(cls->isFinal() && cls->constructor == nullptr) {
+			std::println("[WARN] Class {}, is final with no constructor", cls->getName());
 		}
 
 		componentClasses[cls->name] = cls;

@@ -8,20 +8,22 @@
 #include <vector>
 
 namespace VoidEngine::IO::GFX {
-	struct FrameDrawEntry final {
-	private:
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<GraphicsProgram> program;
-		glm::mat4 modelMatrix;
-	public:
-		FrameDrawEntry(std::shared_ptr<Mesh>, std::shared_ptr<GraphicsProgram>, glm::mat4 modelMatrix);
+	class RenderFrame;
 
-		std::shared_ptr<Mesh> getMesh() const;
+	class AFrameDrawCall : public Object {
+		VE_CLASS(AFrameDrawCall);
+	private:
+		std::shared_ptr<GraphicsProgram> program = nullptr;
+
+	public:
 		std::shared_ptr<GraphicsProgram> getProgram() const;
-		glm::mat4 getModelMatrix() const;
+		void setProgram(std::shared_ptr<GraphicsProgram>);
+
+		virtual void draw(std::shared_ptr<const RenderFrame>);
 	};
 
-	class RenderFrame final {
+	class RenderFrame final : public Object, public std::enable_shared_from_this<RenderFrame> {
+		VE_CLASS(RenderFrame);
 	private:
 		std::vector<std::shared_ptr<RenderFrame>> dependancies = {};
 
@@ -36,14 +38,14 @@ namespace VoidEngine::IO::GFX {
 		std::vector<PointLight> pointLights = {};
 		std::vector<SpotLight> spotLights = {};
 
-		std::vector<FrameDrawEntry> draws = {};
+		std::vector<std::weak_ptr<AFrameDrawCall>> draws = {};
 
 		glm::mat4 projection = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 
 		std::shared_ptr<IRenderTarget> target;
 
-		RenderFrame();
+		RenderFrame() = default;
 	public:
 		const int32_t MAX_POINT_LIGHTS = 4;
 		const int32_t MAX_SPOT_LIGHTS = 4;
@@ -66,7 +68,9 @@ namespace VoidEngine::IO::GFX {
 
 		void addPointLight(PointLight);
 		void addSpotLight(SpotLight);
-		void addDraw(std::shared_ptr<Mesh>, std::shared_ptr<GraphicsProgram>, glm::mat4 modelMatrix);
+
+		void addDraw(std::shared_ptr<AFrameDrawCall>);
+		void removeDraw(std::shared_ptr<AFrameDrawCall>);
 
 		void render() const;
 	};

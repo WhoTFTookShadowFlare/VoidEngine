@@ -1,56 +1,64 @@
 #pragma once
 
-#include "ve/io/gfx/light.hpp"
-#include "ve/io/gfx/render_frame.hpp"
-#include "ve/io/gfx/render_target.hpp"
-#include "ve/object.hpp"
-#include "ve/scene/game_object.hpp"
-#include <memory>
-#include <map>
-#include <vector>
-#include <string>
-#include <filesystem>
+#include <ve/object.hpp>
 
-namespace VoidEngine::IO {
-	class Window;
-}
+#include <ve/physics2d/a_world_2d.hpp>
 
-namespace VoidEngine::Scene::Components {
-	class ACamera;
-}
+#include <ve/io/gfx/render_frame.hpp>
 
 namespace VoidEngine::Scene {
-	class Scene final : public Object, public std::enable_shared_from_this<Scene> {
-		VE_CLASS(Scene)
+	namespace Components {
+		class APolyObjectComponent;
+	}
+	namespace Components::GFX {
+		class ACameraComponent;
+	}
+	class GameObject;
 
-		std::map<std::string, std::shared_ptr<GameObject>> objects = {};
+	class Scene : public Object, public std::enable_shared_from_this<Scene> {
+		VE_CLASS(Scene);
+	private:
+		std::shared_ptr<Physics2D::APhysics2DWorld> world2d;
+		Scene();
 
-		std::shared_ptr<GameObject> currentCamera = nullptr;
+		std::map<std::string, std::shared_ptr<GameObject>> objects;
+		std::vector<std::shared_ptr<Components::APolyObjectComponent>> polyComponents;
 
-		IO::GFX::DirectionalLight light = {
-			{
-				{ 1.0f, 1.0f, 1.0f },
-				{ 1.0f, 1.0f, 1.0f }
-			},
-			{ -0.5f, -1.0f, -0.5f },
-		};
+		std::shared_ptr<IO::GFX::IRenderTarget> renderTarget = nullptr;
+		std::shared_ptr<IO::GFX::RenderFrame> renderFrame = IO::GFX::RenderFrame::create();
+		std::shared_ptr<Components::GFX::ACameraComponent> currentCamera = nullptr;
+
+		void scr_setCurrentCamera(Variant);
+		Variant scr_getCurrentCamera(void) const;
+
+		Variant scr_getObject(std::vector<Variant>);
+		Variant scr_addObject(std::vector<Variant>);
+		Variant scr_removeObject(std::vector<Variant>);
+
+		void updateCameraValues();
+
 	public:
 		static std::shared_ptr<Scene> create();
-		static std::shared_ptr<Scene> loadFrom(std::filesystem::path);
+		~Scene();
 
-		std::shared_ptr<GameObject> getObject(std::string name);
-		void addObject(std::shared_ptr<GameObject> obj);
+		void handleObjectRenamed(std::shared_ptr<Object>);
+		void handleCameraValueChanged(std::shared_ptr<Object>);
 
-		std::shared_ptr<GameObject> getObjectFromPath(std::string path);
+		std::shared_ptr<GameObject> getObject(std::string);
+		void addObject(std::shared_ptr<GameObject>);
+		void removeObject(std::string name);
 
-		std::vector<std::shared_ptr<GameObject>> getObjects();
+		void update(double delta);
+		void draw(double delta);
 
-		void setCamera(std::shared_ptr<GameObject>);
-		std::shared_ptr<GameObject> getCamera();
+		void bindPolyObjectComponent(std::shared_ptr<Components::APolyObjectComponent>);
+		
+		std::shared_ptr<IO::GFX::IRenderTarget> getRenderTarget() const;
+		void setRenderTarget(std::shared_ptr<IO::GFX::IRenderTarget>);
 
-		IO::GFX::DirectionalLight getDirectionalLight();
-		void setDirectionalLight(IO::GFX::DirectionalLight);
+		std::shared_ptr<IO::GFX::RenderFrame> getRenderFrame() const;
 
-		std::shared_ptr<IO::GFX::RenderFrame> draw(double delta, std::shared_ptr<IO::GFX::IRenderTarget> target);
+		void setCurrentCamera(std::shared_ptr<Components::GFX::ACameraComponent>);
+		std::shared_ptr<Components::GFX::ACameraComponent> getCurrentCamera() const;
 	};
 }

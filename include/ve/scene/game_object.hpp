@@ -1,74 +1,94 @@
 #pragma once
 
-#include "glm/ext/matrix_float4x4.hpp"
-#include "ve/object.hpp"
-#include "ve/scene/object_component.hpp"
-
-#include <memory>
-#include <string>
-#include <vector>
-#include <map>
-
-#include <glm/ext/vector_float3.hpp>
-
-#include "ve/event/event_bus.hpp"
-#include "ve/scene/events.hpp"
-
-#include "ve/class_db.hpp"
-#include "ve/variant.hpp"
+#include <ve/object.hpp>
+#include <ve/scene/events.hpp>
+#include <ve/event/event_bus.hpp>
 
 namespace VoidEngine::Scene {
-	class GameObject final : public Object, public std::enable_shared_from_this<GameObject> {
-		VE_CLASS(GameObject)
-		std::map<const Class*, std::shared_ptr<AObjectComponent>> components;
+	class Scene;
 
-		std::map<std::string, std::shared_ptr<GameObject>> children;
+	namespace Components {
+		class AObjectComponent;
+		class AMonoObjectComponent;
+		class APolyObjectComponent;
+	}
+
+	class GameObject final : public Object, public std::enable_shared_from_this<GameObject> {
+		friend class Scene;
+		VE_CLASS(GameObject);
+	private:
+		GameObject();
+
+		std::string name = "GameObject";
+
+		std::weak_ptr<Scene> scene;
 		std::weak_ptr<GameObject> parent;
 
-		GameObject(std::string name);
+		std::map<std::string, std::shared_ptr<GameObject>> children;
 
-		const std::string name;
+		std::map<const Class*, std::shared_ptr<Components::AMonoObjectComponent>> monoComponents;
+		std::map<const Class*, std::shared_ptr<Components::APolyObjectComponent>> polyComponents;
 
-		glm::vec3
-			position = { 0.0f, 0.0f, 0.0f },
-			rotation = { 0.0f, 0.0f, 0.0f },
-			scale = { 1.0f, 1.0f, 1.0f };
+		void handleOnRename(std::shared_ptr<Object> evt);
+		void handleOnChildAdded(std::shared_ptr<Object> evt);
+		void handleOnParented(std::shared_ptr<Object> evt);
+		void handleOnAddedToScene(std::shared_ptr<Object> evt);
+		void handleOnRemovedFromScene(std::shared_ptr<Object> evt);
+		void handleOnUpdate(std::shared_ptr<Object> evt);
+		void handleOnDraw(std::shared_ptr<Object> evt);
+
+		Variant scr_getName(void) const;
+		Variant scr_getPosition(void) const;
+		Variant scr_getRotation(void) const;
+		Variant scr_getScale(void) const;
+
+		void scr_setName(Variant);
+		void scr_setPosition(Variant);
+		void scr_setRotation(Variant);
+		void scr_setScale(Variant);
+
+		// TODO: glm::mat4 struct def
+
+		Variant scr_getScene(std::vector<Variant>) const;
+		Variant scr_getParent(std::vector<Variant>) const;
 
 	public:
-		static std::shared_ptr<GameObject> create(std::string name);
+		~GameObject();
+		static std::shared_ptr<GameObject> create();
 
+		Event::EventBus onRename = &EObjectRenamed::ClassData;
+		Event::EventBus onChildAdded = &EChildAdded::ClassData;
+		Event::EventBus onParented = &EParented::ClassData;
+		Event::EventBus onChildRemoved = &EChildRemoved::ClassData;
+		Event::EventBus onAddedToScene = &EAddedToScene::ClassData;
+		Event::EventBus onRemovedFromScene = &ERemovedFromScene::ClassData;
+		Event::EventBus onComponentAdded = &EComponentAdded::ClassData;
+		Event::EventBus onComponentRemoved = &EComponentRemoved::ClassData;
+		Event::EventBus onSceneUpdate = &ESceneUpdate::ClassData;
+		Event::EventBus onSceneDraw = &ESceneDraw::ClassData;
+
+		glm::vec3 position = { 0, 0, 0 };
+		glm::vec3 rotation = { 0, 0 ,0 };
+		glm::vec3 scale = { 1, 1, 1 };
+		
 		std::string getName() const;
+		void setName(std::string);
 
-		glm::mat4 getModelMatrix() const;
+		glm::mat4 calculateModelMatrix() const;
 
-		std::vector<std::shared_ptr<GameObject>> getChildren();
-		std::vector<std::shared_ptr<AObjectComponent>> getComponents();
+		std::shared_ptr<Scene> getScene() const;
+		std::shared_ptr<GameObject> getParent() const;
 
-		void addChild(std::shared_ptr<GameObject> child);
+		std::shared_ptr<GameObject> getChild(std::string);
+		void addChild(std::shared_ptr<GameObject>);
 		void removeChild(std::string name);
-		std::shared_ptr<GameObject> getChild(std::string name);
-		std::shared_ptr<GameObject> getChildFromPath(std::string path);
 
-		void addComponent(std::shared_ptr<AObjectComponent> component);
-		void removeComponent(std::shared_ptr<AObjectComponent> component);
+		std::vector<std::shared_ptr<Components::AMonoObjectComponent>> getMonoComponents() const;
+		std::vector<std::shared_ptr<Components::APolyObjectComponent>> getPolyComponents() const;
 
-		Event::EventBus onAddedToScene = &Events::EAddedToScene::ClassData;
-		Event::EventBus onRemovedFromScene = &Events::ERemovedFromScene::ClassData;
-
-		Event::EventBus onComponentAdded = &Events::EComponentAddedToObject::ClassData;
-		Event::EventBus onComponentRemoved = &Events::EComponentRemovedFromObject::ClassData;
-
-		Event::EventBus onChildAdded = &Events::EChildAdded::ClassData;
-		Event::EventBus onChildRemoved = &Events::EChildRemoved::ClassData;
-
-		void draw(Events::ESceneDraw& draw);
-
-		std::shared_ptr<AObjectComponent> getComponent(const Class* cls);
-		std::shared_ptr<AObjectComponent> getFirstOfType(const Class* cls);
-		std::vector<std::shared_ptr<AObjectComponent>> gatherComponentsOfType(const Class* cls);
-
-		Variant getPosition() const;
-		Variant getRotation() const;
-		Variant getScale() const;
+		std::shared_ptr<Components::AMonoObjectComponent> getMonoComponent(const Class* compCls);
+		std::shared_ptr<Components::APolyObjectComponent> getPolyComponent(const Class* compCls);
+		void addComponent(std::shared_ptr<Components::AObjectComponent>);
+		void removeComponent(const Class* compCls);
 	};
 }
