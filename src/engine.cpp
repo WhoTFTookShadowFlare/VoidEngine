@@ -6,6 +6,7 @@
 #include "ve/io/window_events.hpp"
 #include "ve/io/input.hpp"
 #include "ve/io/input_events.hpp"
+#include "ve/io/joystick.hpp"
 #include "ve/io/sfx/audio.hpp"
 #include "ve/io/gfx/renderer.hpp"
 #include "ve/math/rect2.hpp"
@@ -33,6 +34,9 @@
 #if defined(_WIN64) or defined(_WIN32)
 #include <Windows.h>
 #endif // _WIN64 or _WIN32
+
+// Engine internal includes
+#include "io/_joystick_internal.hpp"
 
 namespace VoidEngine {
 	std::shared_ptr<Engine> Engine::instance = nullptr;
@@ -70,7 +74,7 @@ namespace VoidEngine {
 
 		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 
-		SDL_Init(SDL_INIT_VIDEO);
+		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 
 		signal(SIGINT, sigHandler);
 		signal(SIGTERM, sigHandler);
@@ -252,6 +256,70 @@ namespace VoidEngine {
 					winPtr->onKeyButton.fireEvent(button);
 					input->onKeyButton.fireEvent(button);
 					} break;
+				case SDL_EVENT_JOYSTICK_ADDED: {
+					SDL_Joystick* ctrl = SDL_OpenJoystick(event.jdevice.which);
+					if(ctrl == nullptr) {
+						std::println("[ERR] [IO] Failed to open controller {} ({})", event.jdevice.which, SDL_GetError());
+						break;
+					}
+
+					auto dev = IO::HardwareJoystick::create();
+					dev->internal->ctrl = ctrl;
+					input->joysticks.push_back(dev);
+
+					auto evt = IO::Events::EJoystickConnected::create();
+					evt->joystick = dev;
+					input->onJoystickConnected.fireEvent(evt);
+					}; break;
+				case SDL_EVENT_JOYSTICK_REMOVED: {
+					SDL_Joystick* ctrl = nullptr;
+						
+					const auto iter = std::find_if(input->joysticks.cbegin(), input->joysticks.cend(), [&event](const std::shared_ptr<IO::AJoystick> dev) {
+						return SDL_GetJoystickID(dev->internal->ctrl) == event.jdevice.which;
+					});
+
+					if(iter == input->joysticks.cend()) {
+						std::println("[ERR] [IO] Missing controller {}", event.jdevice.which);
+						break;
+					}
+
+					ctrl = (*iter)->internal->ctrl;
+					if(ctrl == nullptr) {
+						break;
+					}
+
+					std::shared_ptr<IO::AJoystick> dev = *iter;
+					auto evt = IO::Events::EJoystickDisconnected::create();
+					evt->joystick = dev;
+					dev->onDisconnect.fireEvent(evt);
+
+					input->joysticks.erase(iter);
+					SDL_CloseJoystick(ctrl);
+					}; break;
+				case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+				case SDL_EVENT_JOYSTICK_BUTTON_UP: {
+					SDL_Joystick* ctrl = nullptr;
+						
+					const auto iter = std::find_if(input->joysticks.cbegin(), input->joysticks.cend(), [&event](const std::shared_ptr<IO::AJoystick> dev) {
+						return SDL_GetJoystickID(dev->internal->ctrl) == event.jbutton.which;
+					});
+
+					if(iter == input->joysticks.cend()) {
+						std::println("[ERR] [IO] Missing controller {}", event.jbutton.which);
+						break;
+					}
+
+					ctrl = (*iter)->internal->ctrl;
+					if(ctrl == nullptr) {
+						break;
+					}
+
+					auto evt = IO::Events::EJoystickButton::create();
+					evt->joystick = (*iter);
+					evt->button = event.jbutton.button;
+					evt->pressed = event.jbutton.down;
+					(*iter)->onButton.fireEvent(evt);
+				}; break;
 			}
 		}
 	}
