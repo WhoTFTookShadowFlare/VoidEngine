@@ -15,6 +15,8 @@ namespace VoidEngine::IO {
 		friend class ::VoidEngine::Engine;
 	private:
 		JoystickInternal* internal = nullptr;
+
+		Variant scr_getName(void) const;
 	protected:
 		AJoystick();
 	public:
@@ -22,8 +24,12 @@ namespace VoidEngine::IO {
 
 		virtual bool isButtonDown() = 0;
 
+		std::string getName() const;
+
 		Event::EventBus onDisconnect = &Events::EJoystickDisconnected::ClassData;
 		Event::EventBus onButton = &Events::EJoystickButton::ClassData;
+		Event::EventBus onAxis = &Events::EJoystickAxis::ClassData;
+		Event::EventBus onHat = &Events::EJoystickHat::ClassData;
 	};
 
 	class HardwareJoystick final : public AJoystick {

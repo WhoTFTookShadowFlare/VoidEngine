@@ -320,6 +320,52 @@ namespace VoidEngine {
 					evt->pressed = event.jbutton.down;
 					(*iter)->onButton.fireEvent(evt);
 				}; break;
+				case SDL_EVENT_JOYSTICK_AXIS_MOTION: {
+					SDL_Joystick* ctrl = nullptr;
+						
+					const auto iter = std::find_if(input->joysticks.cbegin(), input->joysticks.cend(), [&event](const std::shared_ptr<IO::AJoystick> dev) {
+						return SDL_GetJoystickID(dev->internal->ctrl) == event.jaxis.which;
+					});
+
+					if(iter == input->joysticks.cend()) {
+						std::println("[ERR] [IO] Missing controller {}", event.jaxis.which);
+						break;
+					}
+
+					ctrl = (*iter)->internal->ctrl;
+					if(ctrl == nullptr) {
+						break;
+					}
+
+					auto evt = IO::Events::EJoystickAxis::create();
+					evt->joystick = (*iter);
+					evt->axis = event.jaxis.axis;
+					evt->value = static_cast<float>((event.jaxis.value - SDL_JOYSTICK_AXIS_MIN) * (1.0f / (SDL_JOYSTICK_AXIS_MAX - SDL_JOYSTICK_AXIS_MIN))) * 2.0f - 1.0f;
+					(*iter)->onAxis.fireEvent(evt);
+				}; break;
+				case SDL_EVENT_JOYSTICK_HAT_MOTION: {
+					SDL_Joystick* ctrl = nullptr;
+						
+					const auto iter = std::find_if(input->joysticks.cbegin(), input->joysticks.cend(), [&event](const std::shared_ptr<IO::AJoystick> dev) {
+						return SDL_GetJoystickID(dev->internal->ctrl) == event.jhat.which;
+					});
+
+					if(iter == input->joysticks.cend()) {
+						std::println("[ERR] [IO] Missing controller {}", event.jhat.which);
+						break;
+					}
+
+					ctrl = (*iter)->internal->ctrl;
+					if(ctrl == nullptr) {
+						break;
+					}
+
+					auto evt = IO::Events::EJoystickHat::create();
+					evt->joystick = (*iter);
+					evt->hat = event.jhat.value;
+					evt->value = event.jhat.value;
+					(*iter)->onHat.fireEvent(evt);
+				}; break;
 			}
 		}
 	}

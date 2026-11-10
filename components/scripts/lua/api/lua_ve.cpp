@@ -13,7 +13,7 @@ namespace VoidEngine::Scripts::Lua::API {
 		const Class* cls = lua_checkClass(state, 2)->cls;
 
 		if (cls->getSuper()->isAbstract()) {
-			luaL_argerror(state, 2, "Class must not be abstract");
+			luaL_argerror(state, 2, "Parent class is missing a constructor");
 			return 0;
 		}
 

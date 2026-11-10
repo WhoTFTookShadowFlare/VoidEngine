@@ -97,4 +97,65 @@ namespace VoidEngine::IO::Events {
 	bool EJoystickButton::wasPressed() const {
 		return pressed;
 	}
+
+	const Class EJoystickAxis::ClassData = {
+		.name = "EJoystickAxis",
+		.super = &AJoystickEvent::ClassData,
+		.properties = {
+			new NativeProperty("axis", &EJoystickAxis::scr_getAxis),
+			new NativeProperty("value", &EJoystickAxis::scr_getValue)
+		},
+		.constructor = new NativeConstructor(&EJoystickAxis::create),
+		.flags = ClassFlags::FINAL
+	};
+
+	Variant EJoystickAxis::scr_getAxis(void) const {
+		return getAxis();
+	}
+
+	Variant EJoystickAxis::scr_getValue(void) const {
+		return getValue();
+	}
+
+	std::shared_ptr<EJoystickAxis> EJoystickAxis::create() {
+		return std::shared_ptr<EJoystickAxis>(new EJoystickAxis);
+	}
+
+	uint8_t EJoystickAxis::getAxis() const {
+		return axis;
+	}
+
+	float EJoystickAxis::getValue() const {
+		return value;
+	}
+
+	const Class EJoystickHat::ClassData = {
+		.name = "EJoystickHat",
+		.super = &AJoystickEvent::ClassData,
+		.properties = {
+			new NativeProperty("hat", &EJoystickHat::scr_getHat),
+			new NativeProperty("value", &EJoystickHat::scr_getValue),
+		},
+		.constructor = new NativeConstructor(&EJoystickHat::create)
+	};
+
+	Variant EJoystickHat::scr_getHat(void) const {
+		return getHat();
+	}
+
+	Variant EJoystickHat::scr_getValue(void) const {
+		return getValue();
+	}
+
+	std::shared_ptr<EJoystickHat> EJoystickHat::create() {
+		return std::shared_ptr<EJoystickHat>(new EJoystickHat);
+	}
+
+	uint8_t EJoystickHat::getHat() const {
+		return hat;
+	}
+
+	uint8_t EJoystickHat::getValue() const {
+		return value;
+	}
 }

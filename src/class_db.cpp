@@ -54,6 +54,8 @@ namespace VoidEngine {
 		registerClass(&IO::Events::EJoystickConnected::ClassData);
 		registerClass(&IO::Events::EJoystickDisconnected::ClassData);
 		registerClass(&IO::Events::EJoystickButton::ClassData);
+		registerClass(&IO::Events::EJoystickAxis::ClassData);
+		registerClass(&IO::Events::EJoystickHat::ClassData);
 
 		registerClass(&IO::AJoystick::ClassData);
 		registerClass(&IO::HardwareJoystick::ClassData);

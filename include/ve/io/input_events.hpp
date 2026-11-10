@@ -110,4 +110,40 @@ namespace VoidEngine::IO::Events {
 		uint8_t getButton() const;
 		bool wasPressed() const;
 	};
+
+	class EJoystickAxis final : public AJoystickEvent {
+		friend class ::VoidEngine::Engine;
+		VE_CLASS(EJoystickAxis)
+	private:
+		EJoystickAxis() = default;
+
+		uint8_t axis = 0;
+		float value = 0.0f;
+
+		Variant scr_getAxis(void) const;
+		Variant scr_getValue(void) const;
+	public:
+		static std::shared_ptr<EJoystickAxis> create();
+
+		uint8_t getAxis() const;
+		float getValue() const;
+	};
+
+	class EJoystickHat final : public AJoystickEvent {
+		friend class ::VoidEngine::Engine;
+		VE_CLASS(EJoystickHat)
+	private:
+		EJoystickHat() = default;
+
+		uint8_t hat;
+		uint8_t value;
+
+		Variant scr_getHat(void) const;
+		Variant scr_getValue(void) const;
+	public:
+		static std::shared_ptr<EJoystickHat> create();
+
+		uint8_t getHat() const;
+		uint8_t getValue() const;
+	};
 }
