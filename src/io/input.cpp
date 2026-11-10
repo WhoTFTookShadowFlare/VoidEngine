@@ -7,4 +7,8 @@ namespace VoidEngine::IO {
 		if(instance == nullptr) instance = std::shared_ptr<Input>(new Input());
 		return instance;
 	}
+
+	std::vector<std::shared_ptr<AJoystick>> Input::getJoysticks() {
+		return joysticks;
+	}
 }

@@ -5,6 +5,8 @@
 #include "ve/io/res_providers/mesh/a_provider.hpp"
 #include "ve/io/res_providers/texture/a_provider.hpp"
 #include "ve/io/window_events.hpp"
+#include "ve/io/input_events.hpp"
+#include "ve/io/joystick.hpp"
 #include "ve/object.hpp"
 
 #include "ve/scene/scene.hpp"
@@ -45,6 +47,19 @@ namespace VoidEngine {
 		registerClass(&IO::Events::EWindowRepositioned::ClassData);
 		registerClass(&IO::Events::EMouseEnter::ClassData);
 		registerClass(&IO::Events::EWindowFocus::ClassData);
+
+		registerClass(&IO::Events::EMouseMotion::ClassData);
+		registerClass(&IO::Events::EMouseButton::ClassData);
+		registerClass(&IO::Events::EKeyButton::ClassData);
+		registerClass(&IO::Events::EJoystickConnected::ClassData);
+		registerClass(&IO::Events::EJoystickDisconnected::ClassData);
+		registerClass(&IO::Events::EJoystickButton::ClassData);
+		registerClass(&IO::Events::EJoystickAxis::ClassData);
+		registerClass(&IO::Events::EJoystickHat::ClassData);
+
+		registerClass(&IO::AJoystick::ClassData);
+		registerClass(&IO::HardwareJoystick::ClassData);
+		registerClass(&IO::SoftwareJoystick::ClassData);
 
 		registerClass(&IO::Events::WindowCloseRequestedDefaultHandler::ClassData);
 
